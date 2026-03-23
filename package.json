@@ -4,9 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run generate-manifest && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "validate": "npx tsx scripts/validate.ts",
+    "check-duplicates": "npx tsx scripts/check-duplicates.ts",
+    "sanity-check": "npx tsx scripts/sanity-check.ts",
+    "generate-manifest": "npx tsx scripts/generate-manifest.ts",
+    "test": "vitest --run"
   },
   "dependencies": {
     "next": "16.2.1",
@@ -15,12 +20,18 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "ajv": "^8.18.0",
+    "ajv-formats": "^3.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
+    "fast-check": "^4.6.0",
+    "js-yaml": "^4.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.1"
   }
 }

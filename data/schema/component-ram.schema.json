@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "component-ram.schema.json",
+  "title": "RAM Component",
+  "description": "Schema for RAM component YAML data files",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "manufacturer",
+    "model",
+    "interface",
+    "capacity",
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier matching the filename stem"
+    },
+    "type": {
+      "type": "string",
+      "const": "ram"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "interface": {
+      "type": "object",
+      "required": ["type", "speed_mhz", "base_speed_mhz"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["DDR4", "DDR5"]
+        },
+        "speed_mhz": {
+          "type": "number"
+        },
+        "base_speed_mhz": {
+          "type": "number"
+        }
+      }
+    },
+    "capacity": {
+      "type": "object",
+      "required": ["per_module_gb", "modules", "total_gb"],
+      "additionalProperties": false,
+      "properties": {
+        "per_module_gb": {
+          "type": "number"
+        },
+        "modules": {
+          "type": "integer"
+        },
+        "total_gb": {
+          "type": "number"
+        }
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  }
+}

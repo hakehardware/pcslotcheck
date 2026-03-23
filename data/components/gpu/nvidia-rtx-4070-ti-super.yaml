@@ -1,0 +1,14 @@
+id: nvidia-rtx-4070-ti-super
+type: gpu
+manufacturer: NVIDIA
+model: GeForce RTX 4070 Ti SUPER
+interface:
+  pcie_gen: 4
+  lanes: 16
+physical:
+  slot_width: 2
+  length_mm: 304
+power:
+  tdp_w: 285
+  recommended_psu_w: 700
+schema_version: "1.0"

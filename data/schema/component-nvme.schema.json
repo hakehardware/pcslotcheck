@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "component-nvme.schema.json",
+  "title": "NVMe Component",
+  "description": "Schema for NVMe drive component YAML data files",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "manufacturer",
+    "model",
+    "interface",
+    "form_factor",
+    "capacity_gb",
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier matching the filename stem"
+    },
+    "type": {
+      "type": "string",
+      "const": "nvme"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "interface": {
+      "type": "object",
+      "required": ["protocol", "pcie_gen", "lanes"],
+      "additionalProperties": false,
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "enum": ["NVMe", "SATA"]
+        },
+        "pcie_gen": {
+          "oneOf": [
+            { "type": "integer" },
+            { "type": "null" }
+          ]
+        },
+        "lanes": {
+          "oneOf": [
+            { "type": "integer" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "form_factor": {
+      "type": "string"
+    },
+    "capacity_gb": {
+      "type": "number"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  }
+}

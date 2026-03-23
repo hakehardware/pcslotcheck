@@ -1,0 +1,36 @@
+name: Validate PR Data
+
+on:
+  pull_request:
+    paths:
+      - 'data/**'
+
+jobs:
+  validate:
+    name: Validate Data Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate changed YAML files
+        run: npm run validate -- --changed-only
+
+      - name: Check for duplicate IDs
+        run: npm run check-duplicates
+
+      - name: Sanity check value ranges
+        run: npm run sanity-check
+
+      - name: Run tests
+        run: npm run test

@@ -1,0 +1,11 @@
+id: samsung-990-pro-2tb
+type: nvme
+manufacturer: Samsung
+model: 990 PRO 2TB
+interface:
+  protocol: NVMe
+  pcie_gen: 5
+  lanes: 4
+form_factor: "2280"
+capacity_gb: 2000
+schema_version: "1.0"

@@ -1,0 +1,158 @@
+id: asus-rog-strix-z890-f-gaming-wifi
+manufacturer: ASUS
+model: ROG STRIX Z890-F GAMING WIFI
+chipset: Z890
+socket: LGA1851
+form_factor: ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 9066
+  base_speed_mhz: 4800
+  max_capacity_gb: 256
+  ecc_support: false
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a1
+      - dimm_a2
+      - dimm_b1
+      - dimm_b2
+
+m2_slots:
+  - id: m2_1
+    label: M.2_1 (CPU)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+      - "22110"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M.2_2 (CPU)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_3
+    label: M.2_3 (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_4
+    label: M.2_4 (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2280"
+      - "22110"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_5
+    label: M.2_5 (Chipset)
+    interface: PCIe_or_SATA
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: true
+    heatsink_included: false
+    sharing:
+      - type: disables
+        targets:
+          - sata_1
+          - sata_2
+        condition: M.2_5 is populated with a SATA device
+        effect: SATA ports 1 and 2 are disabled
+
+pcie_slots:
+  - id: pcie_1
+    label: PCIEX16_1 (CPU)
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_2
+    label: PCIEX16_2 (Chipset)
+    gen: 4
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: m2_5
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: m2_5
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manufacturer
+    url: https://rog.asus.com/us/motherboards/rog-strix/rog-strix-z890-f-gaming-wifi/spec/

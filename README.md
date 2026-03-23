@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PCSlotCheck
 
-## Getting Started
+An open-source PC component slot compatibility checker. Select a motherboard, assign components (NVMe drives, GPUs, RAM, SATA devices) to specific physical slots, and get warnings about mismatches, suboptimal placements, and bottlenecks.
 
-First, run the development server:
+Unlike broad compatibility tools, PCSlotCheck operates at the **slot level** — catching issues like a Gen5 NVMe in a Gen4 slot, M.2 slots disabling SATA ports, or RAM in non-optimal DIMM slots.
+
+## Quick Start
 
 ```bash
+# Install dependencies
+npm ci
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start the development server |
+| `npm run build` | Generate data manifest and build for production |
+| `npm run start` | Start the production server |
+| `npm run lint` | Run ESLint |
+| `npm run validate` | Validate all YAML data against schemas |
+| `npm run validate -- --changed-only` | Validate only changed YAML files (used in CI) |
+| `npm run check-duplicates` | Check for duplicate IDs across data files |
+| `npm run sanity-check` | Flag values outside reasonable ranges |
+| `npm run generate-manifest` | Compile YAML data into static JSON |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+pcslotcheck/
+├── data/                    # YAML hardware data (source of truth)
+│   ├── motherboards/        # Organized by manufacturer
+│   ├── components/          # nvme/, gpu/, ram/, sata/
+│   └── schema/              # JSON Schema definitions
+├── scripts/                 # Data pipeline scripts (TypeScript)
+├── src/
+│   ├── app/                 # Next.js App Router pages
+│   ├── lib/                 # Shared modules (types, validation, sharing)
+│   └── components/          # Reusable React UI components
+└── tests/                   # Unit and property-based tests
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework**: Next.js 16 (App Router) with TypeScript
+- **Styling**: Tailwind CSS v4
+- **Hosting**: Vercel
+- **Data**: YAML files compiled to static JSON at build time (Phase 1)
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add motherboard and component data via YAML files.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+Open source. See repository for license details.

@@ -1,0 +1,167 @@
+id: msi-mag-x870-tomahawk-wifi
+manufacturer: MSI
+model: MAG X870 TOMAHAWK WIFI
+chipset: X870
+socket: AM5
+form_factor: ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 8400
+  base_speed_mhz: 4800
+  max_capacity_gb: 256
+  ecc_support: false
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a1
+      - dimm_a2
+      - dimm_b1
+      - dimm_b2
+
+m2_slots:
+  - id: m2_1
+    label: M2_1 (CPU)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2280"
+      - "22110"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2_2 (CPU)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: bandwidth_split
+        target: usb_40gbps_c
+        condition: M.2_2 is populated
+        effect: USB 40Gbps Type-C ports operate at PCIe 5.0 x2
+
+  - id: m2_3
+    label: M2_3 (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 2
+    form_factors:
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: bandwidth_split
+        target: pcie_3
+        condition: M.2_3 is populated
+        effect: PCI_E3 slot operates at x2 instead of x4
+
+  - id: m2_4
+    label: M2_4 (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: disables
+        targets:
+          - sata_3
+          - sata_4
+        condition: M.2_4 is populated
+        effect: SATA ports 3 and 4 are disabled
+
+pcie_slots:
+  - id: pcie_1
+    label: PCI_E1 (CPU)
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_2
+    label: PCI_E2 (Chipset)
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+  - id: pcie_3
+    label: PCI_E3 (Chipset)
+    gen: 4
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing:
+      - type: bandwidth_split
+        target: m2_3
+        condition: M.2_3 is populated
+        effect: PCI_E3 operates at x2 instead of x4
+
+sata_ports:
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: m2_4
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: m2_4
+
+sources:
+  - type: manufacturer
+    url: https://us.msi.com/Motherboard/MAG-X870-TOMAHAWK-WIFI/Specification
+  - type: review
+    url: https://www.techreviewer.com/tech-specs/msi-mag-x870-tomahawk-wifi-motherboard-specs/

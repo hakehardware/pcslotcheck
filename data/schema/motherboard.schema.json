@@ -1,0 +1,261 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "motherboard.schema.json",
+  "title": "Motherboard",
+  "description": "Schema for motherboard YAML data files",
+  "type": "object",
+  "required": [
+    "id",
+    "manufacturer",
+    "model",
+    "chipset",
+    "socket",
+    "form_factor",
+    "memory",
+    "m2_slots",
+    "pcie_slots",
+    "sata_ports",
+    "sources",
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier matching the filename stem"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "chipset": {
+      "type": "string"
+    },
+    "socket": {
+      "type": "string"
+    },
+    "form_factor": {
+      "type": "string",
+      "enum": ["ATX", "Micro-ATX", "Mini-ITX", "E-ATX"]
+    },
+    "memory": {
+      "$ref": "#/definitions/MemoryConfig"
+    },
+    "m2_slots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/M2Slot"
+      }
+    },
+    "pcie_slots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PCIeSlot"
+      }
+    },
+    "sata_ports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SATAPort"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Source"
+      },
+      "minItems": 1
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "MemorySlot": {
+      "type": "object",
+      "required": ["id", "channel", "position", "recommended"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "channel": { "type": "string", "enum": ["A", "B"] },
+        "position": { "type": "integer" },
+        "recommended": { "type": "boolean" }
+      }
+    },
+    "MemoryConfig": {
+      "type": "object",
+      "required": [
+        "type",
+        "max_speed_mhz",
+        "base_speed_mhz",
+        "max_capacity_gb",
+        "ecc_support",
+        "channels",
+        "slots",
+        "recommended_population"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["DDR4", "DDR5"]
+        },
+        "max_speed_mhz": { "type": "number" },
+        "base_speed_mhz": { "type": "number" },
+        "max_capacity_gb": { "type": "number" },
+        "ecc_support": { "type": "boolean" },
+        "channels": { "type": "integer" },
+        "slots": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/MemorySlot" }
+        },
+        "recommended_population": {
+          "type": "object",
+          "required": ["two_dimm"],
+          "additionalProperties": false,
+          "properties": {
+            "two_dimm": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "four_dimm": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "SharingRule": {
+      "type": "object",
+      "required": ["type", "condition"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["disables", "bandwidth_split"]
+        },
+        "targets": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "target": { "type": "string" },
+        "condition": { "type": "string" },
+        "effect": { "type": "string" }
+      }
+    },
+    "M2Slot": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "interface",
+        "gen",
+        "lanes",
+        "form_factors",
+        "source",
+        "supports_sata",
+        "heatsink_included",
+        "sharing"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "interface": {
+          "type": "string",
+          "enum": ["PCIe", "SATA", "PCIe_or_SATA"]
+        },
+        "gen": { "type": "integer" },
+        "lanes": { "type": "integer" },
+        "form_factors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "source": {
+          "type": "string",
+          "enum": ["CPU", "Chipset"]
+        },
+        "supports_sata": { "type": "boolean" },
+        "heatsink_included": { "type": "boolean" },
+        "sharing": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "$ref": "#/definitions/SharingRule" }
+            },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "PCIeSlot": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "gen",
+        "electrical_lanes",
+        "physical_size",
+        "source",
+        "reinforced",
+        "sharing"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "gen": { "type": "integer" },
+        "electrical_lanes": { "type": "integer" },
+        "physical_size": {
+          "type": "string",
+          "enum": ["x1", "x4", "x8", "x16"]
+        },
+        "source": {
+          "type": "string",
+          "enum": ["CPU", "Chipset"]
+        },
+        "reinforced": { "type": "boolean" },
+        "sharing": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "$ref": "#/definitions/SharingRule" }
+            },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "SATAPort": {
+      "type": "object",
+      "required": ["id", "version", "source", "disabled_by"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" },
+        "source": {
+          "type": "string",
+          "enum": ["CPU", "Chipset"]
+        },
+        "disabled_by": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "Source": {
+      "type": "object",
+      "required": ["type", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string" },
+        "url": { "type": "string", "format": "uri" }
+      }
+    }
+  }
+}
