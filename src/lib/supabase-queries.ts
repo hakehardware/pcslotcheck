@@ -15,8 +15,8 @@ import type {
   MotherboardPageResult,
   FilterOptions,
 } from "./types";
-import type { MotherboardRow, SlotRow, PerTypeComponentRow } from "../../scripts/sync";
-import { COMPONENT_TABLE_MAP, reconstructComponent } from "../../scripts/sync";
+import type { MotherboardRow, SlotRow, PerTypeComponentRow } from "./db-types";
+import { COMPONENT_TABLE_MAP, reconstructComponent } from "./db-types";
 
 /**
  * Reassembles flat DB rows (motherboard row + slot rows) back into the

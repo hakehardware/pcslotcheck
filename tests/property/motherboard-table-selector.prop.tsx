@@ -68,7 +68,7 @@ function uniqueMotherboardArrayArb(
 /** Helper to set up mocks and render the component, waiting for table to appear */
 async function renderWithMockedData(
   items: MotherboardSummary[],
-  props: { selectedBoardId?: string | null; onSelectBoard?: ReturnType<typeof vi.fn> } = {}
+  props: { selectedBoardId?: string | null; onSelectBoard?: (boardId: string) => void } = {}
 ) {
   vi.clearAllMocks();
   mockedFetchPage.mockResolvedValue({ rows: items, totalCount: items.length });
@@ -77,7 +77,7 @@ async function renderWithMockedData(
     chipsets: [...new Set(items.map((r) => r.chipset))].sort(),
   });
 
-  const onSelectBoard = props.onSelectBoard ?? vi.fn();
+  const onSelectBoard = props.onSelectBoard ?? vi.fn<(boardId: string) => void>();
   const result = render(
     <MotherboardTable
       selectedBoardId={props.selectedBoardId ?? null}
