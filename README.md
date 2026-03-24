@@ -26,7 +26,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## How Data Works
 
-All hardware data lives as YAML files in `data/` — that's the source of truth. At build time, YAML gets compiled to static JSON that the app serves. No database needed (Phase 1).
+All hardware data lives as YAML files in `data/` — that's the source of truth. The database is a derived artifact that's kept in sync automatically.
+
+**The flow:** YAML in git → merge to main → GitHub Action validates and syncs to Supabase → app reads from Supabase.
 
 Want to add a motherboard or component? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -40,8 +42,9 @@ Want to add a motherboard or component? See [CONTRIBUTING.md](CONTRIBUTING.md).
 | `npm run validate -- --changed-only` | Validate only changed files (CI) |
 | `npm run check-duplicates` | Check for duplicate IDs |
 | `npm run sanity-check` | Flag out-of-range values |
-| `npm run generate-manifest` | Compile YAML → static JSON |
-| `npm run test` | Run all tests |
+| `npm run generate-manifest` | Compile YAML → static JSON manifest |
+| `npm run sync` | Sync YAML data to Supabase |
+| `npm test` | Run all tests |
 
 ## Project Structure
 
@@ -64,21 +67,22 @@ tests/
 
 - Next.js 16 (App Router) + TypeScript
 - Tailwind CSS v4
+- Supabase (Postgres) with RLS
 - Vitest + fast-check for testing
-- YAML → JSON build pipeline with schema validation
-- GitHub Actions CI
+- YAML → Supabase sync pipeline with schema validation
+- GitHub Actions CI (PR validation + auto-sync on merge)
 - Vercel hosting
 
 ## Contributing
 
-The easiest way to help is adding motherboard and component data. Each board is a single YAML file — no code changes needed. PRs are validated automatically by CI.
+The easiest way to help is adding motherboard and component data. Each board is a single YAML file — no code changes needed. PRs are validated automatically by CI, and merged data syncs to the live database automatically.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ## Roadmap
 
-- **Phase 1** (current): Static data, client-side validation, ~10-20 boards
-- **Phase 2**: Database + sync pipeline, 100+ boards, search, contribution form
+- **Phase 1** ✅: Static data, client-side validation, seed boards
+- **Phase 2** (current): Database + sync pipeline, 100+ boards, search, contribution form
 - **Phase 3**: LLM build analysis, saved builds, bottleneck scoring
 - **Phase 4**: Laptops, servers, historical boards, public API
 

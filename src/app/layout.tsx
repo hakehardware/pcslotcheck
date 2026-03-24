@@ -55,6 +55,14 @@ export default function RootLayout({
                   Slot Checker
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/support"
+                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                >
+                  Support
+                </Link>
+              </li>
             </ul>
           </nav>
         </header>
