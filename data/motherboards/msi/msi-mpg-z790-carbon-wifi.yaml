@@ -1,14 +1,14 @@
-id: msi-mag-x870-tomahawk-wifi
+id: msi-mpg-z790-carbon-wifi
 manufacturer: MSI
-model: MAG X870 TOMAHAWK WIFI
-chipset: AMD X870
-socket: AM5
+model: MPG Z790 CARBON WIFI
+chipset: Intel Z790
+socket: LGA 1700
 form_factor: ATX
 schema_version: "2.0"
 
 memory:
   type: DDR5
-  max_speed_mhz: 8400
+  max_speed_mhz: 7800
   base_speed_mhz: 4800
   max_capacity_gb: 256
   ecc_support: false
@@ -44,10 +44,10 @@ m2_slots:
   - id: m2_1
     label: M2_1 (CPU)
     interface: PCIe
-    gen: 5
+    gen: 4
     lanes: 4
     form_factors:
-      - "22110"
+      - "2260"
       - "2280"
     source: CPU
     supports_sata: false
@@ -60,6 +60,7 @@ m2_slots:
     gen: 5
     lanes: 4
     form_factors:
+      - "22110"
       - "2260"
       - "2280"
     source: CPU
@@ -73,30 +74,21 @@ m2_slots:
           slot_ids:
             - m2_2
           logic: any_populated
-        condition: M2_2 slot has device installed and USB4 40Gbps ports active
-        effect: Both USB4 and M2_2 run at PCIe 5.0 x2
+        condition: M.2 PCIe SSD installed in M2_2 slot
+        effect: PCI_E1 will operate at Gen5 x8 speed
 
   - id: m2_3
     label: M2_3 (Chipset)
     interface: PCIe
     gen: 4
-    lanes: 2
+    lanes: 4
     form_factors:
       - "2260"
       - "2280"
     source: Chipset
     supports_sata: false
     heatsink_included: true
-    sharing:
-      - type: bandwidth_split
-        target: pcie_3
-        direction: m2_to_pcie
-        trigger:
-          slot_ids:
-            - m2_3
-          logic: any_populated
-        condition: M2_3 slot has device installed
-        effect: PCI_E3 runs at x2 speed
+    sharing: null
 
   - id: m2_4
     label: M2_4 (Chipset)
@@ -108,6 +100,19 @@ m2_slots:
       - "2280"
     source: Chipset
     supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_5
+    label: M2_5 (Chipset)
+    interface: PCIe_or_SATA
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: true
     heatsink_included: true
     sharing: null
 
@@ -143,6 +148,26 @@ pcie_slots:
     sharing: null
 
 sata_ports:
+  - id: sata_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_6
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_7
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_8
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
   - id: sata_a1
     version: "3.0"
     source: Chipset
@@ -153,18 +178,8 @@ sata_ports:
     source: Chipset
     disabled_by: null
 
-  - id: sata_a3
-    version: "3.0"
-    source: Chipset
-    disabled_by: null
-
-  - id: sata_a4
-    version: "3.0"
-    source: Chipset
-    disabled_by: null
-
 sources:
   - type: manual
-    url: https://download.msi.com/archive/mnu_exe/mb/MAGX870TOMAHAWKWIFI_English.pdf
+    url: https://download.msi.com/archive/mnu_exe/mb/MPGZ790CARBONWIFI.pdf
   - type: manufacturer
-    url: https://www.msi.com/Motherboard/MAG-X870-TOMAHAWK-WIFI/Specification
+    url: https://www.msi.com/Motherboard/MPG-Z790-CARBON-WIFI/Specification
