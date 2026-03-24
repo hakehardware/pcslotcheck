@@ -1,0 +1,119 @@
+id: gigabyte-b650-eagle-ax
+manufacturer: Gigabyte
+model: B650 EAGLE AX
+chipset: AMD B650
+socket: AM5
+form_factor: ATX
+schema_version: "2.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 6400
+  base_speed_mhz: 4800
+  max_capacity_gb: 192
+  ecc_support: false
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a2
+      - dimm_b2
+      - dimm_a1
+      - dimm_b1
+
+m2_slots:
+  - id: m2_1
+    label: M2A_CPU
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+      - "25110"
+      - "2580"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2P_CPU
+    interface: PCIe
+    gen: 4
+    lanes: 2
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: false
+    sharing: null
+
+  - id: m2_3
+    label: M2C_SB
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+pcie_slots:
+  - id: pcie_1
+    label: PCIEX16
+    position: 1
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+sata_ports:
+  - id: sata_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manufacturer
+    url: https://www.gigabyte.com/Motherboard/B650-EAGLE-AX
