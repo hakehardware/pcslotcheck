@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { fetchMotherboardPage } from "../lib/supabase-queries";
 import type { MotherboardSummary } from "../lib/types";
+import BoardCardContent from "./BoardCardContent";
 
 interface SearchBarProps {
   placeholder?: string;
@@ -172,14 +173,13 @@ export default function SearchBar({
                   : "text-zinc-300 hover:bg-zinc-800/60"
               }`}
             >
-              <div className="font-medium text-zinc-100">
-                {board.manufacturer} {board.model}
-              </div>
-              <div className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-zinc-400">
-                <span>{board.chipset}</span>
-                <span>{board.socket}</span>
-                <span>{board.form_factor}</span>
-              </div>
+              <BoardCardContent
+                manufacturer={board.manufacturer}
+                model={board.model}
+                chipset={board.chipset}
+                socket={board.socket}
+                formFactor={board.form_factor}
+              />
             </li>
           ))}
         </ul>

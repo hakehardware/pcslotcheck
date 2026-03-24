@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import SlotChecker from "./SlotChecker";
-import { fetchMotherboardPage } from "@/lib/supabase-queries";
+import { fetchMotherboardSummaryById } from "@/lib/supabase-queries";
 import type { DataManifest, MotherboardSummary } from "@/lib/types";
 
 interface CheckPageClientProps {
@@ -30,17 +30,10 @@ export default function CheckPageClient({
       setLoading(true);
       setBoardNotFound(false);
       try {
-        // Search for the exact board ID by querying with the ID as search text
-        // and checking results for an exact match
-        const result = await fetchMotherboardPage({
-          page: 1,
-          pageSize: 50,
-          search: boardId!,
-        });
-        const match = result.rows.find((r) => r.id === boardId);
+        const result = await fetchMotherboardSummaryById(boardId!);
         if (!cancelled) {
-          if (match) {
-            setBoardSummary(match);
+          if (result) {
+            setBoardSummary(result);
           } else {
             setBoardNotFound(true);
           }

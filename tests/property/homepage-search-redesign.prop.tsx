@@ -17,6 +17,7 @@ vi.mock("../../src/lib/supabase-queries", () => ({
   fetchMotherboardFromSupabase: vi.fn(),
   fetchComponentFromSupabase: vi.fn(),
   fetchMotherboardPage: vi.fn(),
+  fetchMotherboardSummaryById: vi.fn(),
   fetchFilterOptions: vi.fn(),
   assembleMotherboard: vi.fn(),
 }));
@@ -25,12 +26,14 @@ import {
   fetchMotherboardFromSupabase,
   fetchFilterOptions,
   fetchMotherboardPage,
+  fetchMotherboardSummaryById,
 } from "../../src/lib/supabase-queries";
 import SlotChecker from "../../src/components/SlotChecker";
 
 const mockedFetchBoard = fetchMotherboardFromSupabase as ReturnType<typeof vi.fn>;
 const mockedFetchPage = fetchMotherboardPage as ReturnType<typeof vi.fn>;
 const mockedFetchFilters = fetchFilterOptions as ReturnType<typeof vi.fn>;
+const mockedFetchSummaryById = fetchMotherboardSummaryById as ReturnType<typeof vi.fn>;
 
 // Minimal valid DataManifest for rendering SlotChecker
 const emptyManifest: DataManifest = {
@@ -850,6 +853,7 @@ describe("Property 9: Board heading contains manufacturer and model", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedFetchBoard.mockResolvedValue(null);
+    mockedFetchSummaryById.mockResolvedValue(null);
     mockedFetchPage.mockResolvedValue({ rows: [], totalCount: 0 });
     mockedFetchFilters.mockResolvedValue({ manufacturers: [], chipsets: [] });
   });
@@ -863,12 +867,9 @@ describe("Property 9: Board heading contains manufacturer and model", () => {
       fc.asyncProperty(motherboardSummaryArb, async (board) => {
         vi.clearAllMocks();
 
-        // Mock fetchMotherboardPage to return the generated board
-        // so CheckPageClient finds an exact ID match
-        mockedFetchPage.mockResolvedValue({
-          rows: [board],
-          totalCount: 1,
-        });
+        // Mock fetchMotherboardSummaryById to return the generated board
+        // so CheckPageClient resolves the board by direct ID lookup
+        mockedFetchSummaryById.mockResolvedValue(board);
 
         const manifest: DataManifest = {
           motherboards: [],

@@ -3,12 +3,13 @@ import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 
-const { mockRedirect, mockPush, mockFetchMotherboardPage } = vi.hoisted(() => ({
+const { mockRedirect, mockPush, mockFetchMotherboardPage, mockFetchMotherboardSummaryById } = vi.hoisted(() => ({
   mockRedirect: vi.fn(() => {
     throw new Error("NEXT_REDIRECT");
   }),
   mockPush: vi.fn(),
   mockFetchMotherboardPage: vi.fn().mockResolvedValue({ rows: [], totalCount: 0 }),
+  mockFetchMotherboardSummaryById: vi.fn().mockResolvedValue(null),
 }));
 
 // Mock next/link to render a plain <a> tag
@@ -50,6 +51,7 @@ vi.mock("../../src/lib/supabase-queries", () => ({
   fetchMotherboardFromSupabase: vi.fn(),
   fetchComponentFromSupabase: vi.fn(),
   fetchMotherboardPage: (...args: unknown[]) => mockFetchMotherboardPage(...args),
+  fetchMotherboardSummaryById: (...args: unknown[]) => mockFetchMotherboardSummaryById(...args),
   fetchFilterOptions: vi.fn(),
   assembleMotherboard: vi.fn(),
 }));
@@ -235,10 +237,7 @@ describe("Check page Change Motherboard link", () => {
       socket: "LGA1851",
       form_factor: "ATX",
     };
-    mockFetchMotherboardPage.mockResolvedValue({
-      rows: [boardRow],
-      totalCount: 1,
-    });
+    mockFetchMotherboardSummaryById.mockResolvedValue(boardRow);
 
     render(
       <CheckPageClient

@@ -1,6 +1,7 @@
 "use client";
 
 import type { DataManifest } from "../lib/types";
+import BoardCardContent from "./BoardCardContent";
 
 interface BoardSelectorProps {
   boards: DataManifest["motherboards"];
@@ -37,14 +38,13 @@ export default function BoardSelector({
                 : "border-zinc-700 bg-zinc-900 hover:border-zinc-500 hover:bg-zinc-800"
             } focus:border-blue-500 focus:ring-1 focus:ring-blue-500`}
           >
-            <div className="text-sm font-semibold text-zinc-100">
-              {board.manufacturer} {board.model}
-            </div>
-            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-400">
-              <span>{board.chipset}</span>
-              <span>{board.socket}</span>
-              <span>{board.form_factor}</span>
-            </div>
+            <BoardCardContent
+              manufacturer={board.manufacturer}
+              model={board.model}
+              chipset={board.chipset}
+              socket={board.socket}
+              formFactor={board.form_factor}
+            />
           </button>
         );
       })}

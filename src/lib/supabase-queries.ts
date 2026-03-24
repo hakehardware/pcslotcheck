@@ -154,6 +154,26 @@ export async function fetchComponentFromSupabase(
 }
 
 /**
+ * Fetches a single motherboard summary by its exact ID.
+ * Returns a lightweight MotherboardSummary or null when no row matches.
+ */
+export async function fetchMotherboardSummaryById(
+  id: string
+): Promise<MotherboardSummary | null> {
+  const { supabase } = await import("./supabase");
+
+  const { data, error } = await supabase
+    .from("motherboards")
+    .select("id, manufacturer, model, chipset, socket, form_factor")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return null;
+
+  return data as MotherboardSummary;
+}
+
+/**
  * Fetches a paginated, filtered, searchable page of motherboards from Supabase.
  * Supports manufacturer/chipset exact-match filters and case-insensitive
  * text search across manufacturer, model, chipset, and socket columns.
