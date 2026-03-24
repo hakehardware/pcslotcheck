@@ -21,6 +21,7 @@ import type { SlotCategory } from "../lib/ui-types";
 
 interface SlotCheckerProps {
   manifest: DataManifest;
+  boardId?: string | null;
 }
 
 /**
@@ -37,7 +38,7 @@ function getSlotCategory(
   return null;
 }
 
-export default function SlotChecker({ manifest }: SlotCheckerProps) {
+export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
   // Core state
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
   const [motherboard, setMotherboard] = useState<Motherboard | null>(null);
@@ -106,6 +107,16 @@ export default function SlotChecker({ manifest }: SlotCheckerProps) {
 
     fetchRestoredBoard(decoded.motherboardId);
   }, [searchParams, manifest.motherboards]);
+
+  // Auto-fetch board when boardId prop is provided and ?build= did not restore
+  useEffect(() => {
+    if (!boardId) return;
+    // build param takes priority — if it already restored, skip
+    if (selectedBoardId) return;
+
+    setSelectedBoardId(boardId);
+    fetchBoard(boardId);
+  }, [boardId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync state to URL on changes
   useEffect(() => {
@@ -264,16 +275,18 @@ export default function SlotChecker({ manifest }: SlotCheckerProps) {
 
   return (
     <div className="space-y-6">
-      {/* Board Selector */}
-      <section aria-label="Motherboard selection">
-        <h2 className="mb-3 text-lg font-semibold text-zinc-100">
-          Select Motherboard
-        </h2>
-        <MotherboardTable
-          selectedBoardId={selectedBoardId}
-          onSelectBoard={handleSelectBoard}
-        />
-      </section>
+      {/* Board Selector — hidden when boardId prop is provided */}
+      {!boardId && (
+        <section aria-label="Motherboard selection">
+          <h2 className="mb-3 text-lg font-semibold text-zinc-100">
+            Select Motherboard
+          </h2>
+          <MotherboardTable
+            selectedBoardId={selectedBoardId}
+            onSelectBoard={handleSelectBoard}
+          />
+        </section>
+      )}
 
       {/* Loading state */}
       {boardLoading && (
@@ -346,8 +359,8 @@ export default function SlotChecker({ manifest }: SlotCheckerProps) {
         </>
       )}
 
-      {/* Empty state — no board selected */}
-      {!selectedBoardId && !boardLoading && (
+      {/* Empty state — no board selected (only when table is shown) */}
+      {!boardId && !selectedBoardId && !boardLoading && (
         <p className="py-8 text-center text-sm text-zinc-500">
           Select a motherboard above to begin checking slot compatibility.
         </p>

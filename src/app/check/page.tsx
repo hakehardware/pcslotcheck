@@ -1,24 +1,43 @@
 import { Suspense } from "react";
-import SlotChecker from "@/components/SlotChecker";
+import { redirect } from "next/navigation";
+import CheckPageClient from "@/components/CheckPageClient";
 import manifest from "../../../data-manifest.json";
 import type { DataManifest } from "@/lib/types";
 import { GITHUB_ISSUES_URL, GITHUB_CONTRIBUTING_URL } from "@/lib/github-links";
 
-export default function SlotCheckerPage() {
+export default async function SlotCheckerPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+
+  const buildParam = typeof params.build === "string" ? params.build : undefined;
+  const boardParam = typeof params.board === "string" ? params.board : undefined;
+
+  // build param takes priority; if neither exists, redirect home
+  if (!buildParam && !boardParam) {
+    redirect("/");
+  }
+
+  // When build param exists, pass boardId as undefined so SlotChecker
+  // uses its existing ?build= restoration logic
+  const boardId = buildParam ? undefined : boardParam;
+
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
-      <h1 className="text-3xl font-bold tracking-tight text-zinc-50 mb-6">
-        Slot Checker
-      </h1>
       <Suspense
         fallback={
           <div className="flex items-center justify-center py-12" role="status">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-600 border-t-zinc-200" />
-            <span className="ml-3 text-sm text-zinc-400">Loading…</span>
+            <span className="ml-3 text-sm text-zinc-400">Loading...</span>
           </div>
         }
       >
-        <SlotChecker manifest={manifest as DataManifest} />
+        <CheckPageClient
+          manifest={manifest as DataManifest}
+          boardId={boardId}
+        />
       </Suspense>
 
       <section

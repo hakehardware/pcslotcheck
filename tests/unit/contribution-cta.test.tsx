@@ -30,6 +30,22 @@ vi.mock("@/components/SlotChecker", () => ({
   default: () => <div data-testid="slot-checker-mock">SlotChecker</div>,
 }));
 
+// Mock CheckPageClient to avoid pulling in the full component tree
+vi.mock("@/components/CheckPageClient", () => ({
+  default: () => <div data-testid="check-page-client-mock">CheckPageClient</div>,
+}));
+
+// Mock next/navigation for redirect (used by check page when no params)
+vi.mock("next/navigation", async () => {
+  const actual = await vi.importActual("next/navigation");
+  return {
+    ...actual,
+    redirect: vi.fn(),
+    useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+    useSearchParams: () => new URLSearchParams(),
+  };
+});
+
 // Mock data-manifest.json used by the checker page
 vi.mock("../../../data-manifest.json", () => ({
   default: { components: [], motherboards: [] },
@@ -43,6 +59,15 @@ import {
   GITHUB_ISSUES_URL,
   GITHUB_CONTRIBUTING_URL,
 } from "../../src/lib/github-links";
+
+/**
+ * Helper to render the async SlotCheckerPage server component.
+ */
+async function renderCheckerPage() {
+  const searchParams = Promise.resolve({ board: "test-board" });
+  const element = await SlotCheckerPage({ searchParams });
+  return render(element as React.ReactElement);
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 6.2 — Landing Page contribution section tests
@@ -98,34 +123,34 @@ describe("Landing Page contribution section", () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe("Checker Page contribution banner", () => {
-  it('renders a <section> with aria-label containing "Contribute"', () => {
-    render(<SlotCheckerPage />);
+  it('renders a <section> with aria-label containing "Contribute"', async () => {
+    await renderCheckerPage();
     const section = screen.getByRole("region", { name: /contribute/i });
     expect(section).toBeInTheDocument();
   });
 
-  it("contains help text about finding issues or missing data", () => {
-    render(<SlotCheckerPage />);
+  it("contains help text about finding issues or missing data", async () => {
+    await renderCheckerPage();
     const section = screen.getByRole("region", { name: /contribute/i });
     expect(within(section).getByText(/find an issue or missing data/i)).toBeInTheDocument();
   });
 
-  it("contains a link to GitHub Issues with correct href", () => {
-    render(<SlotCheckerPage />);
+  it("contains a link to GitHub Issues with correct href", async () => {
+    await renderCheckerPage();
     const section = screen.getByRole("region", { name: /contribute/i });
     const issuesLink = within(section).getByRole("link", { name: /github/i });
     expect(issuesLink).toHaveAttribute("href", GITHUB_ISSUES_URL);
   });
 
-  it("contains a link to CONTRIBUTING guide with correct href", () => {
-    render(<SlotCheckerPage />);
+  it("contains a link to CONTRIBUTING guide with correct href", async () => {
+    await renderCheckerPage();
     const section = screen.getByRole("region", { name: /contribute/i });
     const guideLink = within(section).getByRole("link", { name: /contributing guide/i });
     expect(guideLink).toHaveAttribute("href", GITHUB_CONTRIBUTING_URL);
   });
 
-  it('both links have target="_blank" and rel="noopener noreferrer"', () => {
-    render(<SlotCheckerPage />);
+  it('both links have target="_blank" and rel="noopener noreferrer"', async () => {
+    await renderCheckerPage();
     const section = screen.getByRole("region", { name: /contribute/i });
     const links = within(section).getAllByRole("link");
     for (const link of links) {

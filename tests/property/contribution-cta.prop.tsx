@@ -31,6 +31,22 @@ vi.mock("@/components/SlotChecker", () => ({
   default: () => <div data-testid="slot-checker-mock">SlotChecker</div>,
 }));
 
+// Mock CheckPageClient to avoid pulling in the full component tree
+vi.mock("@/components/CheckPageClient", () => ({
+  default: () => <div data-testid="check-page-client-mock">CheckPageClient</div>,
+}));
+
+// Mock next/navigation for redirect (used by check page when no params)
+vi.mock("next/navigation", async () => {
+  const actual = await vi.importActual("next/navigation");
+  return {
+    ...actual,
+    redirect: vi.fn(),
+    useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+    useSearchParams: () => new URLSearchParams(),
+  };
+});
+
 // Mock data-manifest.json used by the checker page
 vi.mock("../../../data-manifest.json", () => ({
   default: { components: [], motherboards: [] },
@@ -44,6 +60,17 @@ import {
   GITHUB_ISSUES_URL,
   GITHUB_CONTRIBUTING_URL,
 } from "../../src/lib/github-links";
+
+/**
+ * Helper to render the async SlotCheckerPage server component.
+ * Calls it as a function with a mock searchParams Promise containing
+ * a board param so it doesn't redirect.
+ */
+async function renderCheckerPage(): Promise<React.ReactElement> {
+  const searchParams = Promise.resolve({ board: "test-board" });
+  const element = await SlotCheckerPage({ searchParams });
+  return element as React.ReactElement;
+}
 
 /**
  * Helper: render a component and return all <section> elements whose
@@ -108,8 +135,9 @@ describe("Property 1: CTA sections use semantic HTML with accessible labels", ()
     );
   });
 
-  it("every contribution section on the Checker Page has a non-empty aria-label", () => {
-    const sections = getContributionSections(<SlotCheckerPage />);
+  it("every contribution section on the Checker Page has a non-empty aria-label", async () => {
+    const page = await renderCheckerPage();
+    const sections = getContributionSections(page);
     expect(sections.length).toBeGreaterThan(0);
 
     fc.assert(
@@ -165,8 +193,9 @@ describe("Property 2: External CTA links have accessible external indication", (
     );
   });
 
-  it("every external link in Checker Page contribution sections has noopener/noreferrer and external indication", () => {
-    const links = getExternalCtaLinks(<SlotCheckerPage />);
+  it("every external link in Checker Page contribution sections has noopener/noreferrer and external indication", async () => {
+    const page = await renderCheckerPage();
+    const links = getExternalCtaLinks(page);
     expect(links.length).toBeGreaterThan(0);
 
     fc.assert(
@@ -232,8 +261,9 @@ describe("Property 3: Rendered GitHub URLs match centralized configuration", () 
     );
   });
 
-  it("every link in Checker Page contribution sections has an href matching a centralized URL constant", () => {
-    const links = getAllCtaLinks(<SlotCheckerPage />);
+  it("every link in Checker Page contribution sections has an href matching a centralized URL constant", async () => {
+    const page = await renderCheckerPage();
+    const links = getAllCtaLinks(page);
     expect(links.length).toBeGreaterThan(0);
 
     fc.assert(

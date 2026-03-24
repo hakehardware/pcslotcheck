@@ -49,10 +49,10 @@ export default function RootLayout({
               </li>
               <li>
                 <Link
-                  href="/check"
+                  href="/search"
                   className="text-zinc-400 transition-colors hover:text-zinc-50"
                 >
-                  Slot Checker
+                  Browse
                 </Link>
               </li>
               <li>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SearchBar from "@/components/SearchBar";
 import {
   GITHUB_ISSUES_URL,
   GITHUB_CONTRIBUTING_URL,
@@ -15,19 +16,14 @@ export default function Home() {
         motherboard, assign components to slots, and catch placement mistakes
         before you build.
       </p>
-      <a
-        href="https://www.youtube.com/@hakehardware"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-zinc-400 transition-colors hover:text-zinc-50"
-      >
-        Watch Hake Hardware on YouTube
-      </a>
+
+      <SearchBar />
+
       <Link
-        href="/check"
-        className="rounded-lg bg-zinc-50 px-6 py-3 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+        href="/search"
+        className="text-sm text-zinc-400 transition-colors hover:text-zinc-50"
       >
-        Open Slot Checker
+        or browse all motherboards
       </Link>
 
       <section

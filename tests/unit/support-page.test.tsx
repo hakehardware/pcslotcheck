@@ -19,6 +19,21 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+// Mock next/navigation (needed because Homepage renders SearchBar which uses useRouter)
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock supabase-queries (needed because Homepage renders SearchBar which calls fetchMotherboardPage)
+vi.mock("../../src/lib/supabase-queries", () => ({
+  fetchMotherboardFromSupabase: vi.fn(),
+  fetchComponentFromSupabase: vi.fn(),
+  fetchMotherboardPage: vi.fn().mockResolvedValue({ rows: [], totalCount: 0 }),
+  fetchFilterOptions: vi.fn(),
+  assembleMotherboard: vi.fn(),
+}));
+
 // Mock next/font/google to avoid font loading in tests
 vi.mock("next/font/google", () => ({
   Geist: () => ({ variable: "--font-geist-sans" }),
@@ -134,7 +149,7 @@ describe("Navigation bar", () => {
     expect(supportLink).toHaveAttribute("href", "/support");
   });
 
-  it('displays "Home", "Slot Checker", and "Support" links', () => {
+  it('displays "Home", "Browse", and "Support" links', () => {
     render(
       <RootLayout>
         <div />
@@ -143,7 +158,7 @@ describe("Navigation bar", () => {
     const nav = screen.getByRole("navigation");
     expect(within(nav).getByRole("link", { name: "Home" })).toBeInTheDocument();
     expect(
-      within(nav).getByRole("link", { name: "Slot Checker" })
+      within(nav).getByRole("link", { name: "Browse" })
     ).toBeInTheDocument();
     expect(
       within(nav).getByRole("link", { name: "Support" })
@@ -152,26 +167,24 @@ describe("Navigation bar", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 4.4 — Landing page YouTube link tests
+// 4.4 — Landing page content tests (post-redesign)
+// The YouTube link was intentionally removed from the homepage as part of the
+// homepage-search-redesign (Requirement 1.12). These tests verify the new
+// homepage structure instead.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe("Landing page YouTube link", () => {
-  it("contains a link to the Hake Hardware YouTube channel", () => {
+describe("Landing page content (post-redesign)", () => {
+  it("displays the PCSlotCheck title", () => {
     render(<Home />);
-    const ytLink = screen.getByRole("link", {
-      name: /hake hardware/i,
-    });
-    expect(ytLink).toHaveAttribute(
-      "href",
-      "https://www.youtube.com/@hakehardware"
-    );
+    const heading = screen.getByRole("heading", { level: 1 });
+    expect(heading).toHaveTextContent("PCSlotCheck");
   });
 
-  it("link text identifies the Hake Hardware YouTube channel", () => {
+  it("contains a 'browse all motherboards' link to /search", () => {
     render(<Home />);
-    const ytLink = screen.getByRole("link", {
-      name: /hake hardware.*youtube/i,
+    const browseLink = screen.getByRole("link", {
+      name: /browse all motherboards/i,
     });
-    expect(ytLink).toBeInTheDocument();
+    expect(browseLink).toHaveAttribute("href", "/search");
   });
 });

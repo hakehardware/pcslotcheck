@@ -20,6 +20,21 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+// Mock next/navigation (needed because Homepage renders SearchBar which uses useRouter)
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock supabase-queries (needed because Homepage renders SearchBar which calls fetchMotherboardPage)
+vi.mock("../../src/lib/supabase-queries", () => ({
+  fetchMotherboardFromSupabase: vi.fn(),
+  fetchComponentFromSupabase: vi.fn(),
+  fetchMotherboardPage: vi.fn().mockResolvedValue({ rows: [], totalCount: 0 }),
+  fetchFilterOptions: vi.fn(),
+  assembleMotherboard: vi.fn(),
+}));
+
 // Mock next/font/google to avoid font loading in tests
 vi.mock("next/font/google", () => ({
   Geist: () => ({ variable: "--font-geist-sans" }),
