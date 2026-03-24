@@ -1,16 +1,16 @@
-id: asus-rog-strix-z890-f-gaming-wifi
-manufacturer: ASUS
-model: ROG STRIX Z890-F GAMING WIFI
-chipset: Intel Z890
-socket: LGA 1851
+id: asrock-z790-steel-legend-wifi
+manufacturer: ASRock
+model: Z790 Steel Legend WiFi
+chipset: Intel Z790
+socket: LGA 1700
 form_factor: ATX
 schema_version: "2.0"
 
 memory:
   type: DDR5
-  max_speed_mhz: 9066
+  max_speed_mhz: 7200
   base_speed_mhz: 4800
-  max_capacity_gb: 256
+  max_capacity_gb: 192
   ecc_support: false
   channels: 2
   slots:
@@ -42,13 +42,11 @@ memory:
 
 m2_slots:
   - id: m2_1
-    label: M.2_1 (CPU)
+    label: M2_1 Hyper (CPU)
     interface: PCIe
-    gen: 5
+    gen: 4
     lanes: 4
     form_factors:
-      - "22110"
-      - "2242"
       - "2260"
       - "2280"
     source: CPU
@@ -57,45 +55,30 @@ m2_slots:
     sharing: null
 
   - id: m2_2
-    label: M.2_2 (CPU)
+    label: M2_2 Blazing (CPU)
     interface: PCIe
-    gen: 4
+    gen: 5
     lanes: 4
     form_factors:
+      - "2260"
       - "2280"
     source: CPU
     supports_sata: false
     heatsink_included: true
-    sharing: null
+    sharing:
+      - type: bandwidth_split
+        target: pcie_1
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_2
+          logic: any_populated
+        condition: M2_2 is occupied
+        effect: PCIE1 will downgrade to x8 mode
 
   - id: m2_3
-    label: M.2_3 (Chipset)
+    label: M2_3 Hyper (Chipset)
     interface: PCIe
-    gen: 4
-    lanes: 4
-    form_factors:
-      - "2280"
-    source: Chipset
-    supports_sata: false
-    heatsink_included: true
-    sharing: null
-
-  - id: m2_4
-    label: M.2_4 (Chipset)
-    interface: PCIe
-    gen: 4
-    lanes: 4
-    form_factors:
-      - "22110"
-      - "2280"
-    source: Chipset
-    supports_sata: false
-    heatsink_included: true
-    sharing: null
-
-  - id: m2_5
-    label: M.2_5 (Chipset)
-    interface: PCIe_or_SATA
     gen: 4
     lanes: 4
     form_factors:
@@ -103,13 +86,40 @@ m2_slots:
       - "2260"
       - "2280"
     source: Chipset
-    supports_sata: true
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_4
+    label: M2_4 Hyper (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_5
+    label: M2_5 Hyper (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: false
     heatsink_included: false
     sharing: null
 
 pcie_slots:
   - id: pcie_1
-    label: PCIEX16(G5)
+    label: PCIE1
     position: 1
     gen: 5
     electrical_lanes: 16
@@ -119,7 +129,7 @@ pcie_slots:
     sharing: null
 
   - id: pcie_2
-    label: PCIEX16(G4)
+    label: PCIE2
     position: 2
     gen: 4
     electrical_lanes: 4
@@ -128,7 +138,22 @@ pcie_slots:
     reinforced: false
     sharing: null
 
+  - id: pcie_3
+    label: PCIE3
+    position: 3
+    gen: 3
+    electrical_lanes: 2
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
 sata_ports:
+  - id: sata_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
   - id: sata_1
     version: "3.0"
     source: Chipset
@@ -149,8 +174,23 @@ sata_ports:
     source: Chipset
     disabled_by: null
 
+  - id: sata_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_6
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_7
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
 sources:
   - type: manual
-    url: https://dlcdnets.asus.com/pub/ASUS/mb/LGA1851/ROG_STRIX_Z890-F_GAMING_WIFI/E24219_ROG_STRIX_Z890-F_GAMING_WIFI_EM_WEB.pdf
+    url: https://download.asrock.com/Manual/Z790%20Steel%20Legend%20WiFi.pdf
   - type: manufacturer
-    url: https://rog.asus.com/motherboards/rog-strix/rog-strix-z890-f-gaming-wifi/spec/
+    url: https://www.asrock.com/mb/Intel/Z790%20Steel%20Legend%20WiFi/index.asp
