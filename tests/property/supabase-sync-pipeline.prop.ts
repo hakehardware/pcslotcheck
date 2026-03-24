@@ -54,8 +54,8 @@ function arbMemorySlot(slotId: string) {
 /** Generate an array of memory slots with unique IDs. */
 const arbMemorySlots = fc
   .integer({ min: 0, max: 8 })
-  .chain((count) => {
-    if (count === 0) return fc.constant([]);
+  .chain((count): fc.Arbitrary<{ id: string; channel: "A" | "B"; position: number; recommended: boolean }[]> => {
+    if (count === 0) return fc.constant([] as { id: string; channel: "A" | "B"; position: number; recommended: boolean }[]);
     const ids = Array.from({ length: count }, (_, i) => `dimm_${i + 1}`);
     return fc.tuple(...ids.map((id) => arbMemorySlot(id))) as fc.Arbitrary<
       { id: string; channel: "A" | "B"; position: number; recommended: boolean }[]
@@ -82,10 +82,10 @@ function arbM2Slot(slotId: string) {
 /** Generate an array of M.2 slots with unique IDs. */
 const arbM2Slots = fc
   .integer({ min: 0, max: 4 })
-  .chain((count) => {
-    if (count === 0) return fc.constant([]);
+  .chain((count): fc.Arbitrary<MotherboardYAML["m2_slots"]> => {
+    if (count === 0) return fc.constant([] as unknown as MotherboardYAML["m2_slots"]);
     const ids = Array.from({ length: count }, (_, i) => `m2_${i + 1}`);
-    return fc.tuple(...ids.map((id) => arbM2Slot(id))) as fc.Arbitrary<
+    return fc.tuple(...ids.map((id) => arbM2Slot(id))) as unknown as fc.Arbitrary<
       MotherboardYAML["m2_slots"]
     >;
   });
@@ -107,8 +107,8 @@ function arbPCIeSlot(slotId: string) {
 /** Generate an array of PCIe slots with unique IDs. */
 const arbPCIeSlots = fc
   .integer({ min: 0, max: 4 })
-  .chain((count) => {
-    if (count === 0) return fc.constant([]);
+  .chain((count): fc.Arbitrary<MotherboardYAML["pcie_slots"]> => {
+    if (count === 0) return fc.constant([] as unknown as MotherboardYAML["pcie_slots"]);
     const ids = Array.from({ length: count }, (_, i) => `pcie_${i + 1}`);
     return fc.tuple(...ids.map((id) => arbPCIeSlot(id))) as fc.Arbitrary<
       MotherboardYAML["pcie_slots"]
@@ -128,8 +128,8 @@ function arbSATAPort(slotId: string) {
 /** Generate an array of SATA ports with unique IDs. */
 const arbSATAPorts = fc
   .integer({ min: 0, max: 6 })
-  .chain((count) => {
-    if (count === 0) return fc.constant([]);
+  .chain((count): fc.Arbitrary<MotherboardYAML["sata_ports"]> => {
+    if (count === 0) return fc.constant([] as unknown as MotherboardYAML["sata_ports"]);
     const ids = Array.from({ length: count }, (_, i) => `sata_${i + 1}`);
     return fc.tuple(...ids.map((id) => arbSATAPort(id))) as fc.Arbitrary<
       MotherboardYAML["sata_ports"]
@@ -725,16 +725,16 @@ describe("Property 4: Sync idempotency", () => {
    */
 
   /** Strip timestamp columns for comparison. */
-  function stripTimestamps<T extends Record<string, unknown>>(row: T): Omit<T, "updated_at"> {
+  function stripTimestamps(row: Record<string, unknown>): Record<string, unknown> {
     const { updated_at, ...rest } = row;
-    return rest as Omit<T, "updated_at">;
+    return rest;
   }
 
   test("motherboard transform is idempotent (non-timestamp columns)", () => {
     fc.assert(
       fc.property(arbMotherboardYAML(), (yaml) => {
-        const row1 = stripTimestamps(transformMotherboard(yaml));
-        const row2 = stripTimestamps(transformMotherboard(yaml));
+        const row1 = stripTimestamps(transformMotherboard(yaml) as unknown as Record<string, unknown>);
+        const row2 = stripTimestamps(transformMotherboard(yaml) as unknown as Record<string, unknown>);
         expect(row1).toEqual(row2);
       }),
       { numRuns: 100 }
@@ -755,8 +755,8 @@ describe("Property 4: Sync idempotency", () => {
   test("component transform is idempotent (non-timestamp columns)", () => {
     fc.assert(
       fc.property(arbComponentYAML(), (yaml) => {
-        const row1 = stripTimestamps(transformComponent(yaml));
-        const row2 = stripTimestamps(transformComponent(yaml));
+        const row1 = stripTimestamps(transformComponent(yaml) as unknown as Record<string, unknown>);
+        const row2 = stripTimestamps(transformComponent(yaml) as unknown as Record<string, unknown>);
         expect(row1).toEqual(row2);
       }),
       { numRuns: 100 }
