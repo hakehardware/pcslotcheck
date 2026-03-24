@@ -32,5 +32,8 @@ jobs:
       - name: Sanity check value ranges
         run: npm run sanity-check
 
+      - name: Generate data manifest
+        run: npm run generate-manifest
+
       - name: Run tests
         run: npm run test
