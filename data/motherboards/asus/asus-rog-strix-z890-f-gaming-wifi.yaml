@@ -110,6 +110,13 @@ m2_slots:
         targets:
           - sata_1
           - sata_2
+        direction: m2_to_sata
+        trigger:
+          slot_ids:
+            - m2_5
+          logic: any_populated
+        device_filter:
+          protocol: SATA
         condition: M.2_5 is populated with a SATA device
         effect: SATA ports 1 and 2 are disabled
 

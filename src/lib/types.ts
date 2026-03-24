@@ -21,11 +21,27 @@ export interface MemoryConfig {
   };
 }
 
+export interface SharingTrigger {
+  slot_ids: string[];
+  logic: "and" | "or" | "any_populated";
+}
+
+export interface DeviceFilter {
+  protocol?: "NVMe" | "SATA";
+  pcie_gen?: number;
+  form_factor?: string;
+}
+
 export interface SharingRule {
   type: "disables" | "bandwidth_split";
   targets?: string[];
   target?: string;
-  condition: string;
+  direction?: "m2_to_pcie" | "pcie_to_m2" | "m2_to_sata" | "sata_to_pcie";
+  trigger?: SharingTrigger;
+  device_filter?: DeviceFilter;
+  degraded_lanes?: number;
+  // Legacy human-readable fields (kept for backward compat)
+  condition?: string;
   effect?: string;
 }
 
@@ -59,6 +75,7 @@ export interface SATAPort {
   version: string;
   source: "CPU" | "Chipset";
   disabled_by: string | null;
+  sharing?: SharingRule[] | null;
 }
 
 export interface Motherboard {

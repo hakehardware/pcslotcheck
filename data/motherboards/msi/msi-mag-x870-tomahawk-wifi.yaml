@@ -68,6 +68,11 @@ m2_slots:
     sharing:
       - type: bandwidth_split
         target: usb_40gbps_c
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_2
+          logic: any_populated
         condition: M.2_2 is populated
         effect: USB 40Gbps Type-C ports operate at PCIe 5.0 x2
 
@@ -85,6 +90,12 @@ m2_slots:
     sharing:
       - type: bandwidth_split
         target: pcie_3
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_3
+          logic: any_populated
+        degraded_lanes: 2
         condition: M.2_3 is populated
         effect: PCI_E3 slot operates at x2 instead of x4
 
@@ -104,6 +115,11 @@ m2_slots:
         targets:
           - sata_3
           - sata_4
+        direction: m2_to_sata
+        trigger:
+          slot_ids:
+            - m2_4
+          logic: any_populated
         condition: M.2_4 is populated
         effect: SATA ports 3 and 4 are disabled
 
@@ -139,6 +155,12 @@ pcie_slots:
     sharing:
       - type: bandwidth_split
         target: m2_3
+        direction: pcie_to_m2
+        trigger:
+          slot_ids:
+            - m2_3
+          logic: any_populated
+        degraded_lanes: 2
         condition: M.2_3 is populated
         effect: PCI_E3 operates at x2 instead of x4
 
