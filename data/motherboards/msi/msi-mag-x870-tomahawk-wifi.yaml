@@ -4,7 +4,7 @@ model: MAG X870 TOMAHAWK WIFI
 chipset: X870
 socket: AM5
 form_factor: ATX
-schema_version: "1.0"
+schema_version: "2.0"
 
 memory:
   type: DDR5
@@ -110,6 +110,7 @@ m2_slots:
 pcie_slots:
   - id: pcie_1
     label: PCI_E1 (CPU)
+    position: 1
     gen: 5
     electrical_lanes: 16
     physical_size: x16
@@ -119,6 +120,7 @@ pcie_slots:
 
   - id: pcie_2
     label: PCI_E2 (Chipset)
+    position: 2
     gen: 3
     electrical_lanes: 1
     physical_size: x16
@@ -128,6 +130,7 @@ pcie_slots:
 
   - id: pcie_3
     label: PCI_E3 (Chipset)
+    position: 3
     gen: 4
     electrical_lanes: 4
     physical_size: x16

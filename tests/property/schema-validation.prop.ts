@@ -79,6 +79,7 @@ const pcieSlotArb = fc.record({
   gen: posInt,
   electrical_lanes: posInt,
   physical_size: fc.constantFrom("x1" as const, "x4" as const, "x8" as const, "x16" as const),
+  position: posInt,
   source: fc.constantFrom("CPU" as const, "Chipset" as const),
   reinforced: fc.boolean(),
   sharing: fc.constantFrom(null),
@@ -127,23 +128,32 @@ const nvmeArb = fc.record({
   schema_version: versionString,
 });
 
+// Power connector arbitrary
+const powerConnectorArb = fc.record({
+  type: fc.constantFrom("6-pin" as const, "8-pin" as const, "12-pin" as const, "16-pin/12VHPWR" as const, "16-pin/12V-2x6" as const),
+  count: fc.integer({ min: 1, max: 4 }),
+});
+
 // GPU arbitrary
 const gpuArb = fc.record({
   id: nonEmptyString,
   type: fc.constant("gpu" as const),
+  chip_manufacturer: nonEmptyString,
   manufacturer: nonEmptyString,
   model: nonEmptyString,
   interface: fc.record({
     pcie_gen: posInt,
-    lanes: posInt,
+    lanes: fc.constantFrom(1, 4, 8, 16),
   }),
   physical: fc.record({
     slot_width: posInt,
     length_mm: posNum,
+    slots_occupied: fc.integer({ min: 1, max: 4 }),
   }),
   power: fc.record({
     tdp_w: posNum,
     recommended_psu_w: posNum,
+    power_connectors: fc.array(powerConnectorArb, { minLength: 1, maxLength: 3 }),
   }),
   schema_version: versionString,
 });
@@ -197,7 +207,7 @@ const schemaEntries = [
     name: "gpu",
     schema: schemas.gpu,
     arb: gpuArb,
-    requiredFields: ["id", "type", "manufacturer", "model", "interface", "physical", "power", "schema_version"],
+    requiredFields: ["id", "type", "chip_manufacturer", "manufacturer", "model", "interface", "physical", "power", "schema_version"],
   },
   {
     name: "ram",

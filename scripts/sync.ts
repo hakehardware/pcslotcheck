@@ -17,7 +17,7 @@ import * as yaml from "js-yaml";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { createClient } from "@supabase/supabase-js";
-import type { SharingRule } from "../src/lib/types";
+import type { SharingRule, Component, NVMeComponent, GPUComponent, RAMComponent, SATAComponent } from "../src/lib/types";
 
 // ─── YAML Input Types ────────────────────────────────────────────────
 
@@ -166,20 +166,75 @@ export interface SlotRow {
   sort_order: number;
 }
 
-/** Flat row for the `components` Supabase table. */
-export interface ComponentRow {
+// ─── Per-Type Component Row Interfaces ───────────────────────────────
+
+/** Base columns shared by all per-type component rows. */
+interface ComponentRowBase {
   id: string;
   type: string;
   manufacturer: string;
   model: string;
   sku: string | null;
   summary_line: string;
-  specs: Record<string, unknown>;
   sources: { type: string; url: string }[] | null;
   contributed_by: string | null;
   schema_version: string;
   updated_at: string;
 }
+
+export interface NvmeComponentRow extends ComponentRowBase {
+  type: "nvme";
+  interface_protocol: string;
+  interface_pcie_gen: number | null;
+  interface_lanes: number | null;
+  form_factor: string;
+  capacity_gb: number;
+  capacity_variant_note: string | null;
+}
+
+export interface GpuComponentRow extends ComponentRowBase {
+  type: "gpu";
+  chip_manufacturer: string | null;
+  interface_pcie_gen: number;
+  interface_lanes: number;
+  physical_slot_width: number;
+  physical_length_mm: number;
+  physical_slots_occupied: number;
+  power_tdp_w: number;
+  power_recommended_psu_w: number | null;
+  power_connectors: { type: string; count: number }[];
+}
+
+export interface RamComponentRow extends ComponentRowBase {
+  type: "ram";
+  interface_type: string;
+  interface_speed_mhz: number;
+  interface_base_speed_mhz: number | null;
+  capacity_per_module_gb: number;
+  capacity_modules: number;
+  capacity_total_gb: number;
+}
+
+export interface SataComponentRow extends ComponentRowBase {
+  type: "sata_drive";
+  form_factor: string;
+  capacity_gb: number;
+  interface: string;
+}
+
+export type PerTypeComponentRow =
+  | NvmeComponentRow
+  | GpuComponentRow
+  | RamComponentRow
+  | SataComponentRow;
+
+/** Maps component type strings to their per-type Supabase table names. */
+export const COMPONENT_TABLE_MAP: Record<string, string> = {
+  nvme: "components_nvme",
+  gpu: "components_gpu",
+  ram: "components_ram",
+  sata_drive: "components_sata",
+};
 
 // ─── Transform Functions ─────────────────────────────────────────────
 
@@ -361,26 +416,86 @@ export function transformSlots(yaml: MotherboardYAML): SlotRow[] {
 }
 
 /**
- * Transforms a component YAML object into a flat DB row.
- * Base fields are extracted directly; all remaining type-specific fields
- * go into the `specs` JSONB column. A human-readable `summary_line` is
- * generated from the specs.
+ * Transforms a component YAML object into a per-type flat DB row.
+ * Switches on component type to flatten nested fields into typed columns.
+ * A human-readable `summary_line` is generated from the specs.
  */
-export function transformComponent(yaml: ComponentYAML): ComponentRow {
+export function transformComponent(yaml: ComponentYAML): PerTypeComponentRow {
   const { id, type, manufacturer, model, sku, sources, contributed_by, schema_version, ...specs } = yaml;
-  return {
+
+  const base = {
     id,
-    type,
     manufacturer,
     model,
     sku: sku ?? null,
-    summary_line: generateSummaryLine(type, specs),
-    specs,
     sources: (sources as { type: string; url: string }[]) ?? null,
     contributed_by: contributed_by ?? null,
     schema_version,
     updated_at: new Date().toISOString(),
   };
+
+  switch (type) {
+    case "nvme": {
+      const iface = yaml.interface as { protocol: string; pcie_gen?: number | null; lanes?: number | null };
+      return {
+        ...base,
+        type: "nvme",
+        summary_line: generateSummaryLine("nvme", specs),
+        interface_protocol: iface.protocol,
+        interface_pcie_gen: iface.pcie_gen ?? null,
+        interface_lanes: iface.lanes ?? null,
+        form_factor: yaml.form_factor as string,
+        capacity_gb: yaml.capacity_gb as number,
+        capacity_variant_note: (yaml.capacity_variant_note as string) ?? null,
+      };
+    }
+    case "gpu": {
+      const iface = yaml.interface as { pcie_gen: number; lanes: number };
+      const physical = yaml.physical as { slot_width: number; length_mm: number; slots_occupied: number };
+      const power = yaml.power as { tdp_w: number; recommended_psu_w?: number; power_connectors: { type: string; count: number }[] };
+      return {
+        ...base,
+        type: "gpu",
+        summary_line: generateSummaryLine("gpu", specs),
+        chip_manufacturer: (yaml.chip_manufacturer as string) ?? null,
+        interface_pcie_gen: iface.pcie_gen,
+        interface_lanes: iface.lanes,
+        physical_slot_width: physical.slot_width,
+        physical_length_mm: physical.length_mm,
+        physical_slots_occupied: physical.slots_occupied,
+        power_tdp_w: power.tdp_w,
+        power_recommended_psu_w: power.recommended_psu_w ?? null,
+        power_connectors: power.power_connectors,
+      };
+    }
+    case "ram": {
+      const iface = yaml.interface as { type: string; speed_mhz: number; base_speed_mhz?: number };
+      const capacity = yaml.capacity as { per_module_gb: number; modules: number; total_gb: number };
+      return {
+        ...base,
+        type: "ram",
+        summary_line: generateSummaryLine("ram", specs),
+        interface_type: iface.type,
+        interface_speed_mhz: iface.speed_mhz,
+        interface_base_speed_mhz: iface.base_speed_mhz ?? null,
+        capacity_per_module_gb: capacity.per_module_gb,
+        capacity_modules: capacity.modules,
+        capacity_total_gb: capacity.total_gb,
+      };
+    }
+    case "sata_drive": {
+      return {
+        ...base,
+        type: "sata_drive",
+        summary_line: generateSummaryLine("sata_drive", specs),
+        form_factor: yaml.form_factor as string,
+        capacity_gb: yaml.capacity_gb as number,
+        interface: yaml.interface as string,
+      };
+    }
+    default:
+      throw new Error(`Unknown component type: ${type}`);
+  }
 }
 
 /**
@@ -418,6 +533,91 @@ export function generateSummaryLine(type: string, specs: Record<string, unknown>
     }
     default:
       return "";
+  }
+}
+
+/**
+ * Reconstructs a `Component` union object from a flat per-type DB row.
+ * This is the inverse of `transformComponent()` -- it rebuilds nested
+ * structures from flattened typed columns.
+ */
+export function reconstructComponent(row: PerTypeComponentRow): Component {
+  switch (row.type) {
+    case "nvme": {
+      const result: NVMeComponent = {
+        id: row.id,
+        type: "nvme",
+        manufacturer: row.manufacturer,
+        model: row.model,
+        interface: {
+          protocol: row.interface_protocol as "NVMe" | "SATA",
+          pcie_gen: row.interface_pcie_gen,
+          lanes: row.interface_lanes,
+        },
+        form_factor: row.form_factor,
+        capacity_gb: row.capacity_gb,
+        schema_version: row.schema_version,
+      };
+      if (row.capacity_variant_note !== null) {
+        result.capacity_variant_note = row.capacity_variant_note;
+      }
+      return result;
+    }
+    case "gpu": {
+      return {
+        id: row.id,
+        type: "gpu",
+        chip_manufacturer: row.chip_manufacturer!,
+        manufacturer: row.manufacturer,
+        model: row.model,
+        interface: {
+          pcie_gen: row.interface_pcie_gen,
+          lanes: row.interface_lanes,
+        },
+        physical: {
+          slot_width: row.physical_slot_width,
+          length_mm: row.physical_length_mm,
+          slots_occupied: row.physical_slots_occupied,
+        },
+        power: {
+          tdp_w: row.power_tdp_w,
+          recommended_psu_w: row.power_recommended_psu_w!,
+          power_connectors: row.power_connectors,
+        },
+        schema_version: row.schema_version,
+      } as GPUComponent;
+    }
+    case "ram": {
+      return {
+        id: row.id,
+        type: "ram",
+        manufacturer: row.manufacturer,
+        model: row.model,
+        interface: {
+          type: row.interface_type as "DDR4" | "DDR5",
+          speed_mhz: row.interface_speed_mhz,
+          base_speed_mhz: row.interface_base_speed_mhz!,
+        },
+        capacity: {
+          per_module_gb: row.capacity_per_module_gb,
+          modules: row.capacity_modules,
+          total_gb: row.capacity_total_gb,
+        },
+        schema_version: row.schema_version,
+      } as RAMComponent;
+    }
+    case "sata_drive": {
+      return {
+        id: row.id,
+        type: "sata_drive",
+        manufacturer: row.manufacturer,
+        model: row.model,
+        form_factor: row.form_factor,
+        capacity_gb: row.capacity_gb,
+        interface: row.interface,
+        schema_version: row.schema_version,
+      } as SATAComponent;
+    }
   }
 }
 
@@ -731,7 +931,7 @@ export async function sync(baseDir: string): Promise<SyncResult> {
   };
 
   const syncedMotherboardIds: string[] = [];
-  const syncedComponentIds: string[] = [];
+  const syncedIdsByType: Record<string, string[]> = {};
   const syncedMotherboardYamls: MotherboardYAML[] = [];
   const syncedComponentYamls: ComponentYAML[] = [];
 
@@ -787,21 +987,29 @@ export async function sync(baseDir: string): Promise<SyncResult> {
         console.log(`[SYNC] motherboard: ${mbYaml.id}`);
       } else {
         const compYaml = parsed.data as ComponentYAML;
+        const tableName = COMPONENT_TABLE_MAP[compYaml.type];
+        if (!tableName) {
+          throw new Error(`Unknown component type: ${compYaml.type}`);
+        }
+
         const compRow = transformComponent(compYaml);
 
-        // Upsert component row
+        // Upsert component row to per-type table
         const { error: compError } = await supabase
-          .from("components")
+          .from(tableName)
           .upsert(compRow, { onConflict: "id" });
 
         if (compError) {
           throw new Error(`Component upsert failed: ${compError.message}`);
         }
 
-        syncedComponentIds.push(compYaml.id);
+        if (!syncedIdsByType[compYaml.type]) {
+          syncedIdsByType[compYaml.type] = [];
+        }
+        syncedIdsByType[compYaml.type].push(compYaml.id);
         syncedComponentYamls.push(compYaml);
         result.componentsSynced++;
-        console.log(`[SYNC] component: ${compYaml.id}`);
+        console.log(`[SYNC] ${tableName}: ${compYaml.id}`);
       }
     } catch (err) {
       console.error(`[SKIP] ${file}: ${(err as Error).message}`);
@@ -837,27 +1045,32 @@ export async function sync(baseDir: string): Promise<SyncResult> {
       }
     }
 
-    // Get all existing component IDs from DB
-    const { data: dbComponents, error: compQueryError } = await supabase
-      .from("components")
-      .select("id");
+    // Per-type component orphan cleanup
+    for (const [type, tableName] of Object.entries(COMPONENT_TABLE_MAP)) {
+      const { data: dbRows, error: queryError } = await supabase
+        .from(tableName)
+        .select("id");
 
-    if (compQueryError) {
-      console.error(`[WARN] Failed to query component IDs for orphan cleanup: ${compQueryError.message}`);
-    } else if (dbComponents) {
-      const dbCompIds = dbComponents.map((r: { id: string }) => r.id);
-      const orphanCompIds = computeOrphans(dbCompIds, syncedComponentIds);
+      if (queryError) {
+        console.error(`[WARN] Failed to query ${tableName} IDs for orphan cleanup: ${queryError.message}`);
+        continue;
+      }
 
-      if (orphanCompIds.length > 0) {
-        const { error: deleteCompError } = await supabase
-          .from("components")
-          .delete()
-          .in("id", orphanCompIds);
+      if (dbRows) {
+        const dbIds = dbRows.map((r: { id: string }) => r.id);
+        const orphanIds = computeOrphans(dbIds, syncedIdsByType[type] ?? []);
 
-        if (deleteCompError) {
-          console.error(`[WARN] Failed to delete orphan components: ${deleteCompError.message}`);
-        } else {
-          result.componentsDeleted = orphanCompIds.length;
+        if (orphanIds.length > 0) {
+          const { error: deleteError } = await supabase
+            .from(tableName)
+            .delete()
+            .in("id", orphanIds);
+
+          if (deleteError) {
+            console.error(`[WARN] Failed to delete orphan components from ${tableName}: ${deleteError.message}`);
+          } else {
+            result.componentsDeleted += orphanIds.length;
+          }
         }
       }
     }

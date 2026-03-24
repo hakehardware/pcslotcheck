@@ -17,7 +17,7 @@ import {
   type MotherboardRow,
   type SlotRow,
   type ComponentYAML,
-  type ComponentRow,
+  type NvmeComponentRow,
 } from "../../scripts/sync";
 import { assembleMotherboard } from "../../src/lib/supabase-queries";
 
@@ -547,7 +547,7 @@ describe("transformSlots", () => {
 });
 
 describe("transformComponent", () => {
-  it("extracts base fields and puts remaining into specs JSONB (NVMe)", () => {
+  it("flattens NVMe fields into typed columns", () => {
     const yaml: ComponentYAML = {
       id: "samsung-990-pro-2tb",
       type: "nvme",
@@ -568,14 +568,17 @@ describe("transformComponent", () => {
     expect(row.schema_version).toBe("1.0");
     expect(row.sources).toBeNull();
     expect(row.contributed_by).toBeNull();
-    expect(row.specs).toEqual({
-      interface: { protocol: "NVMe", pcie_gen: 5, lanes: 4 },
-      form_factor: "2280",
-      capacity_gb: 2000,
-    });
+    expect(row).not.toHaveProperty("specs");
+    if (row.type === "nvme") {
+      expect(row.interface_protocol).toBe("NVMe");
+      expect(row.interface_pcie_gen).toBe(5);
+      expect(row.interface_lanes).toBe(4);
+      expect(row.form_factor).toBe("2280");
+      expect(row.capacity_gb).toBe(2000);
+    }
   });
 
-  it("extracts base fields and puts remaining into specs JSONB (GPU)", () => {
+  it("flattens GPU fields into typed columns", () => {
     const yaml: ComponentYAML = {
       id: "nvidia-rtx-4070-ti-super",
       type: "gpu",
@@ -583,21 +586,27 @@ describe("transformComponent", () => {
       model: "GeForce RTX 4070 Ti SUPER",
       schema_version: "1.0",
       interface: { pcie_gen: 4, lanes: 16 },
-      physical: { slot_width: 2, length_mm: 304 },
-      power: { tdp_w: 285, recommended_psu_w: 700 },
+      physical: { slot_width: 2, length_mm: 304, slots_occupied: 2 },
+      power: { tdp_w: 285, recommended_psu_w: 700, power_connectors: [{ type: "16-pin", count: 1 }] },
     };
     const row = transformComponent(yaml);
 
     expect(row.id).toBe("nvidia-rtx-4070-ti-super");
     expect(row.type).toBe("gpu");
-    expect(row.specs).toEqual({
-      interface: { pcie_gen: 4, lanes: 16 },
-      physical: { slot_width: 2, length_mm: 304 },
-      power: { tdp_w: 285, recommended_psu_w: 700 },
-    });
+    expect(row).not.toHaveProperty("specs");
+    if (row.type === "gpu") {
+      expect(row.interface_pcie_gen).toBe(4);
+      expect(row.interface_lanes).toBe(16);
+      expect(row.physical_slot_width).toBe(2);
+      expect(row.physical_length_mm).toBe(304);
+      expect(row.physical_slots_occupied).toBe(2);
+      expect(row.power_tdp_w).toBe(285);
+      expect(row.power_recommended_psu_w).toBe(700);
+      expect(row.power_connectors).toEqual([{ type: "16-pin", count: 1 }]);
+    }
   });
 
-  it("extracts base fields and puts remaining into specs JSONB (RAM)", () => {
+  it("flattens RAM fields into typed columns", () => {
     const yaml: ComponentYAML = {
       id: "corsair-vengeance-ddr5-6000-32gb",
       type: "ram",
@@ -611,13 +620,18 @@ describe("transformComponent", () => {
 
     expect(row.id).toBe("corsair-vengeance-ddr5-6000-32gb");
     expect(row.type).toBe("ram");
-    expect(row.specs).toEqual({
-      interface: { type: "DDR5", speed_mhz: 6000, base_speed_mhz: 4800 },
-      capacity: { per_module_gb: 16, modules: 2, total_gb: 32 },
-    });
+    expect(row).not.toHaveProperty("specs");
+    if (row.type === "ram") {
+      expect(row.interface_type).toBe("DDR5");
+      expect(row.interface_speed_mhz).toBe(6000);
+      expect(row.interface_base_speed_mhz).toBe(4800);
+      expect(row.capacity_per_module_gb).toBe(16);
+      expect(row.capacity_modules).toBe(2);
+      expect(row.capacity_total_gb).toBe(32);
+    }
   });
 
-  it("extracts base fields and puts remaining into specs JSONB (SATA)", () => {
+  it("flattens SATA fields into typed columns", () => {
     const yaml: ComponentYAML = {
       id: "samsung-870-evo-1tb",
       type: "sata_drive",
@@ -632,11 +646,12 @@ describe("transformComponent", () => {
 
     expect(row.id).toBe("samsung-870-evo-1tb");
     expect(row.type).toBe("sata_drive");
-    expect(row.specs).toEqual({
-      form_factor: "2.5",
-      capacity_gb: 1000,
-      interface: "SATA III",
-    });
+    expect(row).not.toHaveProperty("specs");
+    if (row.type === "sata_drive") {
+      expect(row.form_factor).toBe("2.5");
+      expect(row.capacity_gb).toBe(1000);
+      expect(row.interface).toBe("SATA III");
+    }
   });
 
   it("passes through optional sku, sources, and contributed_by when present", () => {
@@ -649,6 +664,8 @@ describe("transformComponent", () => {
       sources: [{ type: "manufacturer", url: "https://example.com" }],
       contributed_by: "hake",
       schema_version: "1.0",
+      interface: { protocol: "NVMe", pcie_gen: 4, lanes: 4 },
+      form_factor: "2280",
       capacity_gb: 500,
     };
     const row = transformComponent(yaml);
@@ -665,6 +682,9 @@ describe("transformComponent", () => {
       manufacturer: "T",
       model: "T",
       schema_version: "1.0",
+      interface: { protocol: "NVMe", pcie_gen: 4, lanes: 4 },
+      form_factor: "2280",
+      capacity_gb: 100,
     };
     const before = new Date().toISOString();
     const row = transformComponent(yaml);
@@ -682,21 +702,28 @@ describe("transformComponent", () => {
       manufacturer: "T",
       model: "T",
       schema_version: "1.0",
+      interface: { protocol: "NVMe", pcie_gen: 4, lanes: 4 },
+      form_factor: "2280",
       capacity_gb: 100,
     };
     const row = transformComponent(yaml);
-    const expectedKeys: (keyof ComponentRow)[] = [
+    const expectedKeys: (keyof NvmeComponentRow)[] = [
       "id",
       "type",
       "manufacturer",
       "model",
       "sku",
       "summary_line",
-      "specs",
       "sources",
       "contributed_by",
       "schema_version",
       "updated_at",
+      "interface_protocol",
+      "interface_pcie_gen",
+      "interface_lanes",
+      "form_factor",
+      "capacity_gb",
+      "capacity_variant_note",
     ];
 
     for (const key of expectedKeys) {

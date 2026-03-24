@@ -2,8 +2,10 @@ import type {
   Motherboard,
   Component,
   NVMeComponent,
+  GPUComponent,
   ValidationResult,
   M2Slot,
+  PCIeSlot,
 } from "./types";
 
 /**
@@ -30,7 +32,23 @@ export function validateAssignments(
         continue;
       }
 
-      // PCIe slot and SATA port rules can be added later.
+      // PCIe slot validation — route GPU assignments to validatePCIeAssignment
+      const pcieSlot = motherboard.pcie_slots?.find((s) => s.id === slotId);
+      if (pcieSlot && isGPU(component)) {
+        results.push(
+          ...validatePCIeAssignment(
+            pcieSlot,
+            component,
+            slotId,
+            componentId,
+            motherboard.pcie_slots,
+            assignments
+          )
+        );
+        continue;
+      }
+
+      // SATA port rules can be added later.
       // Unknown slot IDs are silently skipped.
     }
 
@@ -42,6 +60,93 @@ export function validateAssignments(
 
 function isNVMe(component: Component): component is NVMeComponent {
   return component.type === "nvme";
+}
+
+function isGPU(component: Component): component is GPUComponent {
+  return component.type === "gpu";
+}
+
+/** Maps PCIe physical_size string to lane count. */
+const PHYSICAL_SIZE_LANES: Record<string, number> = {
+  x1: 1,
+  x4: 4,
+  x8: 8,
+  x16: 16,
+};
+
+/**
+ * Validates a GPU-to-PCIe slot assignment for physical fit, lane width,
+ * generation mismatch, and position-based blocking.
+ */
+export function validatePCIeAssignment(
+  slot: PCIeSlot,
+  gpu: GPUComponent,
+  slotId: string,
+  componentId: string,
+  allSlots: PCIeSlot[],
+  assignments: Record<string, string>
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+
+  // 1. Physical fit check — GPU lanes vs slot physical size
+  const physicalLanes = PHYSICAL_SIZE_LANES[slot.physical_size] ?? 0;
+  if (gpu.interface.lanes > physicalLanes) {
+    results.push({
+      severity: "error",
+      message: `${gpu.model} requires x${gpu.interface.lanes} lanes but slot ${slot.label} is physically ${slot.physical_size} — the GPU cannot physically fit.`,
+      slotId,
+      componentId,
+    });
+  }
+
+  // 2. Lane width mismatch — GPU lanes vs slot electrical lanes
+  if (gpu.interface.lanes > slot.electrical_lanes) {
+    results.push({
+      severity: "error",
+      message: `${gpu.model} requires x${gpu.interface.lanes} electrical lanes but slot ${slot.label} only provides x${slot.electrical_lanes} — lane width mismatch.`,
+      slotId,
+      componentId,
+    });
+  }
+
+  // 3. Gen mismatch (downgrade) — GPU gen > slot gen
+  if (gpu.interface.pcie_gen > slot.gen) {
+    results.push({
+      severity: "warning",
+      message: `${gpu.model} is PCIe Gen${gpu.interface.pcie_gen} but slot ${slot.label} is Gen${slot.gen} — performance downgrade.`,
+      slotId,
+      componentId,
+    });
+  }
+
+  // 4. Gen mismatch (underuse) — GPU gen < slot gen
+  if (gpu.interface.pcie_gen < slot.gen) {
+    results.push({
+      severity: "info",
+      message: `${gpu.model} is PCIe Gen${gpu.interface.pcie_gen} but slot ${slot.label} supports Gen${slot.gen} — the slot supports a higher gen.`,
+      slotId,
+      componentId,
+    });
+  }
+
+  // 5. Physical blocking — check if GPU blocks adjacent populated slots
+  const slotsOccupied = gpu.physical?.slots_occupied ?? 1;
+  if (slotsOccupied > 1) {
+    for (let offset = 1; offset < slotsOccupied; offset++) {
+      const blockedPosition = slot.position + offset;
+      const blockedSlot = allSlots.find((s) => s.position === blockedPosition);
+      if (blockedSlot && assignments[blockedSlot.id] && blockedSlot.id !== slotId) {
+        results.push({
+          severity: "warning",
+          message: `${gpu.model} occupies ${slotsOccupied} slot positions — it physically blocks slot ${blockedSlot.label} (position ${blockedPosition}) which has a component assigned.`,
+          slotId,
+          componentId,
+        });
+      }
+    }
+  }
+
+  return results;
 }
 
 function validateM2Assignment(
@@ -82,6 +187,13 @@ function validateM2Assignment(
       slotId,
       componentId,
     });
+  }
+
+  // Append capacity variant note to all messages if present
+  if (component.capacity_variant_note && component.capacity_variant_note.trim().length > 0) {
+    for (const result of results) {
+      result.message = `${result.message} [Note: ${component.capacity_variant_note}]`;
+    }
   }
 
   return results;

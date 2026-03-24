@@ -8,4 +8,4 @@ interface:
   lanes: 4
 form_factor: "2280"
 capacity_gb: 2000
-schema_version: "1.0"
+schema_version: "1.1"

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import BoardSelector from "./BoardSelector";
+import MotherboardTable from "./MotherboardTable";
 import SlotList from "./SlotList";
 import ComponentPicker from "./ComponentPicker";
 import ValidationPanel from "./ValidationPanel";
@@ -204,14 +204,16 @@ export default function SlotChecker({ manifest }: SlotCheckerProps) {
     }
 
     try {
-      const comp = await fetchComponentFromSupabase(componentId);
+      const manifestEntry = manifest.components.find((c) => c.id === componentId);
+      const compType = manifestEntry?.type ?? "";
+      const comp = await fetchComponentFromSupabase(componentId, compType);
       if (!comp) return; // silently skip — validation will run without it
       componentCache.current.set(componentId, comp);
       setLoadedComponents((prev) => ({ ...prev, [componentId]: comp }));
     } catch {
       // Component fetch failure is non-fatal
     }
-  }, []);
+  }, [manifest.components]);
 
   // Open the component picker for a slot
   const handleAssign = useCallback(
@@ -267,8 +269,7 @@ export default function SlotChecker({ manifest }: SlotCheckerProps) {
         <h2 className="mb-3 text-lg font-semibold text-zinc-100">
           Select Motherboard
         </h2>
-        <BoardSelector
-          boards={manifest.motherboards}
+        <MotherboardTable
           selectedBoardId={selectedBoardId}
           onSelectBoard={handleSelectBoard}
         />

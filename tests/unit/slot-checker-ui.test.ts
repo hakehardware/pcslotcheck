@@ -43,8 +43,8 @@ const asusZ890F: Motherboard = {
     { id: "m2_5", label: "M.2_5 (Chipset)", interface: "PCIe_or_SATA", gen: 4, lanes: 4, form_factors: ["2242","2260","2280"], source: "Chipset", supports_sata: true, heatsink_included: false, sharing: [{ type: "disables", targets: ["sata_1","sata_2"], condition: "M.2_5 is populated with a SATA device", effect: "SATA ports 1 and 2 are disabled" }] },
   ],
   pcie_slots: [
-    { id: "pcie_1", label: "PCIEX16_1 (CPU)", gen: 5, electrical_lanes: 16, physical_size: "x16", source: "CPU", reinforced: true, sharing: null },
-    { id: "pcie_2", label: "PCIEX16_2 (Chipset)", gen: 4, electrical_lanes: 4, physical_size: "x16", source: "Chipset", reinforced: false, sharing: null },
+    { id: "pcie_1", label: "PCIEX16_1 (CPU)", gen: 5, electrical_lanes: 16, physical_size: "x16", position: 1, source: "CPU", reinforced: true, sharing: null },
+    { id: "pcie_2", label: "PCIEX16_2 (Chipset)", gen: 4, electrical_lanes: 4, physical_size: "x16", position: 2, source: "Chipset", reinforced: false, sharing: null },
   ],
   sata_ports: [
     { id: "sata_1", version: "3.0", source: "Chipset", disabled_by: "m2_5" },
@@ -90,9 +90,9 @@ const msiX870: Motherboard = {
     { id: "m2_4", label: "M2_4 (Chipset)", interface: "PCIe", gen: 4, lanes: 4, form_factors: ["2260","2280"], source: "Chipset", supports_sata: false, heatsink_included: true, sharing: [{ type: "disables", targets: ["sata_3","sata_4"], condition: "M.2_4 is populated", effect: "SATA ports 3 and 4 are disabled" }] },
   ],
   pcie_slots: [
-    { id: "pcie_1", label: "PCI_E1 (CPU)", gen: 5, electrical_lanes: 16, physical_size: "x16", source: "CPU", reinforced: true, sharing: null },
-    { id: "pcie_2", label: "PCI_E2 (Chipset)", gen: 3, electrical_lanes: 1, physical_size: "x16", source: "Chipset", reinforced: false, sharing: null },
-    { id: "pcie_3", label: "PCI_E3 (Chipset)", gen: 4, electrical_lanes: 4, physical_size: "x16", source: "Chipset", reinforced: false, sharing: [{ type: "bandwidth_split", target: "m2_3", condition: "M.2_3 is populated", effect: "PCI_E3 operates at x2 instead of x4" }] },
+    { id: "pcie_1", label: "PCI_E1 (CPU)", gen: 5, electrical_lanes: 16, physical_size: "x16", position: 1, source: "CPU", reinforced: true, sharing: null },
+    { id: "pcie_2", label: "PCI_E2 (Chipset)", gen: 3, electrical_lanes: 1, physical_size: "x16", position: 2, source: "Chipset", reinforced: false, sharing: null },
+    { id: "pcie_3", label: "PCI_E3 (Chipset)", gen: 4, electrical_lanes: 4, physical_size: "x16", position: 3, source: "Chipset", reinforced: false, sharing: [{ type: "bandwidth_split", target: "m2_3", condition: "M.2_3 is populated", effect: "PCI_E3 operates at x2 instead of x4" }] },
   ],
   sata_ports: [
     { id: "sata_1", version: "3.0", source: "Chipset", disabled_by: null },

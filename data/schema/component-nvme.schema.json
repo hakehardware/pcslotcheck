@@ -59,6 +59,10 @@
     "capacity_gb": {
       "type": "number"
     },
+    "capacity_variant_note": {
+      "type": "string",
+      "description": "Documents when this capacity variant has different interface specs than other variants of the same model family"
+    },
     "schema_version": {
       "type": "string"
     }

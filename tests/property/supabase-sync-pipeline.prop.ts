@@ -9,6 +9,7 @@ import {
   transformMotherboard,
   transformSlots,
   transformComponent,
+  reconstructComponent,
   generateSummaryLine,
   discoverYamlFiles,
   computeOrphans,
@@ -91,13 +92,14 @@ const arbM2Slots = fc
   });
 
 /** Generate a PCIe slot. */
-function arbPCIeSlot(slotId: string) {
+function arbPCIeSlot(slotId: string, position: number) {
   return fc.record({
     id: fc.constant(slotId),
     label: nonEmptyStringArb,
     gen: fc.constantFrom(3, 4, 5),
     electrical_lanes: fc.constantFrom(1, 4, 8, 16),
     physical_size: fc.constantFrom("x1" as const, "x4" as const, "x8" as const, "x16" as const),
+    position: fc.constant(position),
     source: fc.constantFrom("CPU" as const, "Chipset" as const),
     reinforced: fc.boolean(),
     sharing: fc.option(fc.array(sharingRuleArb, { minLength: 1, maxLength: 2 }), { nil: null }),
@@ -110,7 +112,7 @@ const arbPCIeSlots = fc
   .chain((count): fc.Arbitrary<MotherboardYAML["pcie_slots"]> => {
     if (count === 0) return fc.constant([] as unknown as MotherboardYAML["pcie_slots"]);
     const ids = Array.from({ length: count }, (_, i) => `pcie_${i + 1}`);
-    return fc.tuple(...ids.map((id) => arbPCIeSlot(id))) as fc.Arbitrary<
+    return fc.tuple(...ids.map((id, i) => arbPCIeSlot(id, i + 1))) as fc.Arbitrary<
       MotherboardYAML["pcie_slots"]
     >;
   });
@@ -332,10 +334,11 @@ function arbGpuYAML(): fc.Arbitrary<ComponentYAML> {
   return fc.record({
     id: idArb,
     type: fc.constant("gpu"),
+    chip_manufacturer: fc.constantFrom("NVIDIA", "AMD", "Intel"),
     manufacturer: nonEmptyStringArb,
     model: nonEmptyStringArb,
     sku: fc.option(nonEmptyStringArb, { nil: undefined }),
-    schema_version: fc.constantFrom("1.0", "2.0"),
+    schema_version: fc.constant("2.0"),
     sources: fc.option(
       fc.constant([{ type: "manual", url: "https://example.com" }]),
       { nil: undefined }
@@ -343,15 +346,23 @@ function arbGpuYAML(): fc.Arbitrary<ComponentYAML> {
     contributed_by: fc.option(nonEmptyStringArb, { nil: undefined }),
     interface: fc.record({
       pcie_gen: fc.constantFrom(3, 4, 5),
-      lanes: fc.constantFrom(8, 16),
+      lanes: fc.constantFrom(1, 4, 8, 16),
     }),
     physical: fc.record({
       slot_width: fc.constantFrom(1, 2, 3),
       length_mm: fc.integer({ min: 150, max: 400 }),
+      slots_occupied: fc.integer({ min: 1, max: 4 }),
     }),
     power: fc.record({
       tdp_w: fc.integer({ min: 75, max: 600 }),
       recommended_psu_w: fc.option(fc.integer({ min: 450, max: 1200 }), { nil: undefined }),
+      power_connectors: fc.array(
+        fc.record({
+          type: fc.constantFrom("6-pin", "8-pin", "12-pin", "16-pin/12VHPWR", "16-pin/12V-2x6"),
+          count: fc.integer({ min: 1, max: 4 }),
+        }),
+        { minLength: 1, maxLength: 3 }
+      ),
     }),
   });
 }
@@ -421,13 +432,28 @@ describe("Property 2: Component transform round-trip", () => {
    * Validates: Requirements 6.1, 6.3, 10.2
    *
    * For any valid component YAML object (nvme, gpu, ram, or sata_drive),
-   * extracting the base fields and storing the remaining fields as a `specs`
-   * JSONB blob, then merging them back together, should produce an object
-   * equivalent to the original YAML input (excluding generated fields like
-   * `summary_line` and `updated_at`).
+   * transforming it into a per-type row and then reconstructing the Component
+   * union from that row should produce an object equivalent to the original
+   * YAML input (excluding metadata fields like sku, sources, contributed_by,
+   * summary_line, and updated_at).
    */
 
-  test("transformComponent → merge base + specs reproduces original YAML", () => {
+  test("transformComponent → reconstructComponent reproduces original YAML", () => {
+    /** Recursively normalize an object: convert null to undefined, then strip undefined keys. */
+    function normalize(obj: unknown): unknown {
+      if (obj === null || obj === undefined) return undefined;
+      if (Array.isArray(obj)) return obj.map(normalize);
+      if (typeof obj === "object") {
+        const result: Record<string, unknown> = {};
+        for (const [key, val] of Object.entries(obj as Record<string, unknown>)) {
+          const normalized = normalize(val);
+          if (normalized !== undefined) result[key] = normalized;
+        }
+        return result;
+      }
+      return obj;
+    }
+
     fc.assert(
       fc.property(arbComponentYAML(), (yaml) => {
         const row = transformComponent(yaml);
@@ -442,27 +468,19 @@ describe("Property 2: Component transform round-trip", () => {
         expect(row.contributed_by).toBe(yaml.contributed_by ?? null);
         expect(row.sources).toEqual(yaml.sources ?? null);
 
-        // Reconstruct the original by merging base fields + specs
-        const reconstructed: Record<string, unknown> = {
-          id: row.id,
-          type: row.type,
-          manufacturer: row.manufacturer,
-          model: row.model,
-          schema_version: row.schema_version,
-          ...row.specs,
-        };
-        if (row.sku !== null) reconstructed.sku = row.sku;
-        if (row.sources !== null) reconstructed.sources = row.sources;
-        if (row.contributed_by !== null) reconstructed.contributed_by = row.contributed_by;
+        // Reconstruct the Component union from the per-type row
+        const reconstructed = reconstructComponent(row);
 
-        // Build expected from original YAML, excluding generated fields
+        // Build expected from original YAML, excluding metadata/generated fields
         const expected: Record<string, unknown> = { ...yaml };
-        // Remove undefined optional fields to match reconstruction
-        for (const key of Object.keys(expected)) {
-          if (expected[key] === undefined) delete expected[key];
-        }
+        delete expected.sku;
+        delete expected.sources;
+        delete expected.contributed_by;
+        delete expected.summary_line;
+        delete expected.updated_at;
 
-        expect(reconstructed).toEqual(expected);
+        // Normalize both sides: null and undefined are equivalent for optional fields
+        expect(normalize(reconstructed)).toEqual(normalize(expected));
       }),
       { numRuns: 100 }
     );
@@ -1003,7 +1021,7 @@ describe("Property 6: Invalid files are skipped without aborting valid syncs", (
       chipset: "Z890",
       socket: "LGA1851",
       form_factor: "ATX",
-      schema_version: "1.0",
+      schema_version: "2.0",
       memory: {
         type: "DDR5",
         max_speed_mhz: 6000,
@@ -1026,12 +1044,17 @@ describe("Property 6: Invalid files are skipped without aborting valid syncs", (
     return yaml.dump({
       id,
       type: "gpu",
+      chip_manufacturer: "NVIDIA",
       manufacturer: "TestGPU",
       model: "TestCard",
       interface: { pcie_gen: 4, lanes: 16 },
-      physical: { slot_width: 2, length_mm: 300 },
-      power: { tdp_w: 250, recommended_psu_w: 650 },
-      schema_version: "1.0",
+      physical: { slot_width: 2, length_mm: 300, slots_occupied: 2 },
+      power: {
+        tdp_w: 250,
+        recommended_psu_w: 650,
+        power_connectors: [{ type: "8-pin", count: 2 }],
+      },
+      schema_version: "2.0",
     });
   }
 

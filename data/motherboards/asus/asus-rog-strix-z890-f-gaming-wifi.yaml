@@ -4,7 +4,7 @@ model: ROG STRIX Z890-F GAMING WIFI
 chipset: Z890
 socket: LGA1851
 form_factor: ATX
-schema_version: "1.0"
+schema_version: "2.0"
 
 memory:
   type: DDR5
@@ -116,6 +116,7 @@ m2_slots:
 pcie_slots:
   - id: pcie_1
     label: PCIEX16_1 (CPU)
+    position: 1
     gen: 5
     electrical_lanes: 16
     physical_size: x16
@@ -125,6 +126,7 @@ pcie_slots:
 
   - id: pcie_2
     label: PCIEX16_2 (Chipset)
+    position: 2
     gen: 4
     electrical_lanes: 4
     physical_size: x16

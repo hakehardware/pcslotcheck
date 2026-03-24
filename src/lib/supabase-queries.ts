@@ -10,8 +10,13 @@ import type {
   Motherboard,
   Component,
   SharingRule,
+  PCIeSlot,
+  MotherboardSummary,
+  MotherboardPageResult,
+  FilterOptions,
 } from "./types";
-import type { MotherboardRow, SlotRow } from "../../scripts/sync";
+import type { MotherboardRow, SlotRow, PerTypeComponentRow } from "../../scripts/sync";
+import { COMPONENT_TABLE_MAP, reconstructComponent } from "../../scripts/sync";
 
 /**
  * Reassembles flat DB rows (motherboard row + slot rows) back into the
@@ -89,7 +94,7 @@ export function assembleMotherboard(row: MotherboardRow, slotRows: SlotRow[]): M
       },
     },
     m2_slots: m2Slots,
-    pcie_slots: pcieSlots,
+    pcie_slots: pcieSlots as PCIeSlot[],
     sata_ports: sataPorts,
     sources: row.sources,
     schema_version: row.schema_version,
@@ -124,36 +129,103 @@ export async function fetchMotherboardFromSupabase(id: string): Promise<Motherbo
 }
 
 /**
- * Fetches a component from Supabase and reconstructs the full typed object
- * by merging base fields with the specs JSONB column.
- * Returns null when no component row found.
+ * Fetches a component from the correct per-type Supabase table and
+ * reconstructs the full typed Component union from flat columns.
+ * Returns null when the type is unknown or no component row is found.
  */
-export async function fetchComponentFromSupabase(id: string): Promise<Component | null> {
+export async function fetchComponentFromSupabase(
+  id: string,
+  type: string
+): Promise<Component | null> {
   const { supabase } = await import("./supabase");
 
+  const tableName = COMPONENT_TABLE_MAP[type];
+  if (!tableName) return null;
+
   const { data: row, error } = await supabase
-    .from("components")
+    .from(tableName)
     .select("*")
     .eq("id", id)
     .single();
 
   if (error || !row) return null;
 
-  const { id: compId, type, manufacturer, model, specs, schema_version } = row as {
-    id: string;
-    type: string;
-    manufacturer: string;
-    model: string;
-    specs: Record<string, unknown>;
-    schema_version: string;
-  };
+  return reconstructComponent(row as PerTypeComponentRow);
+}
+
+/**
+ * Fetches a paginated, filtered, searchable page of motherboards from Supabase.
+ * Supports manufacturer/chipset exact-match filters and case-insensitive
+ * text search across manufacturer, model, chipset, and socket columns.
+ */
+export async function fetchMotherboardPage(params: {
+  page: number;
+  pageSize: number;
+  manufacturer?: string | null;
+  chipset?: string | null;
+  search?: string | null;
+}): Promise<MotherboardPageResult> {
+  const { supabase } = await import("./supabase");
+
+  const { page, pageSize, manufacturer, chipset, search } = params;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("motherboards")
+    .select("id, manufacturer, model, chipset, socket, form_factor", { count: "exact" });
+
+  if (manufacturer) {
+    query = query.eq("manufacturer", manufacturer);
+  }
+
+  if (chipset) {
+    query = query.eq("chipset", chipset);
+  }
+
+  if (search) {
+    const pattern = `%${search}%`;
+    query = query.or(
+      `manufacturer.ilike.${pattern},model.ilike.${pattern},chipset.ilike.${pattern},socket.ilike.${pattern}`
+    );
+  }
+
+  query = query
+    .order("manufacturer", { ascending: true })
+    .order("model", { ascending: true })
+    .range(from, to);
+
+  const { data, count, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to fetch motherboards: ${error.message}`);
+  }
 
   return {
-    id: compId,
-    type,
-    manufacturer,
-    model,
-    schema_version,
-    ...specs,
-  } as Component;
+    rows: (data ?? []) as MotherboardSummary[],
+    totalCount: count ?? 0,
+  };
+}
+
+/**
+ * Fetches distinct manufacturer and chipset values from the motherboards table
+ * for populating filter dropdowns. Deduplicates and sorts alphabetically.
+ */
+export async function fetchFilterOptions(): Promise<FilterOptions> {
+  const { supabase } = await import("./supabase");
+
+  const { data, error } = await supabase
+    .from("motherboards")
+    .select("manufacturer, chipset");
+
+  if (error) {
+    throw new Error(`Failed to fetch filter options: ${error.message}`);
+  }
+
+  const rows = (data ?? []) as Array<{ manufacturer: string; chipset: string }>;
+
+  const manufacturers = [...new Set(rows.map((r) => r.manufacturer))].sort();
+  const chipsets = [...new Set(rows.map((r) => r.chipset))].sort();
+
+  return { manufacturers, chipsets };
 }

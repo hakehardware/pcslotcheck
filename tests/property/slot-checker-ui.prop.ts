@@ -60,6 +60,7 @@ function arbPCIeSlot(): fc.Arbitrary<PCIeSlot> {
     gen: fc.constantFrom(3, 4, 5),
     electrical_lanes: fc.constantFrom(1, 4, 8, 16),
     physical_size: fc.constantFrom("x1" as const, "x4" as const, "x8" as const, "x16" as const),
+    position: fc.integer({ min: 1, max: 10 }),
     source: fc.constantFrom("CPU" as const, "Chipset" as const),
     reinforced: fc.boolean(),
     sharing: fc.constant(null),
@@ -427,6 +428,7 @@ function arbPCIeSlotWithSharing(
     gen: fc.constantFrom(3, 4, 5),
     electrical_lanes: fc.constantFrom(1, 4, 8, 16),
     physical_size: fc.constantFrom("x1" as const, "x4" as const, "x8" as const, "x16" as const),
+    position: fc.integer({ min: 1, max: 10 }),
     source: fc.constantFrom("CPU" as const, "Chipset" as const),
     reinforced: fc.boolean(),
     sharing: fc.constant(sharing),
@@ -777,6 +779,7 @@ function arbGPUComponent(): fc.Arbitrary<GPUComponent> {
   return fc.record({
     id: idArb,
     type: fc.constant("gpu" as const),
+    chip_manufacturer: fc.constantFrom("NVIDIA", "AMD", "Intel"),
     manufacturer: nonEmptyStringArb,
     model: nonEmptyStringArb,
     interface: fc.record({
@@ -786,10 +789,12 @@ function arbGPUComponent(): fc.Arbitrary<GPUComponent> {
     physical: fc.record({
       slot_width: fc.constantFrom(2, 3),
       length_mm: fc.constantFrom(250, 300, 350),
+      slots_occupied: fc.constantFrom(1, 2, 3, 4),
     }),
     power: fc.record({
       tdp_w: fc.constantFrom(150, 200, 250, 350),
       recommended_psu_w: fc.constantFrom(550, 650, 750, 850),
+      power_connectors: fc.array(fc.record({ type: fc.constantFrom("6-pin", "8-pin", "16-pin/12VHPWR"), count: fc.integer({ min: 1, max: 3 }) }), { minLength: 1, maxLength: 2 }),
     }),
     schema_version: fc.constant("1.0"),
   });

@@ -199,6 +199,7 @@
         "gen",
         "electrical_lanes",
         "physical_size",
+        "position",
         "source",
         "reinforced",
         "sharing"
@@ -212,6 +213,11 @@
         "physical_size": {
           "type": "string",
           "enum": ["x1", "x4", "x8", "x16"]
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Physical vertical position on the board (1 = topmost, incrementing downward)"
         },
         "source": {
           "type": "string",

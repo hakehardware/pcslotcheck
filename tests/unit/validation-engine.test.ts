@@ -227,8 +227,9 @@ describe("validateAssignments", () => {
         manufacturer: "NVIDIA",
         model: "RTX 4070 Ti SUPER",
         interface: { pcie_gen: 4, lanes: 16 },
-        physical: { slot_width: 3, length_mm: 336 },
-        power: { tdp_w: 285, recommended_psu_w: 700 },
+        physical: { slot_width: 3, length_mm: 336, slots_occupied: 2 },
+        power: { tdp_w: 285, recommended_psu_w: 700, power_connectors: [{ type: "16-pin/12VHPWR", count: 1 }] },
+        chip_manufacturer: "NVIDIA",
         schema_version: "1.0",
       };
 

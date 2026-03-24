@@ -1,5 +1,6 @@
 id: nvidia-rtx-4070-ti-super
 type: gpu
+chip_manufacturer: "NVIDIA"
 manufacturer: NVIDIA
 model: GeForce RTX 4070 Ti SUPER
 interface:
@@ -8,7 +9,11 @@ interface:
 physical:
   slot_width: 2
   length_mm: 304
+  slots_occupied: 2
 power:
   tdp_w: 285
   recommended_psu_w: 700
-schema_version: "1.0"
+  power_connectors:
+    - type: "16-pin/12VHPWR"
+      count: 1
+schema_version: "2.0"

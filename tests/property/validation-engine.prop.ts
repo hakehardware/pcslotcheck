@@ -61,6 +61,7 @@ const pcieSlotArb: fc.Arbitrary<PCIeSlot> = fc.record({
   gen: fc.constantFrom(3, 4, 5),
   electrical_lanes: fc.constantFrom(1, 4, 8, 16),
   physical_size: fc.constantFrom("x1" as const, "x4" as const, "x8" as const, "x16" as const),
+  position: fc.integer({ min: 1, max: 10 }),
   source: fc.constantFrom("CPU" as const, "Chipset" as const),
   reinforced: fc.boolean(),
   sharing: fc.constant(null),

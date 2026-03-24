@@ -48,6 +48,7 @@ export interface PCIeSlot {
   gen: number;
   electrical_lanes: number;
   physical_size: "x1" | "x4" | "x8" | "x16";
+  position: number;
   source: "CPU" | "Chipset";
   reinforced: boolean;
   sharing: SharingRule[] | null;
@@ -89,12 +90,14 @@ export interface NVMeComponent {
   };
   form_factor: string;
   capacity_gb: number;
+  capacity_variant_note?: string;
   schema_version: string;
 }
 
 export interface GPUComponent {
   id: string;
   type: "gpu";
+  chip_manufacturer: string;
   manufacturer: string;
   model: string;
   interface: {
@@ -104,10 +107,12 @@ export interface GPUComponent {
   physical: {
     slot_width: number;
     length_mm: number;
+    slots_occupied: number;
   };
   power: {
     tdp_w: number;
     recommended_psu_w: number;
+    power_connectors: { type: string; count: number }[];
   };
   schema_version: string;
 }
@@ -181,4 +186,25 @@ export interface DataManifest {
     model: string;
     specs: Record<string, unknown>;
   }[];
+}
+
+// === Motherboard Table Selector Types ===
+
+export interface MotherboardSummary {
+  id: string;
+  manufacturer: string;
+  model: string;
+  chipset: string;
+  socket: string;
+  form_factor: string;
+}
+
+export interface MotherboardPageResult {
+  rows: MotherboardSummary[];
+  totalCount: number;
+}
+
+export interface FilterOptions {
+  manufacturers: string[];
+  chipsets: string[];
 }
