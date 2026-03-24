@@ -1497,8 +1497,8 @@ describe("Feature: validation-engine-gaps, Property 15: Empty assignments produc
       m2_slots: fc.array(m2SlotArb(), { minLength: 0, maxLength: 3 }),
       pcie_slots: fc.array(pcieSlotArb, { minLength: 0, maxLength: 2 }),
       sata_ports: fc.array(sataPortArb, { minLength: 0, maxLength: 4 }),
-      sources: fc.constant([{ type: "manual", url: "https://example.com" }]),
-      schema_version: fc.constant("2.0"),
+      sources: fc.constant([{ type: "manual", url: "https://example.com" }] as { type: string; url: string }[]),
+      schema_version: fc.constant("2.0" as string),
     });
 
     // Generate an arbitrary component map (non-empty, to prove it is ignored)
