@@ -1,0 +1,170 @@
+id: gigabyte-x870e-aorus-master
+manufacturer: Gigabyte
+model: X870E AORUS MASTER
+chipset: X870E
+socket: AM5
+form_factor: ATX
+schema_version: "2.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 8600
+  base_speed_mhz: 4800
+  max_capacity_gb: 256
+  ecc_support: true
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a2
+      - dimm_b2
+      - dimm_a1
+      - dimm_b1
+
+m2_slots:
+  - id: m2a_cpu
+    label: M2A_CPU
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2b_cpu
+    label: M2B_CPU
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: bandwidth_split
+        target: pciex16
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2b_cpu
+          logic: any_populated
+        condition: Device installed in M2B_CPU or M2C_CPU
+        effect: PCIEX16 operates at up to x8 mode
+
+  - id: m2c_cpu
+    label: M2C_CPU
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: bandwidth_split
+        target: pciex16
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2c_cpu
+          logic: any_populated
+        condition: Device installed in M2B_CPU or M2C_CPU
+        effect: PCIEX16 operates at up to x8 mode
+
+  - id: m2d_sb
+    label: M2D_SB
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+pcie_slots:
+  - id: pciex16
+    label: PCIEX16 (CPU)
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex4_1
+    label: PCIEX4_1 (Chipset)
+    position: 2
+    gen: 4
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+  - id: pciex4_2
+    label: PCIEX4_2 (Chipset)
+    position: 3
+    gen: 3
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manual
+    url: https://download.gigabyte.com/FileList/Manual/mb_manual_x870e-aorus-master_1003_e.pdf
+  - type: manufacturer
+    url: https://www.gigabyte.com/Motherboard/X870E-AORUS-MASTER/sp
