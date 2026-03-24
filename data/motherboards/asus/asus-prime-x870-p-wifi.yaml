@@ -1,17 +1,17 @@
-id: asus-rog-strix-z890-f-gaming-wifi
+id: asus-prime-x870-p-wifi
 manufacturer: ASUS
-model: ROG STRIX Z890-F GAMING WIFI
-chipset: Intel Z890
-socket: LGA 1851
+model: PRIME X870-P WIFI
+chipset: AMD X870
+socket: AM5
 form_factor: ATX
 schema_version: "2.0"
 
 memory:
   type: DDR5
-  max_speed_mhz: 9066
+  max_speed_mhz: 8000
   base_speed_mhz: 4800
   max_capacity_gb: 256
-  ecc_support: false
+  ecc_support: true
   channels: 2
   slots:
     - id: dimm_a1
@@ -47,9 +47,6 @@ m2_slots:
     gen: 5
     lanes: 4
     form_factors:
-      - "22110"
-      - "2242"
-      - "2260"
       - "2280"
     source: CPU
     supports_sata: false
@@ -57,16 +54,28 @@ m2_slots:
     sharing: null
 
   - id: m2_2
-    label: M.2_2 (CPU)
+    label: M.2_2 (Chipset)
     interface: PCIe
     gen: 4
     lanes: 4
     form_factors:
+      - "2242"
+      - "2260"
       - "2280"
-    source: CPU
+    source: Chipset
     supports_sata: false
     heatsink_included: true
-    sharing: null
+    sharing:
+      - type: disables
+        targets:
+          - pcie_2
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_2
+          logic: any_populated
+        condition: M.2_2 is populated
+        effect: PCIEX16(G4)_1 will be disabled
 
   - id: m2_3
     label: M.2_3 (Chipset)
@@ -78,32 +87,28 @@ m2_slots:
     source: Chipset
     supports_sata: false
     heatsink_included: true
-    sharing: null
+    sharing:
+      - type: disables
+        targets:
+          - pcie_3
+          - pcie_4
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_3
+          logic: any_populated
+        condition: M.2_3 is populated
+        effect: PCIEX16(G4)_2 and PCIEX16(G4)_3 will be disabled
 
   - id: m2_4
     label: M.2_4 (Chipset)
     interface: PCIe
-    gen: 4
-    lanes: 4
+    gen: 3
+    lanes: 2
     form_factors:
-      - "22110"
       - "2280"
     source: Chipset
     supports_sata: false
-    heatsink_included: true
-    sharing: null
-
-  - id: m2_5
-    label: M.2_5 (Chipset)
-    interface: PCIe_or_SATA
-    gen: 4
-    lanes: 4
-    form_factors:
-      - "2242"
-      - "2260"
-      - "2280"
-    source: Chipset
-    supports_sata: true
     heatsink_included: false
     sharing: null
 
@@ -119,10 +124,30 @@ pcie_slots:
     sharing: null
 
   - id: pcie_2
-    label: PCIEX16(G4)
+    label: PCIEX16(G4)_1
     position: 2
     gen: 4
-    electrical_lanes: 4
+    electrical_lanes: 1
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+  - id: pcie_3
+    label: PCIEX16(G4)_2
+    position: 3
+    gen: 4
+    electrical_lanes: 1
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+  - id: pcie_4
+    label: PCIEX16(G4)_3
+    position: 4
+    gen: 4
+    electrical_lanes: 1
     physical_size: x16
     source: Chipset
     reinforced: false
@@ -139,18 +164,6 @@ sata_ports:
     source: Chipset
     disabled_by: null
 
-  - id: sata_3
-    version: "3.0"
-    source: Chipset
-    disabled_by: null
-
-  - id: sata_4
-    version: "3.0"
-    source: Chipset
-    disabled_by: null
-
 sources:
-  - type: manual
-    url: https://dlcdnets.asus.com/pub/ASUS/mb/LGA1851/ROG_STRIX_Z890-F_GAMING_WIFI/E24219_ROG_STRIX_Z890-F_GAMING_WIFI_EM_WEB.pdf
   - type: manufacturer
-    url: https://rog.asus.com/motherboards/rog-strix/rog-strix-z890-f-gaming-wifi/spec/
+    url: https://www.asus.com/motherboards-components/motherboards/prime/prime-x870-p-wifi/techspec/
