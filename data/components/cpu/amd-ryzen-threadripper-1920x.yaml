@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-1920x
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper 1920X
+socket: sTR4
+microarchitecture: Whitehaven
+architecture: Zen
+pcie_config:
+  cpu_gen: 3
+  cpu_lanes: 64
+cores: 12
+threads: 24
+tdp_w: 180
+schema_version: "1.0"

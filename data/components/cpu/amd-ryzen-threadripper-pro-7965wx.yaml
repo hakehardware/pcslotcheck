@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-pro-7965wx
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper PRO 7965WX
+socket: sTR5
+microarchitecture: Storm Peak
+architecture: Zen 4
+pcie_config:
+  cpu_gen: 5
+  cpu_lanes: 128
+cores: 24
+threads: 48
+tdp_w: 350
+schema_version: "1.0"

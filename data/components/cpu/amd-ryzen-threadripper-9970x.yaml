@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-9970x
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper 9970X
+socket: sTR5
+microarchitecture: Shimada Peak
+architecture: Zen 5
+pcie_config:
+  cpu_gen: 5
+  cpu_lanes: 48
+cores: 32
+threads: 64
+tdp_w: 350
+schema_version: "1.0"

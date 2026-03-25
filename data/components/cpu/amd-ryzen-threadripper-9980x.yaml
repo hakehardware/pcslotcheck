@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-9980x
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper 9980X
+socket: sTR5
+microarchitecture: Shimada Peak
+architecture: Zen 5
+pcie_config:
+  cpu_gen: 5
+  cpu_lanes: 48
+cores: 64
+threads: 128
+tdp_w: 350
+schema_version: "1.0"

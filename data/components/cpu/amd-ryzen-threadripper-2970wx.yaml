@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-2970wx
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper 2970WX
+socket: sTR4
+microarchitecture: Colfax
+architecture: Zen+
+pcie_config:
+  cpu_gen: 3
+  cpu_lanes: 64
+cores: 24
+threads: 48
+tdp_w: 250
+schema_version: "1.0"

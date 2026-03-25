@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-pro-9995wx
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper PRO 9995WX
+socket: sTR5
+microarchitecture: Shimada Peak
+architecture: Zen 5
+pcie_config:
+  cpu_gen: 5
+  cpu_lanes: 128
+cores: 96
+threads: 192
+tdp_w: 350
+schema_version: "1.0"

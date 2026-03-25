@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-pro-3975wx
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper PRO 3975WX
+socket: sWRX8
+microarchitecture: Castle Peak
+architecture: Zen 2
+pcie_config:
+  cpu_gen: 4
+  cpu_lanes: 128
+cores: 32
+threads: 64
+tdp_w: 280
+schema_version: "1.0"

@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-pro-7975wx
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper PRO 7975WX
+socket: sTR5
+microarchitecture: Storm Peak
+architecture: Zen 4
+pcie_config:
+  cpu_gen: 5
+  cpu_lanes: 128
+cores: 32
+threads: 64
+tdp_w: 350
+schema_version: "1.0"

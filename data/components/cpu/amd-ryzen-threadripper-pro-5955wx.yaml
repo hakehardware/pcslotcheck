@@ -1,0 +1,14 @@
+id: amd-ryzen-threadripper-pro-5955wx
+type: cpu
+manufacturer: AMD
+model: Ryzen Threadripper PRO 5955WX
+socket: sWRX8
+microarchitecture: Chagall
+architecture: Zen 3
+pcie_config:
+  cpu_gen: 4
+  cpu_lanes: 128
+cores: 16
+threads: 32
+tdp_w: 280
+schema_version: "1.0"
