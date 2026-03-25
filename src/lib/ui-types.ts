@@ -1,5 +1,5 @@
 /** Which category a slot belongs to */
-export type SlotCategory = "memory" | "m2" | "pcie" | "sata";
+export type SlotCategory = "memory" | "m2" | "pcie" | "sata" | "cpu";
 
 /** Badge display info */
 export interface BadgeInfo {
@@ -22,11 +22,8 @@ export interface SlotGroup {
   slots: SlotEntry[];
 }
 
-/** Component type key: slot categories plus "cpu" (which is not a slot but needs lookup) */
-export type ComponentTypeKey = SlotCategory | "cpu";
-
-/** Slot category (or cpu) → compatible component type mapping */
-export const SLOT_CATEGORY_TO_COMPONENT_TYPE: Record<ComponentTypeKey, string> = {
+/** Slot category → compatible component type mapping */
+export const SLOT_CATEGORY_TO_COMPONENT_TYPE: Record<SlotCategory, string> = {
   memory: "ram",
   m2: "nvme",
   pcie: "gpu",

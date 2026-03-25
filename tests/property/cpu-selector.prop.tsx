@@ -7,7 +7,8 @@ import { render } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import fc from "fast-check";
 
-import CPUSelector, { filterCompatibleCPUs } from "../../src/components/CPUSelector";
+import CPUSelector from "../../src/components/ComponentPicker";
+import { filterCompatibleCPUs } from "../../src/lib/component-search";
 import { CODENAME_TO_ARCHITECTURE } from "../../src/lib/__tests__/generators";
 import type { DataManifest } from "../../src/lib/types";
 
@@ -205,15 +206,17 @@ describe("Property 5: CPUSelector displays architecture from manifest specs", ()
         (cpuEntry) => {
           const { container } = render(
             <CPUSelector
+              slotCategory="cpu"
               manifestComponents={[cpuEntry]}
               motherboardSocket={targetSocket}
-              selectedCpuId={cpuEntry.id}
+              selectedComponentId={cpuEntry.id}
               onSelect={() => {}}
+              onClose={() => {}}
               onRemove={() => {}}
             />,
           );
 
-          const architecture = cpuEntry.specs.architecture as string;
+          const architecture = cpuEntry.specs.microarchitecture as string;
           expect(container.textContent).toContain(architecture);
         },
       ),

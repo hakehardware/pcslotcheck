@@ -34,7 +34,7 @@ describe("ComponentPicker CPU-specific specs", () => {
     const { container } = render(
       <ComponentPicker
         {...baseProps}
-        slotCategory={"cpu" as "memory"}
+        slotCategory={"cpu"}
         manifestComponents={[cpuManifestEntry]}
       />,
     );

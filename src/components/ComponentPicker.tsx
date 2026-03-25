@@ -1,47 +1,44 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { IoClose } from "react-icons/io5";
 import { SLOT_CATEGORY_TO_COMPONENT_TYPE } from "../lib/ui-types";
+import type { SlotCategory } from "../lib/ui-types";
+import { SPEC_DISPLAY_KEYS, searchComponents } from "../lib/component-search";
 import { GITHUB_ISSUES_URL } from "../lib/github-links";
 import type { DataManifest } from "../lib/types";
 
 interface ComponentPickerProps {
-  slotCategory: "memory" | "m2" | "pcie" | "sata";
+  slotCategory: SlotCategory;
   manifestComponents: DataManifest["components"];
   onSelect: (componentId: string) => void;
   onClose: () => void;
+  /** CPU-only: filter components to this socket */
+  motherboardSocket?: string;
+  /** Show selected-component card when set */
+  selectedComponentId?: string | null;
+  /** Callback when user clicks remove on the selected-component card */
+  onRemove?: () => void;
 }
 
-/** Key specs to display per component type */
-const SPEC_DISPLAY_KEYS: Record<string, { key: string; label: string }[]> = {
-  nvme: [
-    { key: "capacity_gb", label: "Capacity" },
-    { key: "interface.pcie_gen", label: "PCIe Gen" },
-    { key: "interface.protocol", label: "Protocol" },
-  ],
-  gpu: [
-    { key: "power.tdp_w", label: "TDP" },
-    { key: "interface.pcie_gen", label: "PCIe Gen" },
-    { key: "physical.length_mm", label: "Length" },
-  ],
-  ram: [
-    { key: "interface.type", label: "Type" },
-    { key: "interface.speed_mhz", label: "Speed" },
-    { key: "capacity.total_gb", label: "Capacity" },
-  ],
-  sata_drive: [
-    { key: "capacity_gb", label: "Capacity" },
-    { key: "form_factor", label: "Form Factor" },
-  ],
-  cpu: [
-    { key: "socket", label: "Socket" },
-    { key: "microarchitecture", label: "Arch" },
-    { key: "pcie_config.cpu_gen", label: "PCIe Gen" },
-  ],
+const SEARCH_PLACEHOLDERS: Record<SlotCategory, string> = {
+  cpu: "Search CPUs...",
+  m2: "Search NVMe drives...",
+  pcie: "Search GPUs...",
+  memory: "Search RAM...",
+  sata: "Search SATA drives...",
+};
+
+const CATEGORY_DISPLAY_NAMES: Record<SlotCategory, string> = {
+  cpu: "CPU",
+  m2: "NVMe drive",
+  pcie: "GPU",
+  memory: "RAM",
+  sata: "SATA drive",
 };
 
 function formatSpecValue(key: string, value: unknown): string {
-  if (value == null) return "—";
+  if (value == null) return "\u2014";
   if (key.includes("capacity") && typeof value === "number") return `${value} GB`;
   if (key.includes("tdp_w") && typeof value === "number") return `${value}W`;
   if (key.includes("speed_mhz") && typeof value === "number") return `${value} MHz`;
@@ -56,14 +53,85 @@ export default function ComponentPicker({
   manifestComponents,
   onSelect,
   onClose,
+  motherboardSocket,
+  selectedComponentId,
+  onRemove,
 }: ComponentPickerProps) {
+  // Inline mode: component manages its own open/close state
+  const isInlineMode = selectedComponentId !== undefined;
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Search state
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  // Refs
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const focusedIndex = useRef(-1);
 
+  // Filter compatible components by type (and socket for CPU)
   const compatibleType = SLOT_CATEGORY_TO_COMPONENT_TYPE[slotCategory];
-  const filtered = manifestComponents.filter((c) => c.type === compatibleType);
+  const compatibleComponents = manifestComponents.filter((c) => {
+    if (c.type !== compatibleType) return false;
+    if (slotCategory === "cpu" && motherboardSocket) {
+      return c.specs.socket === motherboardSocket;
+    }
+    return true;
+  });
+
   const specKeys = SPEC_DISPLAY_KEYS[compatibleType] ?? [];
 
+  // Find selected component
+  const selectedComponent = selectedComponentId
+    ? compatibleComponents.find((c) => c.id === selectedComponentId) ?? null
+    : null;
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchInput);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Search results
+  const { items: displayItems, totalMatches } = searchComponents(
+    compatibleComponents,
+    debouncedQuery,
+    5,
+  );
+
+  // Determine if picker is effectively open
+  const pickerIsOpen = isInlineMode ? isOpen : true;
+
+  // Close handler: in inline mode, close internally; in modal mode, call prop
+  const handleClose = useCallback(() => {
+    if (isInlineMode) {
+      setIsOpen(false);
+      setSearchInput("");
+      setDebouncedQuery("");
+      focusedIndex.current = -1;
+    } else {
+      onClose();
+    }
+  }, [isInlineMode, onClose]);
+
+  // Handle component selection
+  const handleSelect = useCallback(
+    (componentId: string) => {
+      onSelect(componentId);
+      if (isInlineMode) {
+        setIsOpen(false);
+        setSearchInput("");
+        setDebouncedQuery("");
+        focusedIndex.current = -1;
+      }
+    },
+    [onSelect, isInlineMode],
+  );
+
+  // Focus a list item by index
   const focusItem = useCallback((index: number) => {
     const items = listRef.current?.querySelectorAll<HTMLElement>('[role="option"]');
     if (!items || items.length === 0) return;
@@ -72,36 +140,128 @@ export default function ComponentPicker({
     items[clamped].focus();
   }, []);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-        return;
-      }
+  // Auto-focus search input when picker opens
+  useEffect(() => {
+    if (pickerIsOpen && compatibleComponents.length > 0) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [pickerIsOpen, compatibleComponents.length]);
+
+  // Keyboard navigation on search input
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        focusItem(focusedIndex.current + 1);
-      } else if (e.key === "ArrowUp") {
+        if (displayItems.length > 0) {
+          focusItem(0);
+        }
+      } else if (e.key === "Escape") {
         e.preventDefault();
-        focusItem(focusedIndex.current - 1);
+        handleClose();
       }
     },
-    [onClose, focusItem],
+    [displayItems.length, focusItem, handleClose],
   );
 
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+  // Keyboard navigation on list items
+  const handleItemKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLLIElement>, index: number, componentId: string) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        focusItem(index + 1);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (index === 0) {
+          // Return focus to search input
+          focusedIndex.current = -1;
+          searchInputRef.current?.focus();
+        } else {
+          focusItem(index - 1);
+        }
+      } else if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleSelect(componentId);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        handleClose();
+      }
+    },
+    [focusItem, handleSelect, handleClose],
+  );
 
-  // Focus first item on mount
-  useEffect(() => {
-    if (filtered.length > 0) {
-      focusItem(0);
-    }
-  }, [filtered.length, focusItem]);
+  // --- Render: Selected component card (inline mode only) ---
+  if (isInlineMode && selectedComponent) {
+    return (
+      <div
+        className="rounded-lg border border-zinc-700 bg-zinc-900 p-4"
+        role="group"
+        aria-label={`${CATEGORY_DISPLAY_NAMES[slotCategory]} selection`}
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-zinc-100">
+            {CATEGORY_DISPLAY_NAMES[slotCategory]}
+          </h3>
+          {onRemove && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-400 hover:bg-zinc-800 hover:text-red-300"
+              aria-label={`Remove ${selectedComponent.manufacturer} ${selectedComponent.model}`}
+            >
+              <IoClose aria-hidden="true" className="h-3.5 w-3.5" />
+              Remove
+            </button>
+          )}
+        </div>
+        <div className="mt-2 rounded border border-zinc-700 bg-zinc-800 px-3 py-2">
+          <div className="text-sm font-medium text-zinc-100">
+            {selectedComponent.manufacturer} {selectedComponent.model}
+          </div>
+          {specKeys.length > 0 && (
+            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-400">
+              {specKeys.map(({ key, label }) => {
+                const value = selectedComponent.specs[key];
+                if (value == null) return null;
+                return (
+                  <span key={key}>
+                    {label}: {formatSpecValue(key, value)}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
+  // --- Render: Collapsed "Select [type]" button (inline mode, no selection) ---
+  if (isInlineMode && !pickerIsOpen) {
+    return (
+      <div
+        className="rounded-lg border border-zinc-700 bg-zinc-900 p-4"
+        role="group"
+        aria-label={`${CATEGORY_DISPLAY_NAMES[slotCategory]} selection`}
+      >
+        <h3 className="text-sm font-semibold text-zinc-100">
+          {CATEGORY_DISPLAY_NAMES[slotCategory]}
+        </h3>
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="mt-3 w-full rounded border border-dashed border-zinc-600 px-3 py-2 text-sm text-zinc-400 hover:border-zinc-400 hover:text-zinc-200"
+        >
+          Select {CATEGORY_DISPLAY_NAMES[slotCategory]}
+        </button>
+      </div>
+    );
+  }
+
+  // --- Render: Open picker (both inline and modal modes) ---
   return (
     <div
       className="rounded-lg border border-zinc-700 bg-zinc-900 p-4"
@@ -110,21 +270,27 @@ export default function ComponentPicker({
     >
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-zinc-100">
-          Select Component
+          {isInlineMode
+            ? `Compatible ${CATEGORY_DISPLAY_NAMES[slotCategory]}s${motherboardSocket ? ` (${motherboardSocket})` : ""}`
+            : "Select Component"}
         </h3>
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="rounded p-1 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
           aria-label="Close component picker"
         >
-          ✕
+          <IoClose aria-hidden="true" className="h-4 w-4" />
         </button>
       </div>
 
-      {filtered.length === 0 ? (
+      {compatibleComponents.length === 0 ? (
         <section aria-label="Contribute" className="py-4 text-center text-sm text-zinc-500">
-          <p>No compatible components found for this slot type.</p>
+          <p>
+            {slotCategory === "cpu" && motherboardSocket
+              ? `No compatible CPUs found for ${motherboardSocket}.`
+              : "No compatible components found for this slot type."}
+          </p>
           <p className="mt-2">
             Know a compatible component?{" "}
             <a
@@ -138,46 +304,73 @@ export default function ComponentPicker({
           </p>
         </section>
       ) : (
-        <ul
-          ref={listRef}
-          role="listbox"
-          aria-label="Compatible components"
-          className="space-y-2"
-        >
-          {filtered.map((component) => (
-            <li
-              key={component.id}
-              role="option"
-              aria-selected={false}
-              tabIndex={-1}
-              className="cursor-pointer rounded border border-zinc-700 bg-zinc-800 px-3 py-2.5 outline-none hover:border-zinc-500 hover:bg-zinc-750 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              onClick={() => onSelect(component.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onSelect(component.id);
-                }
-              }}
-            >
-              <div className="text-sm font-medium text-zinc-100">
-                {component.manufacturer} {component.model}
-              </div>
-              {specKeys.length > 0 && (
-                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-400">
-                  {specKeys.map(({ key, label }) => {
-                    const value = component.specs[key];
-                    if (value == null) return null;
-                    return (
-                      <span key={key}>
-                        {label}: {formatSpecValue(key, value)}
-                      </span>
-                    );
-                  })}
-                </div>
+        <>
+          {/* Search input */}
+          <div className="mb-3">
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+              placeholder={SEARCH_PLACEHOLDERS[slotCategory]}
+              aria-label={`Search ${CATEGORY_DISPLAY_NAMES[slotCategory]}s`}
+              className="w-full rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Results */}
+          {displayItems.length === 0 && debouncedQuery.trim().length > 0 ? (
+            <p className="py-4 text-center text-sm text-zinc-500">
+              No matches found
+            </p>
+          ) : (
+            <>
+              <ul
+                ref={listRef}
+                role="listbox"
+                aria-label="Compatible components"
+                className="space-y-2"
+              >
+                {displayItems.map((component, index) => (
+                  <li
+                    key={component.id}
+                    role="option"
+                    aria-selected={false}
+                    tabIndex={-1}
+                    className="cursor-pointer rounded border border-zinc-700 bg-zinc-800 px-3 py-2.5 outline-none hover:border-zinc-500 hover:bg-zinc-750 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    onClick={() => handleSelect(component.id)}
+                    onKeyDown={(e) => handleItemKeyDown(e, index, component.id)}
+                  >
+                    <div className="text-sm font-medium text-zinc-100">
+                      {component.manufacturer} {component.model}
+                    </div>
+                    {specKeys.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-400">
+                        {specKeys.map(({ key, label }) => {
+                          const value = component.specs[key];
+                          if (value == null) return null;
+                          return (
+                            <span key={key}>
+                              {label}: {formatSpecValue(key, value)}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Count indicator */}
+              {totalMatches > 5 && (
+                <p className="mt-2 text-center text-xs text-zinc-500">
+                  Showing 5 of {totalMatches} matches
+                </p>
               )}
-            </li>
-          ))}
-        </ul>
+            </>
+          )}
+        </>
       )}
     </div>
   );

@@ -7,7 +7,6 @@ import SlotList from "./SlotList";
 import ComponentPicker from "./ComponentPicker";
 import ValidationPanel from "./ValidationPanel";
 import ShareButton from "./ShareButton";
-import CPUSelector from "./CPUSelector";
 import { resolveSharingRules } from "../lib/ui-helpers";
 import { validateAssignments } from "../lib/validation-engine";
 import { encode, decode } from "../lib/sharing";
@@ -483,11 +482,13 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
       {/* Slot list + validation (only when board is loaded) */}
       {motherboard && !boardLoading && !boardError && (
         <>
-          <CPUSelector
+          <ComponentPicker
+            slotCategory="cpu"
             manifestComponents={manifest.components}
             motherboardSocket={motherboard.socket}
-            selectedCpuId={cpuId}
+            selectedComponentId={cpuId}
             onSelect={handleCpuSelect}
+            onClose={() => {}}
             onRemove={handleCpuRemove}
           />
 
