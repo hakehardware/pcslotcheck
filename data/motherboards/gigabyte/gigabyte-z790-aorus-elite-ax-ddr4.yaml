@@ -91,18 +91,7 @@ m2_slots:
     source: Chipset
     supports_sata: true
     heatsink_included: true
-    sharing:
-      - type: disables
-        targets:
-          - sata_2
-          - sata_3
-        direction: m2_to_sata
-        trigger:
-          slot_ids:
-            - m2_4
-          logic: any_populated
-        condition: M.2 PCIe SSD installed in M2M_SB
-        effect: SATA3 2 and SATA3 3 will be unavailable
+    sharing: null
 
 pcie_slots:
   - id: pcie_1
@@ -126,22 +115,22 @@ pcie_slots:
     sharing: null
 
 sata_ports:
-  - id: sata_2
-    version: "3.0"
-    source: Chipset
-    disabled_by: m2_4
-
-  - id: sata_3
-    version: "3.0"
-    source: Chipset
-    disabled_by: m2_4
-
   - id: sata_4
     version: "3.0"
     source: Chipset
     disabled_by: null
 
   - id: sata_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_6
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_7
     version: "3.0"
     source: Chipset
     disabled_by: null

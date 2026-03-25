@@ -10,7 +10,7 @@ memory:
   type: DDR5
   max_speed_mhz: 6400
   base_speed_mhz: 4800
-  max_capacity_gb: 192
+  max_capacity_gb: 256
   ecc_support: false
   channels: 2
   slots:
