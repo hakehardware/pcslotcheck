@@ -1,0 +1,169 @@
+id: asus-tuf-gaming-b760-plus-wifi
+manufacturer: ASUS
+model: TUF GAMING B760-PLUS WIFI
+chipset: Intel B760
+socket: LGA 1700
+form_factor: ATX
+schema_version: "2.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 7200
+  base_speed_mhz: 4800
+  max_capacity_gb: 192
+  ecc_support: false
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a2
+      - dimm_b2
+      - dimm_a1
+      - dimm_b1
+
+m2_slots:
+  - id: m2_1
+    label: M.2_1 (CPU)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M.2_2 (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_3
+    label: M.2_3 (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: false
+    sharing: null
+
+pcie_slots:
+  - id: pcie_1
+    label: PCIEX16(G5)
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_2
+    label: PCIEX16(G3)
+    position: 2
+    gen: 3
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+  - id: pcie_3
+    label: PCIEX1_1
+    position: 3
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x1
+    source: Chipset
+    reinforced: false
+    sharing:
+      - type: bandwidth_split
+        target: pcie_2
+        direction: pcie_to_m2
+        trigger:
+          slot_ids:
+            - pcie_3
+          logic: any_populated
+        condition: PCIEX1(G3)_1 or PCIEX1(G3)_2 runs at x1 mode
+        effect: PCIEX16(G3) will only run at PCIe x2 mode
+
+  - id: pcie_4
+    label: PCIEX1_2
+    position: 4
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x1
+    source: Chipset
+    reinforced: false
+    sharing:
+      - type: bandwidth_split
+        target: pcie_2
+        direction: pcie_to_m2
+        trigger:
+          slot_ids:
+            - pcie_4
+          logic: any_populated
+        condition: PCIEX1(G3)_1 or PCIEX1(G3)_2 runs at x1 mode
+        effect: PCIEX16(G3) will only run at PCIe x2 mode
+
+sata_ports:
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manufacturer
+    url: https://www.asus.com/motherboards-components/motherboards/tuf-gaming/tuf-gaming-b760-plus-wifi/techspec/
