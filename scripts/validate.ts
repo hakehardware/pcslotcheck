@@ -141,6 +141,29 @@ function main(): void {
       continue;
     }
 
+    // RAM cross-field check: total_gb must equal per_module_gb * modules
+    const rel = path.relative(DATA_DIR, filePath).replace(/\\/g, "/");
+    if (rel.startsWith("components/ram/")) {
+      const capacity = (record as Record<string, unknown>).capacity as
+        | Record<string, number>
+        | undefined;
+      if (capacity) {
+        const { total_gb, per_module_gb, modules } = capacity;
+        if (
+          typeof total_gb === "number" &&
+          typeof per_module_gb === "number" &&
+          typeof modules === "number" &&
+          total_gb !== per_module_gb * modules
+        ) {
+          console.error(
+            `✗ ${filePath}: capacity mismatch — total_gb (${total_gb}) does not equal per_module_gb (${per_module_gb}) * modules (${modules})`
+          );
+          hasErrors = true;
+          continue;
+        }
+      }
+    }
+
     console.log(`✓ ${filePath}`);
   }
 

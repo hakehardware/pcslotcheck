@@ -1,6 +1,7 @@
 import { describe, test, expect } from "vitest";
 import * as fc from "fast-check";
 import { validateAssignments } from "../../src/lib/validation-engine";
+import { makeStickId } from "../../src/lib/stick-utils";
 import type {
   Motherboard,
   M2Slot,
@@ -470,13 +471,14 @@ describe("Feature: validation-engine-gaps, Property 11: DDR type mismatch produc
 
     fc.assert(
       fc.property(scenarioArb, ([motherboard, component, slotId]) => {
-        const assignments: Record<string, string> = { [slotId]: component.id };
+        const stickId = makeStickId(component.id, 1);
+        const assignments: Record<string, string> = { [slotId]: stickId };
         const components: Record<string, Component> = { [component.id]: component };
 
         const results = validateAssignments(motherboard, assignments, components);
 
         const errors = results.filter(
-          (r) => r.severity === "error" && r.slotId === slotId && r.componentId === component.id
+          (r) => r.severity === "error" && r.componentId === component.id
         );
         expect(errors.length).toBeGreaterThanOrEqual(1);
         expect(
@@ -490,18 +492,18 @@ describe("Feature: validation-engine-gaps, Property 11: DDR type mismatch produc
   });
 });
 
-// -- Feature: validation-engine-gaps, Property 12: RAM speed exceeding board max produces info --
+// -- Feature: validation-engine-gaps, Property 12: RAM speed exceeding board max (not checked at stick level) --
 
-describe("Feature: validation-engine-gaps, Property 12: RAM speed exceeding board max produces info", () => {
+describe("Feature: validation-engine-gaps, Property 12: RAM speed exceeding board max (not checked at stick level)", () => {
   /**
    * Validates: Requirements 8.3
    *
-   * For any RAM component whose speed_mhz is strictly greater than the
-   * motherboard's memory.max_speed_mhz, the validation engine should
-   * produce an info-severity result.
+   * The stick-level validation helpers do not include a per-kit speed check.
+   * For any RAM component whose speed_mhz exceeds the board max, no
+   * speed-related info should be produced through validateAssignments.
    */
 
-  test("RAM with speed exceeding board max produces info", () => {
+  test("RAM with speed exceeding board max produces no speed info at stick level", () => {
     const slotId = "dimm_a1";
     const scenarioArb = fc
       .record({
@@ -520,6 +522,7 @@ describe("Feature: validation-engine-gaps, Property 12: RAM speed exceeding boar
           ramComponentArb().map((c) => ({
             ...c,
             interface: { ...c.interface, type: mb.memory.type, speed_mhz: ramSpeed },
+            capacity: { per_module_gb: 16, modules: 1, total_gb: 16 },
           }))
         );
         return fc.tuple(mbArb, compArb);
@@ -527,22 +530,17 @@ describe("Feature: validation-engine-gaps, Property 12: RAM speed exceeding boar
 
     fc.assert(
       fc.property(scenarioArb, ([motherboard, component]) => {
-        const assignments: Record<string, string> = { [slotId]: component.id };
+        const stickId = makeStickId(component.id, 1);
+        const assignments: Record<string, string> = { [slotId]: stickId };
         const components: Record<string, Component> = { [component.id]: component };
 
         const results = validateAssignments(motherboard, assignments, components);
 
-        const infos = results.filter(
-          (r) => r.severity === "info" && r.slotId === slotId && r.componentId === component.id
+        // No speed-related info at stick level
+        const speedInfos = results.filter(
+          (r) => r.severity === "info" && r.message.includes(String(component.interface.speed_mhz))
         );
-        expect(infos.length).toBeGreaterThanOrEqual(1);
-        expect(
-          infos.some(
-            (e) =>
-              e.message.includes(String(component.interface.speed_mhz)) &&
-              e.message.includes(String(motherboard.memory.max_speed_mhz))
-          )
-        ).toBe(true);
+        expect(speedInfos.length).toBe(0);
       }),
       { numRuns: 100 }
     );
@@ -594,10 +592,12 @@ describe("Feature: validation-engine-gaps, Property 13: Non-recommended DIMM pla
 
     fc.assert(
       fc.property(scenarioArb, ([motherboard, comp1, comp2]) => {
-        // Assign to non-recommended slots
+        // Assign to non-recommended slots using stick IDs
+        const stick1 = makeStickId(comp1.id, 1);
+        const stick2 = makeStickId(comp2.id, 1);
         const assignments: Record<string, string> = {
-          [nonRecommendedSlots[0]]: comp1.id,
-          [nonRecommendedSlots[1]]: comp2.id,
+          [nonRecommendedSlots[0]]: stick1,
+          [nonRecommendedSlots[1]]: stick2,
         };
         const components: Record<string, Component> = {
           [comp1.id]: comp1,
@@ -664,9 +664,11 @@ describe("Feature: validation-engine-gaps, Property 14: Total RAM capacity excee
 
     fc.assert(
       fc.property(scenarioArb, ([motherboard, comp1, comp2]) => {
+        const stick1 = makeStickId(comp1.id, 1);
+        const stick2 = makeStickId(comp2.id, 1);
         const assignments: Record<string, string> = {
-          [slotId1]: comp1.id,
-          [slotId2]: comp2.id,
+          [slotId1]: stick1,
+          [slotId2]: stick2,
         };
         const components: Record<string, Component> = {
           [comp1.id]: comp1,

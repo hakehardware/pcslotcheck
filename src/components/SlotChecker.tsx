@@ -10,6 +10,7 @@ import ShareButton from "./ShareButton";
 import { resolveSharingRules } from "../lib/ui-helpers";
 import { validateAssignments } from "../lib/validation-engine";
 import { encode, decode } from "../lib/sharing";
+import { getKitAssignments, getAssignedKitIds } from "../lib/stick-utils";
 import { fetchMotherboardFromSupabase, fetchComponentFromSupabase } from "../lib/supabase-queries";
 import type {
   DataManifest,
@@ -52,6 +53,9 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
   const [boardLoading, setBoardLoading] = useState(false);
   const [boardError, setBoardError] = useState<string | null>(null);
 
+  // RAM kit tracking — set of kit component IDs that have been selected
+  const [selectedKits, setSelectedKits] = useState<Set<string>>(new Set());
+
   // Picker state
   const [pickerSlotId, setPickerSlotId] = useState<string | null>(null);
   const [pickerCategory, setPickerCategory] = useState<SlotCategory | null>(
@@ -86,6 +90,12 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
     setSelectedBoardId(decoded.motherboardId);
     setAssignments(decoded.assignments);
 
+    // Restore selectedKits from any stick-level assignments in the URL
+    const restoredKitIds = getAssignedKitIds(decoded.assignments);
+    if (restoredKitIds.length > 0) {
+      setSelectedKits(new Set(restoredKitIds));
+    }
+
     // Fetch the board data
     const fetchRestoredBoard = async (boardId: string) => {
       setBoardLoading(true);
@@ -107,6 +117,24 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
 
     fetchRestoredBoard(decoded.motherboardId);
   }, [searchParams, manifest.motherboards]);
+
+  // Fetch component data for restored kit IDs and other assignments from URL
+  useEffect(() => {
+    const allComponentIds = new Set<string>();
+    // Collect kit IDs from selectedKits
+    for (const kitId of selectedKits) {
+      allComponentIds.add(kitId);
+    }
+    // Collect component IDs from non-stick assignments
+    for (const componentId of Object.values(assignments)) {
+      allComponentIds.add(componentId);
+    }
+    for (const id of allComponentIds) {
+      if (!loadedComponents[id] && !componentCache.current.has(id)) {
+        fetchComponent(id);
+      }
+    }
+  }, [selectedKits]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-fetch board when boardId prop is provided and ?build= did not restore
   useEffect(() => {
@@ -189,6 +217,7 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
       setSelectedBoardId(boardId);
       // Clear assignments on board switch (Property 8)
       setAssignments({});
+      setSelectedKits(new Set());
       setValidationResults([]);
       setPickerSlotId(null);
       setPickerCategory(null);
@@ -242,6 +271,24 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
   const handleComponentSelect = useCallback(
     (componentId: string) => {
       if (!pickerSlotId) return;
+
+      // For RAM kits, add to selectedKits instead of direct slot assignment
+      if (pickerCategory === "memory") {
+        setSelectedKits((prev) => new Set(prev).add(componentId));
+        // Fetch full component data if not already loaded
+        if (!loadedComponents[componentId] && !componentCache.current.has(componentId)) {
+          fetchComponent(componentId);
+        } else if (componentCache.current.has(componentId) && !loadedComponents[componentId]) {
+          setLoadedComponents((prev) => ({
+            ...prev,
+            [componentId]: componentCache.current.get(componentId)!,
+          }));
+        }
+        setPickerSlotId(null);
+        setPickerCategory(null);
+        return;
+      }
+
       setAssignments((prev) => ({ ...prev, [pickerSlotId]: componentId }));
       // Fetch full component data if not already loaded
       if (!loadedComponents[componentId] && !componentCache.current.has(componentId)) {
@@ -255,7 +302,7 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
       setPickerSlotId(null);
       setPickerCategory(null);
     },
-    [pickerSlotId, loadedComponents, fetchComponent]
+    [pickerSlotId, pickerCategory, loadedComponents, fetchComponent]
   );
 
   // Remove an assignment
@@ -265,6 +312,44 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
       delete next[slotId];
       return next;
     });
+  }, []);
+
+  // Remove an entire RAM kit and all its stick assignments
+  const handleRemoveKit = useCallback((kitComponentId: string) => {
+    setSelectedKits((prev) => {
+      const next = new Set(prev);
+      next.delete(kitComponentId);
+      return next;
+    });
+    setAssignments((prev) => {
+      const kitEntries = getKitAssignments(prev, kitComponentId);
+      const next = { ...prev };
+      for (const slotId of Object.keys(kitEntries)) {
+        delete next[slotId];
+      }
+      return next;
+    });
+  }, []);
+
+  // Assign a stick to a DIMM slot
+  const handleStickAssign = useCallback((slotId: string, stickId: string) => {
+    setAssignments((prev) => ({ ...prev, [slotId]: stickId }));
+  }, []);
+
+  // Remove a stick assignment from a DIMM slot
+  const handleStickRemove = useCallback((slotId: string) => {
+    setAssignments((prev) => {
+      const next = { ...prev };
+      delete next[slotId];
+      return next;
+    });
+  }, []);
+
+  // Open the RAM kit picker (triggered from SlotList "Add RAM Kit" button)
+  const handleAddRamKit = useCallback(() => {
+    // Use a sentinel value for pickerSlotId since we don't target a specific slot
+    setPickerSlotId("__ram_kit_picker__");
+    setPickerCategory("memory");
   }, []);
 
   // Close the picker
@@ -324,8 +409,13 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
             loadedComponents={loadedComponents}
             disabledSlots={disabledSlots}
             bandwidthWarnings={bandwidthWarnings}
+            selectedKits={selectedKits}
             onAssign={handleAssign}
             onRemove={handleRemove}
+            onAddRamKit={handleAddRamKit}
+            onStickAssign={handleStickAssign}
+            onStickRemove={handleStickRemove}
+            onRemoveKit={handleRemoveKit}
           />
 
           {/* Component Picker overlay */}

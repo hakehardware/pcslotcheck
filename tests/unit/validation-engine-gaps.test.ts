@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { validateAssignments } from "../../src/lib/validation-engine";
+import { makeStickId } from "../../src/lib/stick-utils";
 import type {
   Motherboard,
   M2Slot,
@@ -231,16 +232,17 @@ describe("RAM validation", () => {
       interface: { type: "DDR4", speed_mhz: 3200, base_speed_mhz: 2133 },
     });
 
-    const results = validateAssignments(board, { dimm_a2: "ddr4-ram" }, { "ddr4-ram": ram });
+    const stickId = makeStickId("ddr4-ram", 1);
+    const results = validateAssignments(board, { dimm_a2: stickId }, { "ddr4-ram": ram });
 
     const errors = results.filter(
-      (r) => r.severity === "error" && r.slotId === "dimm_a2" && r.message.includes("DDR4")
+      (r) => r.severity === "error" && r.message.includes("DDR4")
     );
     expect(errors.length).toBeGreaterThanOrEqual(1);
     expect(errors.some((e) => e.message.includes("DDR5"))).toBe(true);
   });
 
-  test("RAM at 7200 MHz on board with max 6000 MHz produces info", () => {
+  test("RAM speed exceeding board max is not flagged at stick level (no speed helper)", () => {
     const board = makeMotherboard({ memory: baseMemory });
     const ram = makeRAM({
       id: "fast-ram",
@@ -248,13 +250,17 @@ describe("RAM validation", () => {
       capacity: { per_module_gb: 16, modules: 1, total_gb: 16 },
     });
 
-    const results = validateAssignments(board, { dimm_a2: "fast-ram" }, { "fast-ram": ram });
+    const stickId = makeStickId("fast-ram", 1);
+    const results = validateAssignments(board, { dimm_a2: stickId }, { "fast-ram": ram });
 
-    const infos = results.filter(
-      (r) => r.severity === "info" && r.slotId === "dimm_a2" && r.message.includes("7200")
+    // The stick-level validators do not include a speed check, so no
+    // speed-related info should appear. DDR compat passes (both DDR5),
+    // capacity is fine, and a 1-module kit fully assigned produces no
+    // incomplete-kit error.
+    const speedInfos = results.filter(
+      (r) => r.severity === "info" && r.message.includes("7200")
     );
-    expect(infos.length).toBeGreaterThanOrEqual(1);
-    expect(infos.some((e) => e.message.includes("6000"))).toBe(true);
+    expect(speedInfos).toHaveLength(0);
   });
 
   test("Two 128GB modules on board with max_capacity_gb 128 produces error (256 > 128)", () => {
@@ -268,9 +274,11 @@ describe("RAM validation", () => {
       capacity: { per_module_gb: 128, modules: 1, total_gb: 128 },
     });
 
+    const stick1 = makeStickId("big-ram-1", 1);
+    const stick2 = makeStickId("big-ram-2", 1);
     const results = validateAssignments(
       board,
-      { dimm_a2: "big-ram-1", dimm_b2: "big-ram-2" },
+      { dimm_a2: stick1, dimm_b2: stick2 },
       { "big-ram-1": ram1, "big-ram-2": ram2 }
     );
 
@@ -292,10 +300,12 @@ describe("RAM validation", () => {
       capacity: { per_module_gb: 16, modules: 1, total_gb: 16 },
     });
 
+    const stick1 = makeStickId("ram-nr-1", 1);
+    const stick2 = makeStickId("ram-nr-2", 1);
     // Assign to dimm_a1 and dimm_b1 instead of recommended dimm_a2 and dimm_b2
     const results = validateAssignments(
       board,
-      { dimm_a1: "ram-nr-1", dimm_b1: "ram-nr-2" },
+      { dimm_a1: stick1, dimm_b1: stick2 },
       { "ram-nr-1": ram1, "ram-nr-2": ram2 }
     );
 

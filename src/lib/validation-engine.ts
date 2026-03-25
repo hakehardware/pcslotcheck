@@ -12,6 +12,7 @@ import type {
   SATAPort,
   SharingRule,
 } from "./types";
+import { parseStickId, getKitAssignments, getAssignedKitIds } from "./stick-utils";
 
 /**
  * Validates component-to-slot assignments against motherboard compatibility rules.
@@ -69,23 +70,21 @@ export function validateAssignments(
         continue;
       }
 
-      // Memory slot validation -- route to validateRAMAssignment
+      // Memory slots are handled in bulk after the per-slot loop via
+      // validateRAMStickAssignments, so skip them here.
       const memorySlot = motherboard.memory?.slots?.find((s) => s.id === slotId);
       if (memorySlot) {
-        results.push(
-          ...validateRAMAssignment(
-            motherboard.memory,
-            component,
-            slotId,
-            componentId,
-            assignments,
-            components
-          )
-        );
         continue;
       }
 
       // Unknown slot IDs are silently skipped.
+    }
+
+    // RAM stick-level validation (runs once across all memory slots)
+    if (motherboard.memory) {
+      results.push(
+        ...validateRAMStickAssignments(motherboard.memory, assignments, components)
+      );
     }
 
     // Cross-slot sharing rule validation pass
@@ -533,4 +532,261 @@ function matchesDeviceFilter(
     return false;
   }
   return true;
+}
+
+
+// ---------------------------------------------------------------------------
+// RAM stick-level validation
+// ---------------------------------------------------------------------------
+
+/**
+ * Top-level RAM validation for stick-level assignments.
+ *
+ * Collects all stick assignments from the flat assignments map, resolves each
+ * stick to its parent kit, then runs per-kit and cross-kit validators.
+ */
+export function validateRAMStickAssignments(
+  memoryConfig: MemoryConfig,
+  assignments: Record<string, string>,
+  components: Record<string, Component>
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+
+  // Collect only entries where the value is a stick ID and the key is a DIMM slot
+  const dimmSlotIds = new Set(memoryConfig.slots.map((s) => s.id));
+  const stickAssignments: Record<string, string> = {};
+  for (const [slotId, value] of Object.entries(assignments)) {
+    if (dimmSlotIds.has(slotId) && parseStickId(value) !== null) {
+      stickAssignments[slotId] = value;
+    }
+  }
+
+  const assignedKitIds = getAssignedKitIds(stickAssignments);
+
+  // Per-kit validations
+  for (const kitId of assignedKitIds) {
+    const kitComponent = components[kitId];
+    if (!kitComponent || !isRAM(kitComponent)) continue;
+
+    const kitEntries = getKitAssignments(stickAssignments, kitId);
+    const kitSlotIds = Object.keys(kitEntries);
+    const assignedStickCount = kitSlotIds.length;
+
+    results.push(...validateDDRCompat(memoryConfig, kitComponent));
+    results.push(...validateStickCountVsSlots(memoryConfig, kitComponent));
+    results.push(...validateIncompleteKit(kitComponent, assignedStickCount));
+    results.push(...validateDualChannel(memoryConfig, kitComponent, kitSlotIds));
+  }
+
+  // Cross-kit validations
+  const allPopulatedSlotIds = Object.keys(stickAssignments);
+  results.push(...validateMixedKits(assignedKitIds));
+  results.push(
+    ...validateTotalCapacity(memoryConfig, stickAssignments, components)
+  );
+  results.push(
+    ...validateRecommendedPopulation(memoryConfig, allPopulatedSlotIds)
+  );
+
+  return results;
+}
+
+/**
+ * Produces a warning when ALL sticks from a multi-stick kit are on the same
+ * memory channel. Single-stick kits are skipped (dual-channel is irrelevant).
+ */
+function validateDualChannel(
+  memoryConfig: MemoryConfig,
+  kitComponent: RAMComponent,
+  kitStickSlots: string[]
+): ValidationResult[] {
+  // Only relevant for multi-stick kits (modules > 1)
+  if (kitComponent.capacity.modules <= 1) return [];
+  if (kitStickSlots.length <= 1) return [];
+
+  const channels = new Set<string>();
+  for (const slotId of kitStickSlots) {
+    const slot = memoryConfig.slots.find((s) => s.id === slotId);
+    if (slot) channels.add(slot.channel);
+  }
+
+  if (channels.size === 1) {
+    const channel = [...channels][0];
+    return [
+      {
+        severity: "warning" as const,
+        message: `${kitComponent.model}: all sticks are on channel ${channel} -- dual-channel mode is not active`,
+        slotId: kitStickSlots[0],
+        componentId: kitComponent.id,
+      },
+    ];
+  }
+
+  return [];
+}
+
+/**
+ * Compares populated slot IDs against recommended_population.two_dimm or
+ * four_dimm. Warning if mismatch, info if no recommendation for that count.
+ */
+function validateRecommendedPopulation(
+  memoryConfig: MemoryConfig,
+  allPopulatedSlotIds: string[]
+): ValidationResult[] {
+  const count = allPopulatedSlotIds.length;
+  if (count === 0) return [];
+
+  const rec = memoryConfig.recommended_population;
+  let recommended: string[] | undefined;
+
+  if (count === 2) {
+    recommended = rec?.two_dimm;
+  } else if (count === 4) {
+    recommended = rec?.four_dimm;
+  }
+
+  // If there's a recommendation for this count, check it
+  if (recommended && recommended.length > 0) {
+    const recSet = new Set(recommended);
+    const popSet = new Set(allPopulatedSlotIds);
+    const match =
+      recSet.size === popSet.size &&
+      [...recSet].every((id) => popSet.has(id));
+
+    if (!match) {
+      const populatedStr = allPopulatedSlotIds.join(", ");
+      const recommendedStr = recommended.join(", ");
+      return [
+        {
+          severity: "warning" as const,
+          message: `RAM in slots ${populatedStr} but recommended placement for ${count} DIMMs is ${recommendedStr}`,
+          slotId: allPopulatedSlotIds[0],
+          componentId: "",
+        },
+      ];
+    }
+    return [];
+  }
+
+  // No recommendation exists for this count
+  return [
+    {
+      severity: "info" as const,
+      message: `No manufacturer recommendation exists for ${count} DIMM population`,
+      slotId: allPopulatedSlotIds[0],
+      componentId: "",
+    },
+  ];
+}
+
+/**
+ * Error when assignedStickCount < kitComponent.capacity.modules.
+ */
+function validateIncompleteKit(
+  kitComponent: RAMComponent,
+  assignedStickCount: number
+): ValidationResult[] {
+  const totalModules = kitComponent.capacity.modules;
+  if (assignedStickCount >= totalModules) return [];
+
+  const unassigned = totalModules - assignedStickCount;
+  return [
+    {
+      severity: "error" as const,
+      message: `${kitComponent.model}: ${unassigned} of ${totalModules} sticks unassigned -- all sticks must be installed`,
+      slotId: "",
+      componentId: kitComponent.id,
+    },
+  ];
+}
+
+/**
+ * Warning when 2+ distinct kit IDs are assigned.
+ */
+function validateMixedKits(
+  assignedKitIds: string[]
+): ValidationResult[] {
+  if (assignedKitIds.length < 2) return [];
+
+  return [
+    {
+      severity: "warning" as const,
+      message:
+        "Multiple RAM kits detected -- mixing kits may prevent XMP/EXPO profiles from activating at rated speeds",
+      slotId: "",
+      componentId: "",
+    },
+  ];
+}
+
+/**
+ * Error when sum of per_module_gb across all assigned sticks exceeds
+ * max_capacity_gb.
+ */
+function validateTotalCapacity(
+  memoryConfig: MemoryConfig,
+  allStickAssignments: Record<string, string>,
+  components: Record<string, Component>
+): ValidationResult[] {
+  let totalGb = 0;
+
+  for (const stickId of Object.values(allStickAssignments)) {
+    const parsed = parseStickId(stickId);
+    if (!parsed) continue;
+    const kit = components[parsed.componentId];
+    if (!kit || !isRAM(kit)) continue;
+    totalGb += kit.capacity.per_module_gb;
+  }
+
+  if (totalGb > memoryConfig.max_capacity_gb) {
+    return [
+      {
+        severity: "error" as const,
+        message: `Total RAM capacity (${totalGb} GB) exceeds this motherboard's maximum of ${memoryConfig.max_capacity_gb} GB`,
+        slotId: "",
+        componentId: "",
+      },
+    ];
+  }
+
+  return [];
+}
+
+/**
+ * Error when kit's interface.type doesn't match memoryConfig.type.
+ */
+function validateDDRCompat(
+  memoryConfig: MemoryConfig,
+  kitComponent: RAMComponent
+): ValidationResult[] {
+  if (kitComponent.interface.type === memoryConfig.type) return [];
+
+  return [
+    {
+      severity: "error" as const,
+      message: `${kitComponent.model} is ${kitComponent.interface.type} but this motherboard requires ${memoryConfig.type}`,
+      slotId: "",
+      componentId: kitComponent.id,
+    },
+  ];
+}
+
+/**
+ * Error when kit's capacity.modules exceeds number of DIMM slots.
+ */
+function validateStickCountVsSlots(
+  memoryConfig: MemoryConfig,
+  kitComponent: RAMComponent
+): ValidationResult[] {
+  const slotCount = memoryConfig.slots.length;
+  if (kitComponent.capacity.modules <= slotCount) return [];
+
+  return [
+    {
+      severity: "error" as const,
+      message: `${kitComponent.model} has ${kitComponent.capacity.modules} sticks but this motherboard only has ${slotCount} DIMM slots`,
+      slotId: "",
+      componentId: kitComponent.id,
+    },
+  ];
 }
