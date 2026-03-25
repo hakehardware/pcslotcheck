@@ -1,7 +1,7 @@
 id: msi-mag-b760m-mortar-wifi
 manufacturer: MSI
 model: MAG B760M MORTAR WIFI
-chipset: Intel B760M
+chipset: Intel B760
 socket: LGA 1700
 form_factor: Micro-ATX
 schema_version: "2.0"

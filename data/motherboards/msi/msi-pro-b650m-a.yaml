@@ -1,7 +1,7 @@
 id: msi-pro-b650m-a
 manufacturer: MSI
 model: PRO B650M-A
-chipset: AMD B650M
+chipset: AMD B650
 socket: AM5
 form_factor: Micro-ATX
 schema_version: "2.0"

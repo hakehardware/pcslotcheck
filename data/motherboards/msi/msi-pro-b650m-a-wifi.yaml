@@ -1,7 +1,7 @@
 id: msi-pro-b650m-a-wifi
 manufacturer: MSI
 model: PRO B650M-A WIFI
-chipset: AMD B650M
+chipset: AMD B650
 socket: AM5
 form_factor: Micro-ATX
 schema_version: "2.0"

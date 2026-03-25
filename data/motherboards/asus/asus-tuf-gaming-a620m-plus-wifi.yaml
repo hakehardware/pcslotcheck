@@ -1,7 +1,7 @@
 id: asus-tuf-gaming-a620m-plus-wifi
 manufacturer: ASUS
 model: TUF GAMING A620M-PLUS WIFI
-chipset: AMD A620M
+chipset: AMD A620
 socket: AM5
 form_factor: Micro-ATX
 schema_version: "2.0"

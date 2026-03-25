@@ -1,7 +1,7 @@
 id: gigabyte-b760m-aorus-elite-ddr4
 manufacturer: Gigabyte
 model: B760M AORUS ELITE DDR4
-chipset: Intel B760M
+chipset: Intel B760
 socket: LGA 1700
 form_factor: Micro-ATX
 schema_version: "2.0"

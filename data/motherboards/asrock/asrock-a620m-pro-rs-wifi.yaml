@@ -1,7 +1,7 @@
 id: asrock-a620m-pro-rs-wifi
 manufacturer: ASRock
 model: A620M Pro RS WiFi
-chipset: AMD A620M
+chipset: AMD A620
 socket: AM5
 form_factor: Micro-ATX
 schema_version: "2.0"
