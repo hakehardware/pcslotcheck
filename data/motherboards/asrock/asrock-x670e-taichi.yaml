@@ -1,0 +1,160 @@
+id: asrock-x670e-taichi
+manufacturer: ASRock
+model: X670E Taichi
+chipset: AMD X670E
+socket: AM5
+form_factor: E-ATX
+schema_version: "2.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 7800
+  base_speed_mhz: 4800
+  max_capacity_gb: 192
+  ecc_support: true
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a2
+      - dimm_b2
+      - dimm_a1
+      - dimm_b1
+
+m2_slots:
+  - id: m2_1
+    label: M2_1 Blazing (CPU)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2_2 Hyper (Chipset)
+    interface: PCIe_or_SATA
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2230"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_3
+    label: M2_3 Hyper (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_4
+    label: M2_4 Hyper (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+pcie_slots:
+  - id: pcie_1
+    label: PCIE1
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_2
+    label: PCIE2
+    position: 2
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+sata_ports:
+  - id: sata_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_6
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_7
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manufacturer
+    url: https://www.asrock.com/mb/AMD/X670E%20Taichi/index.asp
