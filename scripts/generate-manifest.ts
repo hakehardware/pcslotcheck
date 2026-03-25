@@ -80,6 +80,7 @@ export function extractSpecs(data: Record<string, unknown>): Record<string, unkn
       return {
         socket: data.socket,
         microarchitecture: data.microarchitecture,
+        architecture: data.architecture,
         "pcie_config.cpu_gen": pcieConfig?.cpu_gen,
       };
     }

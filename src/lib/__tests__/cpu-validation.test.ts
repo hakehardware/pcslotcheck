@@ -570,3 +570,136 @@ describe("Property 8: NVMe gen vs effective slot gen validation", () => {
     );
   });
 });
+
+
+// -- Property 6: Validation engine override resolution uses microarchitecture codename
+// Validates: Requirements 8.1, 8.2
+
+import { arbCPUComponent as arbCPUComponentGen, MICROARCHITECTURES as MICRO_ARCHS } from "./generators";
+
+describe("Property 6: Validation engine override resolution uses microarchitecture codename", () => {
+  const baseGen = fc.integer({ min: 1, max: 6 });
+  const baseLanes = fc.integer({ min: 1, max: 16 });
+
+  it("applies override when override microarchitecture equals CPU codename", () => {
+    /**
+     * Validates: Requirements 8.1
+     *
+     * For any CPU with a codename microarchitecture and an override whose
+     * microarchitecture equals the CPU's codename, resolveEffectiveSlotValues
+     * returns the override's gen/lanes (falling back to base when unspecified).
+     */
+    fc.assert(
+      fc.property(
+        baseGen,
+        baseLanes,
+        arbCPUComponentGen(),
+        arbCPUOverride(),
+        (bGen, bLanes, cpu, override) => {
+          // Force the override to match the CPU's codename microarchitecture
+          const matchingOverride: CPUOverride = {
+            ...override,
+            microarchitecture: cpu.microarchitecture,
+          };
+          const overrides = [matchingOverride];
+
+          const result = resolveEffectiveSlotValues(
+            bGen,
+            bLanes,
+            overrides,
+            cpu.microarchitecture
+          );
+
+          const expectedGen = matchingOverride.gen ?? bGen;
+          const expectedLanes = matchingOverride.lanes ?? bLanes;
+
+          expect(result.gen).toBe(expectedGen);
+          expect(result.lanes).toBe(expectedLanes);
+
+          // Verify the CPU's microarchitecture is a real codename
+          expect(MICRO_ARCHS).toContain(cpu.microarchitecture);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("returns base values when no override matches the CPU codename", () => {
+    /**
+     * Validates: Requirements 8.2
+     *
+     * For any CPU with a codename microarchitecture and overrides that do NOT
+     * contain the CPU's codename, resolveEffectiveSlotValues returns base values.
+     */
+    fc.assert(
+      fc.property(
+        baseGen,
+        baseLanes,
+        arbCPUComponentGen(),
+        fc.array(arbCPUOverride(), { minLength: 1, maxLength: 5 }),
+        (bGen, bLanes, cpu, overrides) => {
+          // Filter out any overrides that happen to match the CPU's codename
+          const nonMatchingOverrides = overrides
+            .map((o) => ({
+              ...o,
+              microarchitecture:
+                o.microarchitecture === cpu.microarchitecture
+                  ? "NonExistent Arch 9999"
+                  : o.microarchitecture,
+            }));
+
+          const result = resolveEffectiveSlotValues(
+            bGen,
+            bLanes,
+            nonMatchingOverrides,
+            cpu.microarchitecture
+          );
+
+          expect(result.gen).toBe(bGen);
+          expect(result.lanes).toBe(bLanes);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+});
+
+// -- Unit tests: resolveEffectiveSlotValues with specific codenames -----------
+
+describe("resolveEffectiveSlotValues codename-specific unit tests", () => {
+  it("Granite Ridge CPU matches an override for Granite Ridge", () => {
+    const overrides: CPUOverride[] = [
+      { microarchitecture: "Granite Ridge", gen: 5, lanes: 4 },
+    ];
+    const result = resolveEffectiveSlotValues(4, 2, overrides, "Granite Ridge");
+    expect(result.gen).toBe(5);
+    expect(result.lanes).toBe(4);
+  });
+
+  it("Raptor Lake Refresh CPU does NOT match an override for Raptor Lake", () => {
+    const overrides: CPUOverride[] = [
+      { microarchitecture: "Raptor Lake", gen: 4, lanes: 4 },
+    ];
+    const result = resolveEffectiveSlotValues(3, 2, overrides, "Raptor Lake Refresh");
+    expect(result.gen).toBe(3);
+    expect(result.lanes).toBe(2);
+  });
+
+  it("Phoenix 2 CPU matches an override for Phoenix 2", () => {
+    const overrides: CPUOverride[] = [
+      { microarchitecture: "Phoenix 2", gen: 4, lanes: 2 },
+    ];
+    const result = resolveEffectiveSlotValues(3, 4, overrides, "Phoenix 2");
+    expect(result.gen).toBe(4);
+    expect(result.lanes).toBe(2);
+  });
+
+  it("Phoenix 2 CPU does NOT match an override for Phoenix", () => {
+    const overrides: CPUOverride[] = [
+      { microarchitecture: "Phoenix", gen: 5, lanes: 4 },
+    ];
+    const result = resolveEffectiveSlotValues(3, 2, overrides, "Phoenix 2");
+    expect(result.gen).toBe(3);
+    expect(result.lanes).toBe(2);
+  });
+});

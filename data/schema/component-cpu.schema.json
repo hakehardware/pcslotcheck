@@ -11,6 +11,7 @@
     "model",
     "socket",
     "microarchitecture",
+    "architecture",
     "pcie_config",
     "schema_version"
   ],
@@ -36,9 +37,13 @@
     "microarchitecture": {
       "type": "string"
     },
+    "architecture": {
+      "type": "string",
+      "description": "User-friendly architecture name for display (e.g., Zen 5, 14th Gen Core)"
+    },
     "pcie_config": {
       "type": "object",
-      "required": ["cpu_gen", "cpu_lanes"],
+      "required": ["cpu_gen"],
       "additionalProperties": false,
       "properties": {
         "cpu_gen": {
@@ -50,6 +55,21 @@
           "minimum": 1
         }
       }
+    },
+    "cores": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Total core count"
+    },
+    "threads": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Total thread count"
+    },
+    "tdp_w": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Thermal design power in watts"
     },
     "schema_version": {
       "type": "string"

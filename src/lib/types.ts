@@ -178,10 +178,14 @@ export interface CPUComponent {
   model: string;
   socket: string;
   microarchitecture: string;
+  architecture: string;
   pcie_config: {
     cpu_gen: number;
-    cpu_lanes: number;
+    cpu_lanes?: number;
   };
+  cores?: number;
+  threads?: number;
+  tdp_w?: number;
   schema_version: string;
 }
 

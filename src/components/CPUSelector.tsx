@@ -107,7 +107,7 @@ export default function CPUSelector({
             {selectedCpu.manufacturer} {selectedCpu.model}
           </div>
           <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-400">
-            <span>Microarchitecture: {String(selectedCpu.specs.microarchitecture ?? "—")}</span>
+            <span>Architecture: {String(selectedCpu.specs.architecture ?? selectedCpu.specs.microarchitecture ?? "—")}</span>
             <span>PCIe Gen: {selectedCpu.specs["pcie_config.cpu_gen"] != null ? `Gen ${selectedCpu.specs["pcie_config.cpu_gen"]}` : "—"}</span>
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function CPUSelector({
                     {cpu.manufacturer} {cpu.model}
                   </div>
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-400">
-                    <span>Microarchitecture: {String(cpu.specs.microarchitecture ?? "—")}</span>
+                    <span>Architecture: {String(cpu.specs.architecture ?? cpu.specs.microarchitecture ?? "—")}</span>
                     <span>PCIe Gen: {cpu.specs["pcie_config.cpu_gen"] != null ? `Gen ${cpu.specs["pcie_config.cpu_gen"]}` : "—"}</span>
                   </div>
                 </li>

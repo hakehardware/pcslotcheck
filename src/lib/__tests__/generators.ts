@@ -301,15 +301,31 @@ import type { CPUOverride, M2Slot, PCIeSlot, NVMeComponent } from "../types";
 
 // -- CPU-related generators ---------------------------------------------------
 
-/** Pool of microarchitecture names used across CPU generators. */
+/** Pool of microarchitecture codenames used across CPU generators. */
 export const MICROARCHITECTURES = [
-  "Zen 4",
-  "Zen 5",
+  "Raphael",
+  "Phoenix",
+  "Phoenix 2",
+  "Granite Ridge",
+  "Strix Point",
   "Alder Lake",
   "Raptor Lake",
+  "Raptor Lake Refresh",
   "Arrow Lake",
-  "Meteor Lake",
 ] as const;
+
+/** Maps microarchitecture codenames to user-friendly architecture names. */
+export const CODENAME_TO_ARCHITECTURE: Record<string, string> = {
+  "Raphael": "Zen 4",
+  "Phoenix": "Zen 4",
+  "Phoenix 2": "Zen 4 / Zen 4c",
+  "Granite Ridge": "Zen 5",
+  "Strix Point": "Zen 5",
+  "Alder Lake": "12th Gen Core",
+  "Raptor Lake": "13th Gen Core",
+  "Raptor Lake Refresh": "14th Gen Core",
+  "Arrow Lake": "Core Ultra (Series 2)",
+};
 
 /**
  * Generates a CPUOverride with a microarchitecture drawn from the shared pool
@@ -351,6 +367,8 @@ const CPU_MODEL_PREFIXES = [
  *
  * Socket, microarchitecture, and pcie_config are independently randomized
  * so property tests can exercise all combinations (including mismatched ones).
+ * The `architecture` field is derived from the codename via CODENAME_TO_ARCHITECTURE.
+ * `cpu_lanes` is optional, and `cores`, `threads`, `tdp_w` are optionally generated.
  */
 export function arbCPUComponent(): fc.Arbitrary<CPUComponent> {
   return fc
@@ -360,22 +378,33 @@ export function arbCPUComponent(): fc.Arbitrary<CPUComponent> {
       socket: fc.constantFrom(...CPU_SOCKETS),
       microarchitecture: fc.constantFrom(...MICROARCHITECTURES),
       cpuGen: fc.integer({ min: 3, max: 5 }),
-      cpuLanes: fc.integer({ min: 16, max: 28 }),
+      cpuLanes: fc.option(fc.integer({ min: 16, max: 28 }), { nil: undefined }),
+      cores: fc.option(fc.integer({ min: 1, max: 128 }), { nil: undefined }),
+      threads: fc.option(fc.integer({ min: 1, max: 256 }), { nil: undefined }),
+      tdpW: fc.option(fc.integer({ min: 1, max: 500 }), { nil: undefined }),
       idSuffix: kebabSegmentArb,
     })
-    .map(({ manufacturer, modelPrefix, socket, microarchitecture, cpuGen, cpuLanes, idSuffix }) => ({
-      id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
-      type: "cpu" as const,
-      manufacturer,
-      model: `${modelPrefix} ${idSuffix}`,
-      socket,
-      microarchitecture,
-      pcie_config: {
-        cpu_gen: cpuGen,
-        cpu_lanes: cpuLanes,
-      },
-      schema_version: "1.0",
-    }));
+    .map(({ manufacturer, modelPrefix, socket, microarchitecture, cpuGen, cpuLanes, cores, threads, tdpW, idSuffix }) => {
+      const pcie_config: CPUComponent["pcie_config"] = { cpu_gen: cpuGen };
+      if (cpuLanes !== undefined) pcie_config.cpu_lanes = cpuLanes;
+
+      const cpu: CPUComponent = {
+        id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
+        type: "cpu" as const,
+        manufacturer,
+        model: `${modelPrefix} ${idSuffix}`,
+        socket,
+        microarchitecture,
+        architecture: CODENAME_TO_ARCHITECTURE[microarchitecture],
+        pcie_config,
+        schema_version: "1.0",
+      };
+      if (cores !== undefined) cpu.cores = cores;
+      if (threads !== undefined) cpu.threads = threads;
+      if (tdpW !== undefined) cpu.tdp_w = tdpW;
+
+      return cpu;
+    });
 }
 
 /**

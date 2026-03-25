@@ -1,10 +1,14 @@
-// Property tests for CPU selector filtering logic.
+// Property tests for CPU selector filtering logic and architecture display.
 // Feature: cpu-component-support, Property 6: CPU selector filters by socket.
+// Feature: cpu-schema-enhancements, Property 5: CPUSelector displays architecture.
 
 import { describe, it, expect } from "vitest";
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import fc from "fast-check";
 
-import { filterCompatibleCPUs } from "../../src/components/CPUSelector";
+import CPUSelector, { filterCompatibleCPUs } from "../../src/components/CPUSelector";
+import { CODENAME_TO_ARCHITECTURE } from "../../src/lib/__tests__/generators";
 import type { DataManifest } from "../../src/lib/types";
 
 // -- Generators ---------------------------------------------------------------
@@ -150,6 +154,70 @@ describe("Property 6: CPU selector filters by socket", () => {
         }
       ),
       { numRuns: 100 }
+    );
+  });
+});
+
+
+// -- Architecture-aware generator ---------------------------------------------
+
+const CODENAMES = Object.keys(CODENAME_TO_ARCHITECTURE);
+
+/** Generates a manifest-style CPU with specs.architecture set from the codename map. */
+function arbManifestCPUWithArchitecture(socket: string): fc.Arbitrary<ManifestComponent> {
+  return fc
+    .record({
+      idSuffix: fc.stringMatching(/^[a-z][a-z0-9]{1,8}$/).filter((s) => s.length >= 2),
+      manufacturer: fc.constantFrom(...MANUFACTURERS),
+      model: fc.constantFrom("Ryzen 7 9700X", "Core i7-14700K", "Ryzen 9 9950X", "Core i5-12400F"),
+      codename: fc.constantFrom(...CODENAMES),
+      cpuGen: fc.integer({ min: 3, max: 5 }),
+    })
+    .map(({ idSuffix, manufacturer, model, codename, cpuGen }) => ({
+      id: `${manufacturer.toLowerCase()}-${model.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
+      type: "cpu",
+      manufacturer,
+      model,
+      specs: {
+        socket,
+        microarchitecture: codename,
+        architecture: CODENAME_TO_ARCHITECTURE[codename],
+        "pcie_config.cpu_gen": cpuGen,
+      },
+    }));
+}
+
+// ---------------------------------------------------------------------------
+// Property 5: CPUSelector displays architecture from manifest specs
+// **Validates: Requirements 5.2**
+//
+// For any CPU manifest entry with a specs.architecture value, the rendered
+// CPUSelector output contains that architecture string.
+// ---------------------------------------------------------------------------
+
+describe("Property 5: CPUSelector displays architecture from manifest specs", () => {
+  it("rendered selected CPU view contains the architecture string", () => {
+    const targetSocket = "AM5";
+
+    fc.assert(
+      fc.property(
+        arbManifestCPUWithArchitecture(targetSocket),
+        (cpuEntry) => {
+          const { container } = render(
+            <CPUSelector
+              manifestComponents={[cpuEntry]}
+              motherboardSocket={targetSocket}
+              selectedCpuId={cpuEntry.id}
+              onSelect={() => {}}
+              onRemove={() => {}}
+            />,
+          );
+
+          const architecture = cpuEntry.specs.architecture as string;
+          expect(container.textContent).toContain(architecture);
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 });
