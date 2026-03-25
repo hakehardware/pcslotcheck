@@ -1,0 +1,173 @@
+id: gigabyte-x670e-aorus-master
+manufacturer: Gigabyte
+model: X670E AORUS MASTER
+chipset: AMD X670E
+socket: AM5
+form_factor: ATX
+schema_version: "2.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 6600
+  base_speed_mhz: 4800
+  max_capacity_gb: 192
+  ecc_support: false
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a2
+      - dimm_b2
+      - dimm_a1
+      - dimm_b1
+
+m2_slots:
+  - id: m2_1
+    label: M2A_CPU
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+      - "25110"
+      - "2580"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2B_CPU
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_3
+    label: M2C_SB
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_4
+    label: M2D_SB
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+pcie_slots:
+  - id: pcie_1
+    label: PCIEX16
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_2
+    label: PCIEX4
+    position: 2
+    gen: 4
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+  - id: pcie_3
+    label: PCIEX2
+    position: 3
+    gen: 3
+    electrical_lanes: 2
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing:
+      - type: disables
+        targets:
+          - sata_4
+          - sata_5
+        direction: pcie_to_m2
+        trigger:
+          slot_ids:
+            - pcie_3
+          logic: any_populated
+        condition: Device installed in PCIEX2 slot
+        effect: SATA3 4/5 connectors will become unavailable
+
+sata_ports:
+  - id: sata_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: pcie_3
+
+  - id: sata_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: pcie_3
+
+sources:
+  - type: manufacturer
+    url: https://www.gigabyte.com/Motherboard/X670E-AORUS-MASTER
