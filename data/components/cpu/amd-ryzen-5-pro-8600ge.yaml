@@ -1,0 +1,10 @@
+id: amd-ryzen-5-pro-8600ge
+type: cpu
+manufacturer: AMD
+model: Ryzen 5 PRO 8600GE
+socket: AM5
+microarchitecture: Phoenix
+pcie_config:
+  cpu_gen: 4
+  cpu_lanes: 20
+schema_version: "1.0"

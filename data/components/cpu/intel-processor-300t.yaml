@@ -1,7 +1,7 @@
-id: intel-core-i7-14700k
+id: intel-processor-300t
 type: cpu
 manufacturer: Intel
-model: Core i7-14700K
+model: Intel Processor 300T
 socket: LGA 1700
 microarchitecture: Raptor Lake Refresh
 pcie_config:

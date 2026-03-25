@@ -1,0 +1,10 @@
+id: amd-ryzen-ai-5-440ge
+type: cpu
+manufacturer: AMD
+model: Ryzen AI 5 440GE
+socket: AM5
+microarchitecture: Strix Point
+pcie_config:
+  cpu_gen: 4
+  cpu_lanes: 20
+schema_version: "1.0"

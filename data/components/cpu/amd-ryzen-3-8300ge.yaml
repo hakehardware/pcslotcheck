@@ -1,0 +1,10 @@
+id: amd-ryzen-3-8300ge
+type: cpu
+manufacturer: AMD
+model: Ryzen 3 8300GE
+socket: AM5
+microarchitecture: Phoenix 2
+pcie_config:
+  cpu_gen: 4
+  cpu_lanes: 14
+schema_version: "1.0"
