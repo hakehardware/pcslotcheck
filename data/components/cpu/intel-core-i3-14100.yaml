@@ -1,7 +1,7 @@
-id: intel-core-i7-14700k
+id: intel-core-i3-14100
 type: cpu
 manufacturer: Intel
-model: Core i7-14700K
+model: Core i3-14100
 socket: LGA 1700
 microarchitecture: Raptor Lake Refresh
 pcie_config:

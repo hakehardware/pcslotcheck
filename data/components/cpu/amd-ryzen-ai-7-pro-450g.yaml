@@ -1,0 +1,10 @@
+id: amd-ryzen-ai-7-pro-450g
+type: cpu
+manufacturer: AMD
+model: Ryzen AI 7 PRO 450G
+socket: AM5
+microarchitecture: Strix Point
+pcie_config:
+  cpu_gen: 4
+  cpu_lanes: 20
+schema_version: "1.0"

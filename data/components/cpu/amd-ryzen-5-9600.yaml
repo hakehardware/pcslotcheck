@@ -1,7 +1,7 @@
-id: amd-ryzen-7-9700x
+id: amd-ryzen-5-9600
 type: cpu
 manufacturer: AMD
-model: Ryzen 7 9700X
+model: Ryzen 5 9600
 socket: AM5
 microarchitecture: Granite Ridge
 pcie_config:

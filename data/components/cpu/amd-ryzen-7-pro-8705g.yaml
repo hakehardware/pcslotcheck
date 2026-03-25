@@ -1,0 +1,10 @@
+id: amd-ryzen-7-pro-8705g
+type: cpu
+manufacturer: AMD
+model: Ryzen 7 PRO 8705G
+socket: AM5
+microarchitecture: Phoenix
+pcie_config:
+  cpu_gen: 4
+  cpu_lanes: 20
+schema_version: "1.0"

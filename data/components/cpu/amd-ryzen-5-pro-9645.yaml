@@ -1,7 +1,7 @@
-id: amd-ryzen-7-9700x
+id: amd-ryzen-5-pro-9645
 type: cpu
 manufacturer: AMD
-model: Ryzen 7 9700X
+model: Ryzen 5 PRO 9645
 socket: AM5
 microarchitecture: Granite Ridge
 pcie_config:

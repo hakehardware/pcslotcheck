@@ -1,9 +1,9 @@
-id: amd-ryzen-7-9700x
+id: amd-ryzen-7-7800x3d
 type: cpu
 manufacturer: AMD
-model: Ryzen 7 9700X
+model: Ryzen 7 7800X3D
 socket: AM5
-microarchitecture: Granite Ridge
+microarchitecture: Raphael
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 28

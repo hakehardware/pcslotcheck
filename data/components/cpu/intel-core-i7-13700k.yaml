@@ -1,9 +1,9 @@
-id: intel-core-i7-14700k
+id: intel-core-i7-13700k
 type: cpu
 manufacturer: Intel
-model: Core i7-14700K
+model: Core i7-13700K
 socket: LGA 1700
-microarchitecture: Raptor Lake Refresh
+microarchitecture: Raptor Lake
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 20
