@@ -296,3 +296,230 @@ export function arbMultiKitAssignments(
     }
   );
 }
+
+import type { CPUOverride, M2Slot, PCIeSlot, NVMeComponent } from "../types";
+
+// -- CPU-related generators ---------------------------------------------------
+
+/** Pool of microarchitecture names used across CPU generators. */
+export const MICROARCHITECTURES = [
+  "Zen 4",
+  "Zen 5",
+  "Alder Lake",
+  "Raptor Lake",
+  "Arrow Lake",
+  "Meteor Lake",
+] as const;
+
+/**
+ * Generates a CPUOverride with a microarchitecture drawn from the shared pool
+ * and optional gen/lanes fields.
+ */
+export function arbCPUOverride(): fc.Arbitrary<CPUOverride> {
+  return fc
+    .record({
+      microarchitecture: fc.constantFrom(...MICROARCHITECTURES),
+      gen: fc.option(fc.integer({ min: 1, max: 6 }), { nil: undefined }),
+      lanes: fc.option(fc.integer({ min: 1, max: 16 }), { nil: undefined }),
+    })
+    .map(({ microarchitecture, gen, lanes }) => {
+      const override: CPUOverride = { microarchitecture };
+      if (gen !== undefined) override.gen = gen;
+      if (lanes !== undefined) override.lanes = lanes;
+      return override;
+    });
+}
+
+import type { CPUComponent, Motherboard } from "../types";
+
+// -- CPU socket pools ---------------------------------------------------------
+
+const CPU_SOCKETS = ["AM5", "LGA 1700", "LGA 1851"] as const;
+
+const CPU_MANUFACTURERS = ["AMD", "Intel"] as const;
+
+const CPU_MODEL_PREFIXES = [
+  "Ryzen 7",
+  "Ryzen 9",
+  "Core i5",
+  "Core i7",
+  "Core i9",
+] as const;
+
+/**
+ * Generates a CPUComponent with realistic field values.
+ *
+ * Socket, microarchitecture, and pcie_config are independently randomized
+ * so property tests can exercise all combinations (including mismatched ones).
+ */
+export function arbCPUComponent(): fc.Arbitrary<CPUComponent> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...CPU_MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...CPU_MODEL_PREFIXES),
+      socket: fc.constantFrom(...CPU_SOCKETS),
+      microarchitecture: fc.constantFrom(...MICROARCHITECTURES),
+      cpuGen: fc.integer({ min: 3, max: 5 }),
+      cpuLanes: fc.integer({ min: 16, max: 28 }),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ manufacturer, modelPrefix, socket, microarchitecture, cpuGen, cpuLanes, idSuffix }) => ({
+      id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
+      type: "cpu" as const,
+      manufacturer,
+      model: `${modelPrefix} ${idSuffix}`,
+      socket,
+      microarchitecture,
+      pcie_config: {
+        cpu_gen: cpuGen,
+        cpu_lanes: cpuLanes,
+      },
+      schema_version: "1.0",
+    }));
+}
+
+/**
+ * Generates a minimal Motherboard with only the fields needed for
+ * socket-level and slot-level CPU validation tests.
+ *
+ * The motherboard has a random socket, empty slot arrays, and a minimal
+ * memory config. Extend as needed for slot-level property tests.
+ */
+export function arbMinimalMotherboard(): fc.Arbitrary<Motherboard> {
+  return fc
+    .record({
+      socket: fc.constantFrom(...CPU_SOCKETS),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ socket, idSuffix }) => ({
+      id: `board-${idSuffix}`,
+      manufacturer: "TestVendor",
+      model: `Test Board ${idSuffix}`,
+      chipset: "X870E",
+      socket,
+      form_factor: "ATX",
+      memory: {
+        type: "DDR5" as const,
+        max_speed_mhz: 6400,
+        base_speed_mhz: 4800,
+        max_capacity_gb: 128,
+        ecc_support: false,
+        channels: 2,
+        slots: [],
+        recommended_population: { two_dimm: [] },
+      },
+      m2_slots: [],
+      pcie_slots: [],
+      sata_ports: [],
+      sources: [],
+      schema_version: "1.0",
+    }));
+}
+
+// -- Slot generators for CPU-direct validation tests --------------------------
+
+const SLOT_SOURCES = ["CPU", "Chipset"] as const;
+
+/**
+ * Generates an M2Slot with a random source (CPU or Chipset), gen, lanes,
+ * and optional cpu_overrides. Useful for Property 4 tests.
+ */
+export function arbM2Slot(): fc.Arbitrary<M2Slot> {
+  return fc
+    .record({
+      idSuffix: fc.integer({ min: 1, max: 8 }),
+      gen: fc.integer({ min: 3, max: 5 }),
+      lanes: fc.constantFrom(2, 4),
+      source: fc.constantFrom(...SLOT_SOURCES),
+      overrides: fc.option(
+        fc.array(arbCPUOverride(), { minLength: 0, maxLength: 3 }),
+        { nil: undefined }
+      ),
+    })
+    .map(({ idSuffix, gen, lanes, source, overrides }) => ({
+      id: `m2_${idSuffix}`,
+      label: `M.2_${idSuffix} (${source})`,
+      interface: "PCIe" as const,
+      gen,
+      lanes,
+      form_factors: ["2280"],
+      source,
+      supports_sata: false,
+      heatsink_included: false,
+      sharing: null,
+      ...(overrides ? { cpu_overrides: overrides } : {}),
+    }));
+}
+
+/**
+ * Generates a PCIeSlot with a random source (CPU or Chipset), gen,
+ * electrical_lanes, and optional cpu_overrides. Useful for Property 4 tests.
+ */
+export function arbPCIeSlot(): fc.Arbitrary<PCIeSlot> {
+  return fc
+    .record({
+      idSuffix: fc.integer({ min: 1, max: 6 }),
+      gen: fc.integer({ min: 3, max: 5 }),
+      electricalLanes: fc.constantFrom(1, 4, 8, 16),
+      source: fc.constantFrom(...SLOT_SOURCES),
+      overrides: fc.option(
+        fc.array(arbCPUOverride(), { minLength: 0, maxLength: 3 }),
+        { nil: undefined }
+      ),
+    })
+    .map(({ idSuffix, gen, electricalLanes, source, overrides }) => ({
+      id: `pcie_${idSuffix}`,
+      label: `PCIEX${electricalLanes}(G${gen}) #${idSuffix}`,
+      gen,
+      electrical_lanes: electricalLanes,
+      physical_size: `x${electricalLanes}` as PCIeSlot["physical_size"],
+      position: idSuffix,
+      source,
+      reinforced: false,
+      sharing: null,
+      ...(overrides ? { cpu_overrides: overrides } : {}),
+    }));
+}
+
+// -- NVMe component generator -------------------------------------------------
+
+const NVME_MANUFACTURERS = ["Samsung", "WD", "Crucial", "Sabrent", "SK Hynix"];
+const NVME_MODEL_PREFIXES = ["990 Pro", "SN850X", "T500", "Rocket", "P41 Platinum"];
+
+/**
+ * Generates an NVMeComponent with realistic field values.
+ * pcie_gen ranges from 3 to 5 to exercise gen comparison logic.
+ */
+export function arbNVMeComponent(): fc.Arbitrary<NVMeComponent> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...NVME_MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...NVME_MODEL_PREFIXES),
+      pcieGen: fc.integer({ min: 3, max: 5 }),
+      lanes: fc.constantFrom(2, 4),
+      capacityGb: fc.constantFrom(500, 1000, 2000, 4000),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ manufacturer, modelPrefix, pcieGen, lanes, capacityGb, idSuffix }) => ({
+      id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
+      type: "nvme" as const,
+      manufacturer,
+      model: `${manufacturer} ${modelPrefix} ${capacityGb}GB`,
+      interface: {
+        protocol: "NVMe" as const,
+        pcie_gen: pcieGen,
+        lanes,
+      },
+      form_factor: "2280",
+      capacity_gb: capacityGb,
+      schema_version: "1.0",
+    }));
+}
+
+// -- Aliases for CPU spec task naming conventions -----------------------------
+
+/** Alias for arbM2Slot — generates M.2 slots with optional cpu_overrides. */
+export const arbM2SlotWithOverrides = arbM2Slot;
+
+/** Alias for arbPCIeSlot — generates PCIe slots with optional cpu_overrides. */
+export const arbPCIeSlotWithOverrides = arbPCIeSlot;

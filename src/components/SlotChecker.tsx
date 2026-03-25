@@ -7,15 +7,19 @@ import SlotList from "./SlotList";
 import ComponentPicker from "./ComponentPicker";
 import ValidationPanel from "./ValidationPanel";
 import ShareButton from "./ShareButton";
+import CPUSelector from "./CPUSelector";
 import { resolveSharingRules } from "../lib/ui-helpers";
 import { validateAssignments } from "../lib/validation-engine";
 import { encode, decode } from "../lib/sharing";
 import { getKitAssignments, getAssignedKitIds } from "../lib/stick-utils";
+import { resolveEffectiveSlotValues } from "../lib/cpu-utils";
+import type { EffectiveSlotValues } from "../lib/cpu-utils";
 import { fetchMotherboardFromSupabase, fetchComponentFromSupabase } from "../lib/supabase-queries";
 import type {
   DataManifest,
   Motherboard,
   Component,
+  CPUComponent,
   ValidationResult,
 } from "../lib/types";
 import type { SlotCategory } from "../lib/ui-types";
@@ -53,6 +57,10 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
   const [boardLoading, setBoardLoading] = useState(false);
   const [boardError, setBoardError] = useState<string | null>(null);
 
+  // CPU state
+  const [cpuId, setCpuId] = useState<string | null>(null);
+  const [cpuComponent, setCpuComponent] = useState<CPUComponent | null>(null);
+
   // RAM kit tracking — set of kit component IDs that have been selected
   const [selectedKits, setSelectedKits] = useState<Set<string>>(new Set());
 
@@ -89,6 +97,11 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
 
     setSelectedBoardId(decoded.motherboardId);
     setAssignments(decoded.assignments);
+
+    // Restore CPU selection from URL if present
+    if (decoded.cpuId) {
+      setCpuId(decoded.cpuId);
+    }
 
     // Restore selectedKits from any stick-level assignments in the URL
     const restoredKitIds = getAssignedKitIds(decoded.assignments);
@@ -134,6 +147,11 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
         fetchComponent(id);
       }
     }
+
+    // Fetch CPU component if restored from URL and not yet loaded
+    if (cpuId && !cpuComponent) {
+      fetchCpuComponent(cpuId);
+    }
   }, [selectedKits]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-fetch board when boardId prop is provided and ?build= did not restore
@@ -152,11 +170,11 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
     // Skip URL sync until initial restoration is complete
     if (!hasRestoredUrl.current) return;
 
-    const encoded = encode(selectedBoardId, assignments);
+    const encoded = encode(selectedBoardId, assignments, cpuId ?? undefined);
     const url = new URL(window.location.href);
     url.searchParams.set("build", encoded);
     window.history.replaceState({}, "", url.toString());
-  }, [selectedBoardId, assignments]);
+  }, [selectedBoardId, assignments, cpuId]);
 
   // Derived sharing state — recomputed on assignment or motherboard changes
   const { disabledSlots, bandwidthWarnings } = useMemo(() => {
@@ -175,9 +193,9 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
       setValidationResults([]);
       return;
     }
-    const results = validateAssignments(motherboard, assignments, loadedComponents);
+    const results = validateAssignments(motherboard, assignments, loadedComponents, cpuComponent ?? undefined);
     setValidationResults(results);
-  }, [motherboard, assignments, loadedComponents]);
+  }, [motherboard, assignments, loadedComponents, cpuComponent]);
 
   // Fetch motherboard JSON
   const fetchBoard = useCallback(
@@ -215,8 +233,10 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
     (boardId: string) => {
       if (boardId === selectedBoardId) return;
       setSelectedBoardId(boardId);
-      // Clear assignments on board switch (Property 8)
+      // Clear assignments and CPU state on board switch
       setAssignments({});
+      setCpuId(null);
+      setCpuComponent(null);
       setSelectedKits(new Set());
       setValidationResults([]);
       setPickerSlotId(null);
@@ -254,6 +274,66 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
       // Component fetch failure is non-fatal
     }
   }, [manifest.components]);
+
+  // Fetch a CPU component and store in state
+  const fetchCpuComponent = useCallback(async (id: string) => {
+    const cached = componentCache.current.get(id);
+    if (cached && cached.type === "cpu") {
+      setCpuComponent(cached as CPUComponent);
+      return;
+    }
+
+    try {
+      const comp = await fetchComponentFromSupabase(id, "cpu");
+      if (!comp || comp.type !== "cpu") return;
+      componentCache.current.set(id, comp);
+      setCpuComponent(comp as CPUComponent);
+    } catch {
+      // CPU fetch failure is non-fatal — validation runs without it
+    }
+  }, []);
+
+  // Handle CPU selection from CPUSelector
+  const handleCpuSelect = useCallback(
+    (id: string) => {
+      setCpuId(id);
+      fetchCpuComponent(id);
+    },
+    [fetchCpuComponent]
+  );
+
+  // Handle CPU removal
+  const handleCpuRemove = useCallback(() => {
+    setCpuId(null);
+    setCpuComponent(null);
+  }, []);
+
+  // Compute effective slot values for M.2 and PCIe slots when CPU is selected
+  const effectiveSlotValues = useMemo<Record<string, EffectiveSlotValues>>(() => {
+    if (!motherboard || !cpuComponent) return {};
+
+    const values: Record<string, EffectiveSlotValues> = {};
+
+    for (const slot of motherboard.m2_slots) {
+      values[slot.id] = resolveEffectiveSlotValues(
+        slot.gen,
+        slot.lanes,
+        slot.cpu_overrides,
+        cpuComponent.microarchitecture
+      );
+    }
+
+    for (const slot of motherboard.pcie_slots) {
+      values[slot.id] = resolveEffectiveSlotValues(
+        slot.gen,
+        slot.electrical_lanes,
+        slot.cpu_overrides,
+        cpuComponent.microarchitecture
+      );
+    }
+
+    return values;
+  }, [motherboard, cpuComponent]);
 
   // Open the component picker for a slot
   const handleAssign = useCallback(
@@ -403,6 +483,14 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
       {/* Slot list + validation (only when board is loaded) */}
       {motherboard && !boardLoading && !boardError && (
         <>
+          <CPUSelector
+            manifestComponents={manifest.components}
+            motherboardSocket={motherboard.socket}
+            selectedCpuId={cpuId}
+            onSelect={handleCpuSelect}
+            onRemove={handleCpuRemove}
+          />
+
           <SlotList
             motherboard={motherboard}
             assignments={assignments}
@@ -410,6 +498,7 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
             disabledSlots={disabledSlots}
             bandwidthWarnings={bandwidthWarnings}
             selectedKits={selectedKits}
+            effectiveSlotValues={effectiveSlotValues}
             onAssign={handleAssign}
             onRemove={handleRemove}
             onAddRamKit={handleAddRamKit}

@@ -45,6 +45,12 @@ export interface SharingRule {
   effect?: string;
 }
 
+export interface CPUOverride {
+  microarchitecture: string;
+  gen?: number;
+  lanes?: number;
+}
+
 export interface M2Slot {
   id: string;
   label: string;
@@ -56,6 +62,7 @@ export interface M2Slot {
   supports_sata: boolean;
   heatsink_included: boolean;
   sharing: SharingRule[] | null;
+  cpu_overrides?: CPUOverride[];
 }
 
 export interface PCIeSlot {
@@ -68,6 +75,7 @@ export interface PCIeSlot {
   source: "CPU" | "Chipset";
   reinforced: boolean;
   sharing: SharingRule[] | null;
+  cpu_overrides?: CPUOverride[];
 }
 
 export interface SATAPort {
@@ -163,7 +171,21 @@ export interface SATAComponent {
   schema_version: string;
 }
 
-export type Component = NVMeComponent | GPUComponent | RAMComponent | SATAComponent;
+export interface CPUComponent {
+  id: string;
+  type: "cpu";
+  manufacturer: string;
+  model: string;
+  socket: string;
+  microarchitecture: string;
+  pcie_config: {
+    cpu_gen: number;
+    cpu_lanes: number;
+  };
+  schema_version: string;
+}
+
+export type Component = NVMeComponent | GPUComponent | RAMComponent | SATAComponent | CPUComponent;
 
 // === Validation Types ===
 
@@ -183,6 +205,7 @@ export type SlotAssignment = Record<string, string>;
 export interface SharedBuild {
   motherboardId: string;
   assignments: SlotAssignment;
+  cpuId?: string;
 }
 
 // === Manifest Type ===

@@ -228,6 +228,24 @@
             },
             { "type": "null" }
           ]
+        },
+        "cpu_overrides": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["microarchitecture"],
+                "additionalProperties": false,
+                "properties": {
+                  "microarchitecture": { "type": "string" },
+                  "gen": { "type": "integer", "minimum": 1 },
+                  "lanes": { "type": "integer", "minimum": 1 }
+                }
+              }
+            },
+            { "type": "null" }
+          ]
         }
       }
     },
@@ -269,6 +287,24 @@
             {
               "type": "array",
               "items": { "$ref": "#/definitions/SharingRule" }
+            },
+            { "type": "null" }
+          ]
+        },
+        "cpu_overrides": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["microarchitecture"],
+                "additionalProperties": false,
+                "properties": {
+                  "microarchitecture": { "type": "string" },
+                  "gen": { "type": "integer", "minimum": 1 },
+                  "lanes": { "type": "integer", "minimum": 1 }
+                }
+              }
             },
             { "type": "null" }
           ]

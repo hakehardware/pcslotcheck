@@ -6,6 +6,7 @@ import { getKitAssignments } from "../lib/stick-utils";
 import SlotCard from "./SlotCard";
 import StickPicker from "./StickPicker";
 import type { Motherboard, Component, RAMComponent } from "../lib/types";
+import type { EffectiveSlotValues } from "../lib/cpu-utils";
 import type { SlotCategory } from "../lib/ui-types";
 
 interface SlotListProps {
@@ -15,6 +16,7 @@ interface SlotListProps {
   disabledSlots: Set<string>;
   bandwidthWarnings: Map<string, string>;
   selectedKits: Set<string>;
+  effectiveSlotValues?: Record<string, EffectiveSlotValues>;
   onAssign: (slotId: string) => void;
   onRemove: (slotId: string) => void;
   onAddRamKit: () => void;
@@ -65,6 +67,7 @@ export default function SlotList({
   disabledSlots,
   bandwidthWarnings,
   selectedKits,
+  effectiveSlotValues,
   onAssign,
   onRemove,
   onAddRamKit,
@@ -72,7 +75,7 @@ export default function SlotList({
   onStickRemove,
   onRemoveKit,
 }: SlotListProps) {
-  const groups = groupSlotsByCategory(motherboard);
+  const groups = groupSlotsByCategory(motherboard, effectiveSlotValues);
 
   // Count how many DIMM slots are currently assigned (for populated count)
   const memorySlotIds = new Set(motherboard.memory.slots.map((s) => s.id));

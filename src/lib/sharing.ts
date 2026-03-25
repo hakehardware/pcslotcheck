@@ -4,13 +4,18 @@
  */
 
 /**
- * Encode a motherboard ID and slot assignments into a base64url string.
+ * Encode a motherboard ID, slot assignments, and optional CPU ID into a base64url string.
  */
 export function encode(
   motherboardId: string,
-  assignments: Record<string, string>
+  assignments: Record<string, string>,
+  cpuId?: string
 ): string {
-  const payload = JSON.stringify({ m: motherboardId, a: assignments });
+  const payload = JSON.stringify({
+    m: motherboardId,
+    ...(cpuId ? { c: cpuId } : {}),
+    a: assignments,
+  });
   const base64 = btoa(payload);
   // Convert base64 to base64url: replace + with -, / with _, remove trailing =
   return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -22,7 +27,7 @@ export function encode(
  */
 export function decode(
   queryString: string
-): { motherboardId: string; assignments: Record<string, string> } | null {
+): { motherboardId: string; assignments: Record<string, string>; cpuId?: string } | null {
   try {
     if (!queryString) return null;
 
@@ -49,7 +54,11 @@ export function decode(
       return null;
     }
 
-    return { motherboardId: parsed.m, assignments: parsed.a };
+    return {
+      motherboardId: parsed.m,
+      assignments: parsed.a,
+      ...(typeof parsed.c === "string" ? { cpuId: parsed.c } : {}),
+    };
   } catch {
     return null;
   }

@@ -5,6 +5,7 @@ import type {
   GPUComponent,
   SATAComponent,
   RAMComponent,
+  CPUComponent,
   ValidationResult,
   MemoryConfig,
   M2Slot,
@@ -13,6 +14,7 @@ import type {
   SharingRule,
 } from "./types";
 import { parseStickId, getKitAssignments, getAssignedKitIds } from "./stick-utils";
+import { isCpuGenDowngrade, resolveEffectiveSlotValues } from "./cpu-utils";
 
 /**
  * Validates component-to-slot assignments against motherboard compatibility rules.
@@ -21,12 +23,19 @@ import { parseStickId, getKitAssignments, getAssignedKitIds } from "./stick-util
 export function validateAssignments(
   motherboard: Motherboard,
   assignments: Record<string, string>,
-  components: Record<string, Component>
+  components: Record<string, Component>,
+  cpuComponent?: CPUComponent
 ): ValidationResult[] {
   try {
     if (!motherboard || !assignments) return [];
 
     const results: ValidationResult[] = [];
+
+    // CPU socket compatibility check
+    if (cpuComponent) {
+      results.push(...validateCpuSocketCompat(motherboard, cpuComponent));
+      results.push(...validateCpuDirectSlotGen(motherboard, cpuComponent));
+    }
 
     for (const [slotId, componentId] of Object.entries(assignments)) {
       const component = components?.[componentId];
@@ -34,7 +43,7 @@ export function validateAssignments(
 
       const m2Slot = motherboard.m2_slots?.find((s) => s.id === slotId);
       if (m2Slot) {
-        results.push(...validateM2Assignment(m2Slot, component, slotId, componentId));
+        results.push(...validateM2Assignment(m2Slot, component, slotId, componentId, cpuComponent));
         continue;
       }
 
@@ -98,6 +107,109 @@ export function validateAssignments(
 
 function isNVMe(component: Component): component is NVMeComponent {
   return component.type === "nvme";
+}
+
+/**
+ * Produces an error when the CPU socket does not match the motherboard socket.
+ * Returns an empty array when sockets match.
+ */
+export function validateCpuSocketCompat(
+  motherboard: Motherboard,
+  cpuComponent: CPUComponent
+): ValidationResult[] {
+  if (cpuComponent.socket === motherboard.socket) {
+    return [];
+  }
+
+  return [
+    {
+      severity: "error",
+      message: `${cpuComponent.model} requires socket ${cpuComponent.socket} but this motherboard uses ${motherboard.socket}`,
+      slotId: "cpu",
+      componentId: cpuComponent.id,
+    },
+  ];
+}
+
+/**
+ * Produces a warning for each CPU-direct M.2 or PCIe slot whose effective gen
+ * exceeds the CPU's pcie_config.cpu_gen. Chipset-sourced slots are skipped.
+ */
+export function validateCpuDirectSlotGen(
+  motherboard: Motherboard,
+  cpuComponent: CPUComponent
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const cpuGen = cpuComponent.pcie_config.cpu_gen;
+
+  for (const slot of motherboard.m2_slots ?? []) {
+    const effective = resolveEffectiveSlotValues(
+      slot.gen,
+      slot.lanes,
+      slot.cpu_overrides,
+      cpuComponent.microarchitecture
+    );
+    if (isCpuGenDowngrade(effective.gen, cpuGen, slot.source)) {
+      results.push({
+        severity: "warning",
+        message: `Slot ${slot.label} is advertised as Gen${effective.gen} but ${cpuComponent.model} only supports Gen${cpuGen} on CPU-direct lanes -- slot operates at Gen${cpuGen}`,
+        slotId: slot.id,
+        componentId: cpuComponent.id,
+      });
+    }
+  }
+
+  for (const slot of motherboard.pcie_slots ?? []) {
+    const effective = resolveEffectiveSlotValues(
+      slot.gen,
+      slot.electrical_lanes,
+      slot.cpu_overrides,
+      cpuComponent.microarchitecture
+    );
+    if (isCpuGenDowngrade(effective.gen, cpuGen, slot.source)) {
+      results.push({
+        severity: "warning",
+        message: `Slot ${slot.label} is advertised as Gen${effective.gen} but ${cpuComponent.model} only supports Gen${cpuGen} on CPU-direct lanes -- slot operates at Gen${cpuGen}`,
+        slotId: slot.id,
+        componentId: cpuComponent.id,
+      });
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Produces a warning when an NVMe drive's pcie_gen exceeds the effective slot
+ * gen after CPU override resolution. Only fires when a CPU is selected.
+ */
+export function validateCpuNvmeGenMismatch(
+  slot: M2Slot,
+  nvmeComponent: NVMeComponent,
+  cpuComponent: CPUComponent
+): ValidationResult[] {
+  const effective = resolveEffectiveSlotValues(
+    slot.gen,
+    slot.lanes,
+    slot.cpu_overrides,
+    cpuComponent.microarchitecture
+  );
+
+  if (
+    nvmeComponent.interface.pcie_gen !== null &&
+    nvmeComponent.interface.pcie_gen > effective.gen
+  ) {
+    return [
+      {
+        severity: "warning",
+        message: `${nvmeComponent.model} is Gen${nvmeComponent.interface.pcie_gen} but slot ${slot.label} operates at Gen${effective.gen} with ${cpuComponent.model} -- reduced bandwidth`,
+        slotId: slot.id,
+        componentId: nvmeComponent.id,
+      },
+    ];
+  }
+
+  return [];
 }
 
 function isGPU(component: Component): component is GPUComponent {
@@ -240,11 +352,22 @@ function validateM2Assignment(
   slot: M2Slot,
   component: Component,
   slotId: string,
-  componentId: string
+  componentId: string,
+  cpuComponent?: CPUComponent
 ): ValidationResult[] {
   if (!isNVMe(component)) return [];
 
   const results: ValidationResult[] = [];
+
+  // Resolve effective slot gen/lanes when a CPU is selected
+  const effective = cpuComponent
+    ? resolveEffectiveSlotValues(
+        slot.gen,
+        slot.lanes,
+        slot.cpu_overrides,
+        cpuComponent.microarchitecture
+      )
+    : { gen: slot.gen, lanes: slot.lanes };
 
   // Error: SATA M.2 drive in an NVMe-only slot
   if (component.interface.protocol === "SATA" && !slot.supports_sata) {
@@ -256,24 +379,31 @@ function validateM2Assignment(
     });
   }
 
-  // Warning: Gen5 NVMe in a Gen4 slot — performance impact
-  if (component.interface.pcie_gen === 5 && slot.gen === 4) {
+  // Warning: NVMe gen exceeds effective slot gen — performance impact
+  if (component.interface.pcie_gen !== null && component.interface.pcie_gen > effective.gen) {
     results.push({
       severity: "warning",
-      message: `${component.model} is a Gen5 NVMe drive but slot ${slot.label} is Gen4 — the drive will run at reduced bandwidth.`,
+      message: `${component.model} is a Gen${component.interface.pcie_gen} NVMe drive but slot ${slot.label} is Gen${effective.gen} — the drive will run at reduced bandwidth.`,
       slotId,
       componentId,
     });
   }
 
-  // Info: Gen4 NVMe in a Gen5 slot — wastes slot potential
-  if (component.interface.pcie_gen === 4 && slot.gen === 5) {
+  // Info: NVMe gen below effective slot gen — wastes slot potential
+  if (component.interface.pcie_gen !== null && component.interface.pcie_gen < effective.gen) {
     results.push({
       severity: "info",
-      message: `${component.model} is a Gen4 NVMe drive in a Gen5 slot (${slot.label}) — consider swapping with a Gen5 drive to use the slot's full bandwidth.`,
+      message: `${component.model} is a Gen${component.interface.pcie_gen} NVMe drive in a Gen${effective.gen} slot (${slot.label}) — consider swapping with a Gen${effective.gen} drive to use the slot's full bandwidth.`,
       slotId,
       componentId,
     });
+  }
+
+  // CPU-dependent NVMe gen mismatch warning
+  if (cpuComponent) {
+    results.push(
+      ...validateCpuNvmeGenMismatch(slot, component, cpuComponent)
+    );
   }
 
   // Form factor check: component must fit the slot's supported form factors

@@ -216,6 +216,69 @@ describe("sharing module", () => {
     });
   });
 
+  // --- Task 9: CPU assignment in shareable URLs ---
+
+  describe("CPU assignment round-trip", () => {
+    it("encodes a build with cpuId and decodes back to the same state", () => {
+      const motherboardId = "asus-rog-strix-z890-f-gaming-wifi";
+      const assignments = { m2_1: "samsung-990-pro-2tb" };
+      const cpuId = "intel-core-i7-14700k";
+
+      const encoded = encode(motherboardId, assignments, cpuId);
+      const decoded = decode(encoded);
+
+      expect(decoded).not.toBeNull();
+      expect(decoded!.motherboardId).toBe(motherboardId);
+      expect(decoded!.assignments).toEqual(assignments);
+      expect(decoded!.cpuId).toBe(cpuId);
+    });
+
+    it("decoding a URL without c field returns cpuId undefined", () => {
+      // Manually encode a payload without the c field (pre-CPU format)
+      const payload = JSON.stringify({
+        m: "asus-rog-strix-z890-f-gaming-wifi",
+        a: { m2_1: "samsung-990-pro-2tb" },
+      });
+      const base64 = btoa(payload);
+      const base64url = base64
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+      const decoded = decode(base64url);
+
+      expect(decoded).not.toBeNull();
+      expect(decoded!.motherboardId).toBe("asus-rog-strix-z890-f-gaming-wifi");
+      expect(decoded!.assignments).toEqual({ m2_1: "samsung-990-pro-2tb" });
+      expect(decoded!.cpuId).toBeUndefined();
+    });
+
+    it("encoding without cpuId omits c field from payload", () => {
+      const encoded = encode("test-board", { m2_1: "some-nvme" });
+
+      // Decode the base64url manually to inspect the raw JSON
+      let base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+      const pad = base64.length % 4;
+      if (pad) base64 += "=".repeat(4 - pad);
+      const json = JSON.parse(atob(base64));
+
+      expect(json).not.toHaveProperty("c");
+      expect(json.m).toBe("test-board");
+      expect(json.a).toEqual({ m2_1: "some-nvme" });
+    });
+
+    it("encoding with cpuId includes c field in payload", () => {
+      const encoded = encode("test-board", { m2_1: "some-nvme" }, "amd-ryzen-7-9700x");
+
+      let base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+      const pad = base64.length % 4;
+      if (pad) base64 += "=".repeat(4 - pad);
+      const json = JSON.parse(atob(base64));
+
+      expect(json.c).toBe("amd-ryzen-7-9700x");
+    });
+  });
+
   // --- Task 6.3: Backward-compatibility — legacy kit-level assignment ---
 
   describe("backward compatibility with legacy kit-level assignments", () => {

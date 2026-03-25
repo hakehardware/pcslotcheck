@@ -15,7 +15,7 @@ function getSchemaPath(filePath: string): string | null {
     return path.join(DATA_DIR, "schema", "motherboard.schema.json");
   }
 
-  const componentMatch = rel.match(/^components\/(nvme|gpu|ram|sata)\//);
+  const componentMatch = rel.match(/^components\/(nvme|gpu|ram|sata|cpu)\//);
   if (componentMatch) {
     return path.join(DATA_DIR, "schema", `component-${componentMatch[1]}.schema.json`);
   }

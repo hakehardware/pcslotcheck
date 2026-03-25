@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "component-cpu.schema.json",
+  "title": "CPU Component",
+  "description": "Schema for CPU component YAML data files",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "manufacturer",
+    "model",
+    "socket",
+    "microarchitecture",
+    "pcie_config",
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier matching the filename stem"
+    },
+    "type": {
+      "type": "string",
+      "const": "cpu"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "socket": {
+      "type": "string"
+    },
+    "microarchitecture": {
+      "type": "string"
+    },
+    "pcie_config": {
+      "type": "object",
+      "required": ["cpu_gen", "cpu_lanes"],
+      "additionalProperties": false,
+      "properties": {
+        "cpu_gen": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cpu_lanes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  }
+}

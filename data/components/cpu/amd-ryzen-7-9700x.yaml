@@ -1,0 +1,10 @@
+id: amd-ryzen-7-9700x
+type: cpu
+manufacturer: AMD
+model: Ryzen 7 9700X
+socket: AM5
+microarchitecture: Zen 5
+pcie_config:
+  cpu_gen: 5
+  cpu_lanes: 28
+schema_version: "1.0"

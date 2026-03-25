@@ -33,6 +33,11 @@ const SPEC_DISPLAY_KEYS: Record<string, { key: string; label: string }[]> = {
     { key: "capacity_gb", label: "Capacity" },
     { key: "form_factor", label: "Form Factor" },
   ],
+  cpu: [
+    { key: "socket", label: "Socket" },
+    { key: "microarchitecture", label: "Arch" },
+    { key: "pcie_config.cpu_gen", label: "PCIe Gen" },
+  ],
 };
 
 function formatSpecValue(key: string, value: unknown): string {
@@ -42,6 +47,7 @@ function formatSpecValue(key: string, value: unknown): string {
   if (key.includes("speed_mhz") && typeof value === "number") return `${value} MHz`;
   if (key.includes("length_mm") && typeof value === "number") return `${value} mm`;
   if (key.includes("pcie_gen") && typeof value === "number") return `Gen ${value}`;
+  if (key.includes("cpu_gen") && typeof value === "number") return `Gen ${value}`;
   return String(value);
 }
 

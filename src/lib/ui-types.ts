@@ -22,10 +22,14 @@ export interface SlotGroup {
   slots: SlotEntry[];
 }
 
-/** Slot category → compatible component type mapping */
-export const SLOT_CATEGORY_TO_COMPONENT_TYPE: Record<SlotCategory, string> = {
+/** Component type key: slot categories plus "cpu" (which is not a slot but needs lookup) */
+export type ComponentTypeKey = SlotCategory | "cpu";
+
+/** Slot category (or cpu) → compatible component type mapping */
+export const SLOT_CATEGORY_TO_COMPONENT_TYPE: Record<ComponentTypeKey, string> = {
   memory: "ram",
   m2: "nvme",
   pcie: "gpu",
   sata: "sata_drive",
+  cpu: "cpu",
 };

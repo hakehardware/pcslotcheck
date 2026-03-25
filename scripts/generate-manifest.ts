@@ -38,7 +38,7 @@ function sortKeys(obj: unknown): unknown {
 }
 
 /** Extract type-specific key specs for a component manifest entry. */
-function extractSpecs(data: Record<string, unknown>): Record<string, unknown> {
+export function extractSpecs(data: Record<string, unknown>): Record<string, unknown> {
   const type = data.type as string;
 
   switch (type) {
@@ -73,6 +73,14 @@ function extractSpecs(data: Record<string, unknown>): Record<string, unknown> {
       return {
         capacity_gb: data.capacity_gb,
         form_factor: data.form_factor,
+      };
+    }
+    case "cpu": {
+      const pcieConfig = data.pcie_config as Record<string, unknown> | undefined;
+      return {
+        socket: data.socket,
+        microarchitecture: data.microarchitecture,
+        "pcie_config.cpu_gen": pcieConfig?.cpu_gen,
       };
     }
     default:
