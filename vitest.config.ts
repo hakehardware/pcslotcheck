@@ -10,9 +10,25 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['tests/**/*.{test,prop}.{ts,tsx}'],
     globals: true,
     passWithNoTests: true,
-    environment: 'jsdom',
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'tsx-jsdom',
+          include: ['tests/**/*.{test,prop}.tsx'],
+          environment: 'jsdom',
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'ts-node',
+          include: ['tests/**/*.{test,prop}.ts'],
+          environment: 'node',
+        },
+      },
+    ],
   },
 });

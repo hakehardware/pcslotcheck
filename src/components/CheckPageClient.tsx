@@ -19,15 +19,15 @@ export default function CheckPageClient({
     null
   );
   const [boardNotFound, setBoardNotFound] = useState(false);
-  const [loading, setLoading] = useState(!!boardId);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!boardId) return;
 
     let cancelled = false;
+    setLoading(true);
 
     async function fetchSummary() {
-      setLoading(true);
       setBoardNotFound(false);
       try {
         const result = await fetchMotherboardSummaryById(boardId!);

@@ -20,9 +20,18 @@ export default function SearchBar({
   const [activeIndex, setActiveIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
 
+  const mountedRef = useRef(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Track mount state so async callbacks skip state updates during hydration
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // Debounced fetch
   const fetchResults = useCallback((searchQuery: string) => {
@@ -39,16 +48,19 @@ export default function SearchBar({
     debounceRef.current = setTimeout(() => {
       fetchMotherboardPage({ search: searchQuery, page: 1, pageSize: 5 })
         .then((result) => {
+          if (!mountedRef.current) return;
           setResults(result.rows);
           setIsOpen(true);
           setActiveIndex(-1);
         })
         .catch((err) => {
+          if (!mountedRef.current) return;
           console.warn("SearchBar: failed to fetch results", err);
           setResults([]);
           setIsOpen(false);
         })
         .finally(() => {
+          if (!mountedRef.current) return;
           setLoading(false);
         });
     }, 300);
