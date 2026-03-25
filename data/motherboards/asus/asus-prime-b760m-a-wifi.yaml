@@ -1,7 +1,7 @@
 id: asus-prime-b760m-a-wifi
 manufacturer: ASUS
 model: PRIME B760M-A WIFI
-chipset: Intel B760
+chipset: Intel B760M
 socket: LGA 1700
 form_factor: Micro-ATX
 schema_version: "2.0"

@@ -1,7 +1,7 @@
 id: asus-prime-b650m-a-ax
 manufacturer: ASUS
 model: PRIME B650M-A AX
-chipset: AMD B650
+chipset: AMD B650M
 socket: AM5
 form_factor: Micro-ATX
 schema_version: "2.0"

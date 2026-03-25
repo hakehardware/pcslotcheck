@@ -1,7 +1,7 @@
 id: gigabyte-b650m-aorus-pro
 manufacturer: Gigabyte
 model: B650M AORUS PRO
-chipset: AMD B650
+chipset: AMD B650M
 socket: AM5
 form_factor: Micro-ATX
 schema_version: "2.0"
