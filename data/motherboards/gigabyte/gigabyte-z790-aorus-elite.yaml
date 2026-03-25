@@ -1,0 +1,171 @@
+id: gigabyte-z790-aorus-elite
+manufacturer: Gigabyte
+model: Z790 AORUS ELITE
+chipset: Z790
+socket: LGA1700
+form_factor: ATX
+schema_version: "2.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 7600
+  base_speed_mhz: 4800
+  max_capacity_gb: 256
+  ecc_support: false
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a2
+      - dimm_b2
+      - dimm_a1
+      - dimm_b1
+
+m2_slots:
+  - id: m2_1
+    label: M2A_CPU
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2P_SB
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_3
+    label: M2Q_SB
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_4
+    label: M2M_SB
+    interface: PCIe_or_SATA
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: Chipset
+    supports_sata: true
+    heatsink_included: true
+    sharing:
+      - type: disables
+        targets:
+          - sata_2
+          - sata_3
+        direction: m2_to_sata
+        trigger:
+          slot_ids:
+            - m2_4
+          logic: any_populated
+        condition: M.2 PCIe SSD installed in M2M_SB
+        effect: SATA3 2 and SATA3 3 will be unavailable
+
+pcie_slots:
+  - id: pcie_1
+    label: PCIEX16
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_2
+    label: PCIEX4_1
+    position: 2
+    gen: 4
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+  - id: pcie_3
+    label: PCIEX4_2
+    position: 3
+    gen: 4
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: m2_4
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: m2_4
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_6
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_7
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manual
+    url: https://download.gigabyte.com/FileList/Manual/mb_manual_z790-aorus-elite_1105_e.pdf

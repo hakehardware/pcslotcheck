@@ -1,0 +1,164 @@
+id: asrock-z690-taichi
+manufacturer: ASRock
+model: Z690 Taichi
+chipset: Intel Z690
+socket: LGA 1700
+form_factor: E-ATX
+schema_version: "2.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 6400
+  base_speed_mhz: 4800
+  max_capacity_gb: 128
+  ecc_support: false
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a2
+      - dimm_b2
+      - dimm_a1
+      - dimm_b1
+
+m2_slots:
+  - id: m2_1
+    label: M2_1 Hyper (CPU)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2_2 Hyper (Chipset)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_3
+    label: M2_3 (Chipset)
+    interface: PCIe_or_SATA
+    gen: 3
+    lanes: 2
+    form_factors:
+      - "2230"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: true
+    heatsink_included: false
+    sharing: null
+
+pcie_slots:
+  - id: pcie_1
+    label: PCIE1
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_2
+    label: PCIE2
+    position: 2
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_3
+    label: PCIE3
+    position: 3
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x1
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+  - id: pcie_4
+    label: PCIE4
+    position: 4
+    gen: 4
+    electrical_lanes: 4
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_ind
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manufacturer
+    url: https://www.asrock.com/mb/Intel/Z690%20Taichi/index.asp

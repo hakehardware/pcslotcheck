@@ -1,0 +1,149 @@
+id: gigabyte-b650-ud-ac
+manufacturer: Gigabyte
+model: B650 UD AC
+chipset: AMD B650
+socket: AM5
+form_factor: ATX
+schema_version: "2.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 8000
+  base_speed_mhz: 4800
+  max_capacity_gb: 256
+  ecc_support: false
+  channels: 2
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: false
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a2
+      - dimm_b2
+    four_dimm:
+      - dimm_a1
+      - dimm_a2
+      - dimm_b1
+      - dimm_b2
+
+m2_slots:
+  - id: m2_1
+    label: M2A_CPU
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+      - "25110"
+      - "2580"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2P_CPU
+    interface: PCIe
+    gen: 4
+    lanes: 2
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: false
+    sharing: null
+
+  - id: m2_3
+    label: M2C_SB
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: false
+    sharing: null
+
+pcie_slots:
+  - id: pcie_1
+    label: PCIEX16
+    position: 1
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_2
+    label: PCIEX1_1
+    position: 2
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pcie_3
+    label: PCIEX1_2
+    position: 3
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pcie_4
+    label: PCIEX1_3
+    position: 4
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manufacturer
+    url: https://www.gigabyte.com/Motherboard/B650-UD-AC-rev-10/sp
