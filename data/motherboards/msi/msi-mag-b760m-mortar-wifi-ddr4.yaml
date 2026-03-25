@@ -131,16 +131,6 @@ sata_ports:
     source: Chipset
     disabled_by: m2_2
 
-  - id: sata_a1
-    version: "3.0"
-    source: Chipset
-    disabled_by: null
-
-  - id: sata_a2
-    version: "3.0"
-    source: Chipset
-    disabled_by: null
-
 sources:
   - type: manufacturer
     url: https://www.msi.com/Motherboard/MAG-B760M-MORTAR-WIFI-DDR4/Specification

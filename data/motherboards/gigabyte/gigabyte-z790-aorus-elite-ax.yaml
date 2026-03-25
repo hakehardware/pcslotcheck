@@ -2,7 +2,7 @@ id: gigabyte-z790-aorus-elite-ax
 manufacturer: Gigabyte
 model: Z790 AORUS ELITE AX
 chipset: Intel Z790
-socket: LGA1700
+socket: LGA 1700
 form_factor: ATX
 schema_version: "2.0"
 
@@ -65,7 +65,18 @@ m2_slots:
     source: Chipset
     supports_sata: true
     heatsink_included: true
-    sharing: null
+    sharing:
+      - type: disables
+        targets:
+          - sata_2
+          - sata_3
+        direction: m2_to_sata
+        trigger:
+          slot_ids:
+            - m2m_sb
+          logic: any_populated
+        condition: M.2 PCIe SSD installed in M2M_SB
+        effect: SATA3 2 and SATA3 3 will be unavailable
 
   - id: m2p_sb
     label: M2P_SB
@@ -133,12 +144,12 @@ sata_ports:
   - id: sata_2
     version: "3.0"
     source: Chipset
-    disabled_by: m2_4
+    disabled_by: m2m_sb
 
   - id: sata_3
     version: "3.0"
     source: Chipset
-    disabled_by: m2_4
+    disabled_by: m2m_sb
 
   - id: sata_4
     version: "3.0"

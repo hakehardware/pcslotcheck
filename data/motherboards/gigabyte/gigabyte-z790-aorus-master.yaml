@@ -2,7 +2,7 @@ id: gigabyte-z790-aorus-master
 manufacturer: Gigabyte
 model: Z790 AORUS MASTER
 chipset: Intel Z790
-socket: LGA1700
+socket: LGA 1700
 form_factor: E-ATX
 schema_version: "2.0"
 

@@ -93,6 +93,36 @@ pcie_slots:
     reinforced: true
     sharing: null
 
+  - id: pcie_2
+    label: PCIEX1_1
+    position: 2
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pcie_3
+    label: PCIEX1_2
+    position: 3
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pcie_4
+    label: PCIEX1_3
+    position: 4
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x16
+    source: Chipset
+    reinforced: false
+    sharing: null
+
 sata_ports:
   - id: sata_0
     version: "3.0"

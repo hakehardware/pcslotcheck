@@ -2,7 +2,7 @@ id: msi-mpg-z890-carbon-wifi
 manufacturer: MSI
 model: MPG Z890 CARBON WIFI
 chipset: Intel Z890
-socket: LGA1851
+socket: LGA 1851
 form_factor: ATX
 schema_version: "2.0"
 

@@ -2,7 +2,7 @@ id: msi-pro-z890-p-wifi
 manufacturer: MSI
 model: PRO Z890-P WIFI
 chipset: Intel Z890
-socket: LGA1851
+socket: LGA 1851
 form_factor: ATX
 schema_version: "2.0"
 

@@ -1,7 +1,7 @@
 id: asus-rog-strix-b650e-e-gaming-wifi
 manufacturer: ASUS
 model: ROG STRIX B650E-E GAMING WIFI
-chipset: AMD B650
+chipset: AMD B650E
 socket: AM5
 form_factor: ATX
 schema_version: "2.0"

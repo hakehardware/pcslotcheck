@@ -1,7 +1,7 @@
 id: asus-rog-crosshair-x670e-hero
 manufacturer: ASUS
 model: ROG CROSSHAIR X670E HERO
-chipset: AMD X670
+chipset: AMD X670E
 socket: AM5
 form_factor: ATX
 schema_version: "2.0"
