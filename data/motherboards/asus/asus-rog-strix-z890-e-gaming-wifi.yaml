@@ -1,7 +1,7 @@
 id: asus-rog-strix-z890-e-gaming-wifi
 manufacturer: ASUS
 model: ROG STRIX Z890-E GAMING WIFI
-chipset: Z890
+chipset: Intel Z890
 socket: LGA1851
 form_factor: ATX
 schema_version: "2.0"

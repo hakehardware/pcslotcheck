@@ -1,7 +1,7 @@
 id: msi-mpg-x870e-carbon-wifi
 manufacturer: MSI
 model: MPG X870E CARBON WIFI
-chipset: X870E
+chipset: AMD X870E
 socket: AM5
 form_factor: ATX
 schema_version: "2.0"

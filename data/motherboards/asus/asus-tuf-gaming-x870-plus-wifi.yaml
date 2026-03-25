@@ -1,7 +1,7 @@
 id: asus-tuf-gaming-x870-plus-wifi
 manufacturer: ASUS
 model: TUF GAMING X870-PLUS WIFI
-chipset: X870
+chipset: AMD X870
 socket: AM5
 form_factor: ATX
 schema_version: "2.0"

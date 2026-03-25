@@ -1,7 +1,7 @@
 id: gigabyte-z890-aorus-elite-wifi7
 manufacturer: Gigabyte
 model: Z890 AORUS ELITE WIFI7
-chipset: Z890
+chipset: Intel Z890
 socket: LGA1851
 form_factor: ATX
 schema_version: "2.0"

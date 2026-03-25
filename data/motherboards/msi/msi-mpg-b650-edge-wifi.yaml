@@ -1,7 +1,7 @@
 id: msi-mpg-b650-edge-wifi
 manufacturer: MSI
 model: MPG B650 EDGE WIFI
-chipset: B650
+chipset: AMD B650
 socket: AM5
 form_factor: ATX
 schema_version: "2.0"

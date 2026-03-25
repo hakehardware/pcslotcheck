@@ -1,7 +1,7 @@
 id: gigabyte-b650-aorus-elite-ax-v2
 manufacturer: Gigabyte
 model: B650 AORUS ELITE AX V2
-chipset: B650
+chipset: AMD B650
 socket: AM5
 form_factor: ATX
 schema_version: "2.0"

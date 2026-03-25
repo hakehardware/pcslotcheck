@@ -1,7 +1,7 @@
 id: asus-tuf-gaming-z890-plus-wifi
 manufacturer: ASUS
 model: TUF GAMING Z890-PLUS WIFI
-chipset: Z890
+chipset: Intel Z890
 socket: LGA1851
 form_factor: ATX
 schema_version: "2.0"

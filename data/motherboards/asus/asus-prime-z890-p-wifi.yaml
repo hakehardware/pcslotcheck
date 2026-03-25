@@ -1,7 +1,7 @@
 id: asus-prime-z890-p-wifi
 manufacturer: ASUS
 model: PRIME Z890-P WIFI
-chipset: Z890
+chipset: Intel Z890
 socket: LGA1851
 form_factor: ATX
 schema_version: "2.0"

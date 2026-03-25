@@ -1,7 +1,7 @@
 id: msi-mag-z790-tomahawk-wifi
 manufacturer: MSI
 model: MAG Z790 TOMAHAWK WIFI
-chipset: Z790
+chipset: Intel Z790
 socket: LGA1700
 form_factor: ATX
 schema_version: "2.0"

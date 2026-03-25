@@ -1,7 +1,7 @@
 id: asrock-z890-steel-legend-wifi
 manufacturer: ASRock
 model: Z890 Steel Legend WiFi
-chipset: Z890
+chipset: Intel Z890
 socket: LGA1851
 form_factor: ATX
 schema_version: "2.0"

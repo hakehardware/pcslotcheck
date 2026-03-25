@@ -1,7 +1,7 @@
 id: asrock-b650-steel-legend-wifi
 manufacturer: ASRock
 model: B650 Steel Legend WiFi
-chipset: B650
+chipset: AMD B650
 socket: AM5
 form_factor: ATX
 schema_version: "2.0"

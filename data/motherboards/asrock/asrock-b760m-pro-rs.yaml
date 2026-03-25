@@ -1,7 +1,7 @@
 id: asrock-b760m-pro-rs
 manufacturer: ASRock
 model: B760M Pro RS
-chipset: B760
+chipset: Intel B760
 socket: LGA1700
 form_factor: Micro-ATX
 schema_version: "2.0"
