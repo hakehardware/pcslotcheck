@@ -4,7 +4,11 @@ manufacturer: Intel
 model: Core i3-12300T
 socket: LGA 1700
 microarchitecture: Alder Lake
+architecture: 12th Gen Core
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 20
+cores: 4
+threads: 8
+tdp_w: 35
 schema_version: "1.0"

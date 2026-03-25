@@ -4,7 +4,11 @@ manufacturer: Intel
 model: Core i5-13500T
 socket: LGA 1700
 microarchitecture: Raptor Lake
+architecture: 13th Gen Core
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 20
+cores: 14
+threads: 20
+tdp_w: 35
 schema_version: "1.0"

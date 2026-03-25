@@ -4,7 +4,11 @@ manufacturer: AMD
 model: Ryzen 9 9900X
 socket: AM5
 microarchitecture: Granite Ridge
+architecture: Zen 5
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 28
+cores: 12
+threads: 24
+tdp_w: 120
 schema_version: "1.0"

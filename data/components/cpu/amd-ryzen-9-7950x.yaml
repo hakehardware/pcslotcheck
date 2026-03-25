@@ -4,7 +4,11 @@ manufacturer: AMD
 model: Ryzen 9 7950X
 socket: AM5
 microarchitecture: Raphael
+architecture: Zen 4
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 28
+cores: 16
+threads: 32
+tdp_w: 170
 schema_version: "1.0"

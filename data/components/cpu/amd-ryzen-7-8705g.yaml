@@ -4,7 +4,11 @@ manufacturer: AMD
 model: Ryzen 7 8705G
 socket: AM5
 microarchitecture: Phoenix
+architecture: Zen 4
 pcie_config:
   cpu_gen: 4
   cpu_lanes: 20
+cores: 8
+threads: 16
+tdp_w: 65
 schema_version: "1.0"

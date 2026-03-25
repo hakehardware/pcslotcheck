@@ -4,7 +4,11 @@ manufacturer: Intel
 model: Core i7-12700
 socket: LGA 1700
 microarchitecture: Alder Lake
+architecture: 12th Gen Core
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 20
+cores: 12
+threads: 20
+tdp_w: 65
 schema_version: "1.0"

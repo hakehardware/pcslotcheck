@@ -4,7 +4,11 @@ manufacturer: Intel
 model: Pentium Gold G7400
 socket: LGA 1700
 microarchitecture: Alder Lake
+architecture: 12th Gen Core
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 20
+cores: 2
+threads: 4
+tdp_w: 46
 schema_version: "1.0"

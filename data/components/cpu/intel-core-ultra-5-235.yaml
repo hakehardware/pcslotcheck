@@ -4,7 +4,11 @@ manufacturer: Intel
 model: Core Ultra 5 235
 socket: LGA 1851
 microarchitecture: Arrow Lake
+architecture: Core Ultra (Series 2)
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 24
+cores: 14
+threads: 14
+tdp_w: 65
 schema_version: "1.0"

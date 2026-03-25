@@ -4,7 +4,11 @@ manufacturer: AMD
 model: Ryzen 9 7900X3D
 socket: AM5
 microarchitecture: Raphael
+architecture: Zen 4
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 28
+cores: 12
+threads: 24
+tdp_w: 120
 schema_version: "1.0"

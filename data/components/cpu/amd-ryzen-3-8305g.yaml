@@ -4,7 +4,11 @@ manufacturer: AMD
 model: Ryzen 3 8305G
 socket: AM5
 microarchitecture: Phoenix 2
+architecture: Zen 4 / Zen 4c
 pcie_config:
   cpu_gen: 4
   cpu_lanes: 14
+cores: 4
+threads: 8
+tdp_w: 65
 schema_version: "1.0"

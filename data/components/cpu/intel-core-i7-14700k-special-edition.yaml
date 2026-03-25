@@ -4,7 +4,11 @@ manufacturer: Intel
 model: Core i7-14700K Special Edition
 socket: LGA 1700
 microarchitecture: Raptor Lake Refresh
+architecture: 14th Gen Core
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 20
+cores: 20
+threads: 28
+tdp_w: 125
 schema_version: "1.0"

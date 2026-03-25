@@ -4,7 +4,11 @@ manufacturer: Intel
 model: Core i9-13900F
 socket: LGA 1700
 microarchitecture: Raptor Lake
+architecture: 13th Gen Core
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 20
+cores: 24
+threads: 32
+tdp_w: 65
 schema_version: "1.0"

@@ -4,7 +4,11 @@ manufacturer: Intel
 model: Core i3-14100F
 socket: LGA 1700
 microarchitecture: Raptor Lake Refresh
+architecture: 14th Gen Core
 pcie_config:
   cpu_gen: 5
   cpu_lanes: 20
+cores: 4
+threads: 8
+tdp_w: 58
 schema_version: "1.0"
