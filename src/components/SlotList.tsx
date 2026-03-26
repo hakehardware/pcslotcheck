@@ -30,6 +30,7 @@ const CATEGORY_ICONS: Record<SlotCategory, string> = {
   m2: "💿",
   pcie: "🔌",
   sata: "💽",
+  cpu: "🖥",
 };
 
 /**
