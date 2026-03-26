@@ -1,6 +1,9 @@
 "use client";
 
 import { IoAdd } from "react-icons/io5";
+import { BsMemory, BsNvme, BsGpuCard, BsDeviceHdd } from "react-icons/bs";
+import { FiCpu } from "react-icons/fi";
+import type { IconType } from "react-icons";
 import { groupSlotsByCategory } from "../lib/ui-helpers";
 import { getKitAssignments } from "../lib/stick-utils";
 import SlotCard from "./SlotCard";
@@ -25,12 +28,12 @@ interface SlotListProps {
   onRemoveKit: (kitComponentId: string) => void;
 }
 
-const CATEGORY_ICONS: Record<SlotCategory, string> = {
-  memory: "🧮",
-  m2: "💿",
-  pcie: "🔌",
-  sata: "💽",
-  cpu: "🖥",
+const CATEGORY_ICONS: Record<SlotCategory, IconType> = {
+  memory: BsMemory,
+  m2: BsNvme,
+  pcie: BsGpuCard,
+  sata: BsDeviceHdd,
+  cpu: FiCpu,
 };
 
 /**
@@ -163,6 +166,8 @@ export default function SlotList({
           (slot) => slot.id in assignments,
         ).length;
 
+        const CategoryIcon = CATEGORY_ICONS[group.category];
+
         return (
           <section
             key={group.category}
@@ -172,7 +177,7 @@ export default function SlotList({
               id={`section-${group.category}`}
               className="mb-4 flex items-center gap-2 text-lg font-semibold text-zinc-100"
             >
-              <span aria-hidden="true">{CATEGORY_ICONS[group.category]}</span>
+              <CategoryIcon aria-hidden="true" className="h-5 w-5 text-zinc-400" />
               <span>{group.displayName}</span>
               <span className="ml-auto text-sm font-normal text-zinc-400">
                 {populatedCount}/{group.slots.length} populated
