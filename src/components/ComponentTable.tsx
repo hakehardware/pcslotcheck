@@ -77,11 +77,9 @@ export default function ComponentTable({ components }: ComponentTableProps = {})
 
     // Apply sort
     filtered.sort((a, b) => {
-      const aVal = (a as Record<string, unknown>)[sortColumn];
-      const bVal = (b as Record<string, unknown>)[sortColumn];
-      const aStr = String(aVal ?? "").toLowerCase();
-      const bStr = String(bVal ?? "").toLowerCase();
-      const cmp = aStr.localeCompare(bStr);
+      const aVal = sortColumn === "type" ? a.type : sortColumn === "manufacturer" ? a.manufacturer : a.model;
+      const bVal = sortColumn === "type" ? b.type : sortColumn === "manufacturer" ? b.manufacturer : b.model;
+      const cmp = aVal.toLowerCase().localeCompare(bVal.toLowerCase());
       return sortDirection === "ascending" ? cmp : -cmp;
     });
 
