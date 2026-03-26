@@ -385,7 +385,8 @@ export async function fetchComponentPage(
     ];
 
     // Helper to apply search/manufacturer filters to a query builder
-    const applyFilters = (query: ReturnType<typeof supabase.from>, mfr?: string | null, srch?: string | null) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const applyFilters = (query: any, mfr?: string | null, srch?: string | null) => {
       let q = query;
       if (mfr) {
         q = q.eq("manufacturer", mfr);
