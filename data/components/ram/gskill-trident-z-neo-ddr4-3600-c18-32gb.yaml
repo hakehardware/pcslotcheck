@@ -1,0 +1,13 @@
+id: gskill-trident-z-neo-ddr4-3600-c18-32gb
+type: ram
+manufacturer: G.Skill
+model: "Trident Z Neo DDR4-3600 C18 32GB (2x16GB)"
+interface:
+  type: DDR4
+  speed_mhz: 3600
+  base_speed_mhz: 3200
+capacity:
+  per_module_gb: 16
+  modules: 2
+  total_gb: 32
+schema_version: "1.0"

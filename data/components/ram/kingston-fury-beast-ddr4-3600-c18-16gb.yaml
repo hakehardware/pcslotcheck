@@ -1,0 +1,13 @@
+id: kingston-fury-beast-ddr4-3600-c18-16gb
+type: ram
+manufacturer: Kingston
+model: "Fury Beast DDR4-3600 C18 16GB (2x8GB)"
+interface:
+  type: DDR4
+  speed_mhz: 3600
+  base_speed_mhz: 3200
+capacity:
+  per_module_gb: 8
+  modules: 2
+  total_gb: 16
+schema_version: "1.0"

@@ -1,0 +1,13 @@
+id: kingston-fury-beast-ddr5-6000-c36-64gb
+type: ram
+manufacturer: Kingston
+model: "Fury Beast DDR5-6000 C36 64GB (2x32GB)"
+interface:
+  type: DDR5
+  speed_mhz: 6000
+  base_speed_mhz: 4800
+capacity:
+  per_module_gb: 32
+  modules: 2
+  total_gb: 64
+schema_version: "1.0"

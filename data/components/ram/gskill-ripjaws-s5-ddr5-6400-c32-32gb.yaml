@@ -1,0 +1,13 @@
+id: gskill-ripjaws-s5-ddr5-6400-c32-32gb
+type: ram
+manufacturer: G.Skill
+model: "Ripjaws S5 DDR5-6400 C32 32GB (2x16GB)"
+interface:
+  type: DDR5
+  speed_mhz: 6400
+  base_speed_mhz: 4800
+capacity:
+  per_module_gb: 16
+  modules: 2
+  total_gb: 32
+schema_version: "1.0"
