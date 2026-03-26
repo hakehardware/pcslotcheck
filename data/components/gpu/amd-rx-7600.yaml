@@ -1,0 +1,19 @@
+id: amd-rx-7600
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: AMD
+model: Radeon RX 7600
+interface:
+  pcie_gen: 4
+  lanes: 8
+physical:
+  slot_width: 2
+  length_mm: 204
+  slots_occupied: 2
+power:
+  tdp_w: 165
+  recommended_psu_w: 450
+  power_connectors:
+    - type: "8-pin"
+      count: 1
+schema_version: "2.0"

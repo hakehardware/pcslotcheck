@@ -1,0 +1,19 @@
+id: amd-rx-570
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: AMD
+model: Radeon RX 570
+interface:
+  pcie_gen: 3
+  lanes: 16
+physical:
+  slot_width: 2
+  length_mm: 241
+  slots_occupied: 2
+power:
+  tdp_w: 150
+  recommended_psu_w: 450
+  power_connectors:
+    - type: "6-pin"
+      count: 1
+schema_version: "2.0"

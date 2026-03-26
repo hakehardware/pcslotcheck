@@ -1,0 +1,19 @@
+id: nvidia-rtx-3090
+type: gpu
+chip_manufacturer: "NVIDIA"
+manufacturer: NVIDIA
+model: GeForce RTX 3090
+interface:
+  pcie_gen: 4
+  lanes: 16
+physical:
+  slot_width: 3
+  length_mm: 336
+  slots_occupied: 3
+power:
+  tdp_w: 350
+  recommended_psu_w: 750
+  power_connectors:
+    - type: "12-pin"
+      count: 1
+schema_version: "2.0"

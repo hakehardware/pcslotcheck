@@ -1,18 +1,18 @@
-id: nvidia-rtx-4070-ti-super
+id: nvidia-rtx-4060-ti-16gb
 type: gpu
 chip_manufacturer: "NVIDIA"
 manufacturer: NVIDIA
-model: GeForce RTX 4070 Ti Super
+model: GeForce RTX 4060 Ti 16 GB
 interface:
   pcie_gen: 4
-  lanes: 16
+  lanes: 8
 physical:
   slot_width: 2
-  length_mm: 304
+  length_mm: 240
   slots_occupied: 2
 power:
-  tdp_w: 285
-  recommended_psu_w: 600
+  tdp_w: 165
+  recommended_psu_w: 450
   power_connectors:
     - type: "16-pin/12VHPWR"
       count: 1

@@ -1,15 +1,15 @@
-id: nvidia-rtx-4070-ti-super
+id: asus-tuf-rtx-4070-ti-super-oc
 type: gpu
 chip_manufacturer: "NVIDIA"
-manufacturer: NVIDIA
-model: GeForce RTX 4070 Ti Super
+manufacturer: ASUS
+model: TUF RTX 4070 Ti Super Gaming OC
 interface:
   pcie_gen: 4
   lanes: 16
 physical:
-  slot_width: 2
-  length_mm: 304
-  slots_occupied: 2
+  slot_width: 3
+  length_mm: 305
+  slots_occupied: 3
 power:
   tdp_w: 285
   recommended_psu_w: 600

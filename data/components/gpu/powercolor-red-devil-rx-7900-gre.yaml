@@ -1,0 +1,19 @@
+id: powercolor-red-devil-rx-7900-gre
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: PowerColor
+model: Red Devil RX 7900 GRE
+interface:
+  pcie_gen: 4
+  lanes: 16
+physical:
+  slot_width: 3
+  length_mm: 338
+  slots_occupied: 3
+power:
+  tdp_w: 260
+  recommended_psu_w: 600
+  power_connectors:
+    - type: "8-pin"
+      count: 2
+schema_version: "2.0"

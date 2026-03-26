@@ -1,0 +1,19 @@
+id: evga-rtx-3080-ftw3-ultra
+type: gpu
+chip_manufacturer: "NVIDIA"
+manufacturer: EVGA
+model: RTX 3080 FTW3 Ultra
+interface:
+  pcie_gen: 4
+  lanes: 16
+physical:
+  slot_width: 3
+  length_mm: 300
+  slots_occupied: 3
+power:
+  tdp_w: 320
+  recommended_psu_w: 700
+  power_connectors:
+    - type: "8-pin"
+      count: 3
+schema_version: "2.0"

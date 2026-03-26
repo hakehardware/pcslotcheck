@@ -1,0 +1,19 @@
+id: sapphire-nitro-rx-7900-xtx-vapor-x
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: Sapphire
+model: Nitro+ RX 7900 XTX Vapor-X
+interface:
+  pcie_gen: 4
+  lanes: 16
+physical:
+  slot_width: 4
+  length_mm: 320
+  slots_occupied: 4
+power:
+  tdp_w: 420
+  recommended_psu_w: 800
+  power_connectors:
+    - type: "8-pin"
+      count: 3
+schema_version: "2.0"

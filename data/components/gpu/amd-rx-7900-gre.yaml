@@ -1,0 +1,19 @@
+id: amd-rx-7900-gre
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: AMD
+model: Radeon RX 7900 GRE
+interface:
+  pcie_gen: 4
+  lanes: 16
+physical:
+  slot_width: 2
+  length_mm: 276
+  slots_occupied: 2
+power:
+  tdp_w: 260
+  recommended_psu_w: 600
+  power_connectors:
+    - type: "8-pin"
+      count: 2
+schema_version: "2.0"

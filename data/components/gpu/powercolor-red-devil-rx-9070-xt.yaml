@@ -1,0 +1,19 @@
+id: powercolor-red-devil-rx-9070-xt
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: PowerColor
+model: Red Devil RX 9070 XT
+interface:
+  pcie_gen: 5
+  lanes: 16
+physical:
+  slot_width: 3
+  length_mm: 340
+  slots_occupied: 3
+power:
+  tdp_w: 304
+  recommended_psu_w: 700
+  power_connectors:
+    - type: "8-pin"
+      count: 3
+schema_version: "2.0"

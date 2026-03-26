@@ -1,0 +1,19 @@
+id: amd-rx-vega-64-liquid
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: AMD
+model: Radeon RX Vega 64 Liquid
+interface:
+  pcie_gen: 3
+  lanes: 16
+physical:
+  slot_width: 2
+  length_mm: 272
+  slots_occupied: 2
+power:
+  tdp_w: 345
+  recommended_psu_w: 750
+  power_connectors:
+    - type: "8-pin"
+      count: 2
+schema_version: "2.0"

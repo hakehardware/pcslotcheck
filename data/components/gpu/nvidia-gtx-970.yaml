@@ -1,19 +1,19 @@
-id: nvidia-rtx-4070-ti-super
+id: nvidia-gtx-970
 type: gpu
 chip_manufacturer: "NVIDIA"
 manufacturer: NVIDIA
-model: GeForce RTX 4070 Ti Super
+model: GeForce GTX 970
 interface:
-  pcie_gen: 4
+  pcie_gen: 3
   lanes: 16
 physical:
   slot_width: 2
-  length_mm: 304
+  length_mm: 267
   slots_occupied: 2
 power:
-  tdp_w: 285
-  recommended_psu_w: 600
+  tdp_w: 148
+  recommended_psu_w: 300
   power_connectors:
-    - type: "16-pin/12VHPWR"
-      count: 1
+    - type: "6-pin"
+      count: 2
 schema_version: "2.0"

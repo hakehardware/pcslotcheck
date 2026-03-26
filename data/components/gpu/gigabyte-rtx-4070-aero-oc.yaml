@@ -1,18 +1,18 @@
-id: nvidia-rtx-4070-ti-super
+id: gigabyte-rtx-4070-aero-oc
 type: gpu
 chip_manufacturer: "NVIDIA"
-manufacturer: NVIDIA
-model: GeForce RTX 4070 Ti Super
+manufacturer: Gigabyte
+model: RTX 4070 Aero OC
 interface:
   pcie_gen: 4
   lanes: 16
 physical:
-  slot_width: 2
-  length_mm: 304
-  slots_occupied: 2
+  slot_width: 3
+  length_mm: 300
+  slots_occupied: 3
 power:
-  tdp_w: 285
-  recommended_psu_w: 600
+  tdp_w: 200
+  recommended_psu_w: 550
   power_connectors:
     - type: "16-pin/12VHPWR"
       count: 1

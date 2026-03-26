@@ -1,0 +1,19 @@
+id: amd-rx-vega-56
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: AMD
+model: Radeon RX Vega 56
+interface:
+  pcie_gen: 3
+  lanes: 16
+physical:
+  slot_width: 2
+  length_mm: 280
+  slots_occupied: 2
+power:
+  tdp_w: 210
+  recommended_psu_w: 550
+  power_connectors:
+    - type: "8-pin"
+      count: 2
+schema_version: "2.0"
