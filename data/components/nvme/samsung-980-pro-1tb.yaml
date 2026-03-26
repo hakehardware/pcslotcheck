@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: samsung-980-pro-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Samsung
+model: "980 Pro 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4

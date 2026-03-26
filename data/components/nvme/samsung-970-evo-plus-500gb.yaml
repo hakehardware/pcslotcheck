@@ -1,11 +1,11 @@
-id: samsung-990-pro-2tb
+id: samsung-970-evo-plus-500gb
 type: nvme
 manufacturer: Samsung
-model: "990 Pro 2TB"
+model: "970 EVO Plus 500GB"
 interface:
   protocol: NVMe
-  pcie_gen: 4
+  pcie_gen: 3
   lanes: 4
 form_factor: "2280"
-capacity_gb: 2000
+capacity_gb: 500
 schema_version: "1.1"

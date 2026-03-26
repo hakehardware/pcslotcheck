@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: solidigm-p44-pro-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Solidigm
+model: "P44 Pro 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4

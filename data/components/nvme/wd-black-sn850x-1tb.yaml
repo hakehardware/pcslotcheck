@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: wd-black-sn850x-1tb
 type: nvme
 manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+model: "WD Black SN850X 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4

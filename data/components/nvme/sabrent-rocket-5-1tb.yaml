@@ -1,10 +1,10 @@
-id: wd-black-sn770-1tb
+id: sabrent-rocket-5-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Sabrent
+model: "Rocket 5 1TB"
 interface:
   protocol: NVMe
-  pcie_gen: 4
+  pcie_gen: 5
   lanes: 4
 form_factor: "2280"
 capacity_gb: 1000

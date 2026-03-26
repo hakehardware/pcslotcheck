@@ -1,11 +1,11 @@
-id: wd-black-sn770-1tb
+id: wd-black-sn7100-2tb
 type: nvme
 manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+model: "WD Black SN7100 2TB"
 interface:
   protocol: NVMe
   pcie_gen: 4
   lanes: 4
 form_factor: "2280"
-capacity_gb: 1000
+capacity_gb: 2000
 schema_version: "1.1"

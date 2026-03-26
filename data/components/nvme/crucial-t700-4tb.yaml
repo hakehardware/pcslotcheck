@@ -1,0 +1,11 @@
+id: crucial-t700-4tb
+type: nvme
+manufacturer: Crucial
+model: "T700 4TB"
+interface:
+  protocol: NVMe
+  pcie_gen: 5
+  lanes: 4
+form_factor: "2280"
+capacity_gb: 4000
+schema_version: "1.1"

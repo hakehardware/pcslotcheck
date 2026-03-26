@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: inland-tn450-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Inland
+model: "TN450 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4

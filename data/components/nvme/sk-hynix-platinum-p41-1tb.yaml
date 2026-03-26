@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: sk-hynix-platinum-p41-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: SK Hynix
+model: "Platinum P41 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4

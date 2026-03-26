@@ -1,10 +1,10 @@
-id: samsung-990-pro-2tb
+id: adata-legend-970-2tb
 type: nvme
-manufacturer: Samsung
-model: "990 Pro 2TB"
+manufacturer: ADATA
+model: "Legend 970 2TB"
 interface:
   protocol: NVMe
-  pcie_gen: 4
+  pcie_gen: 5
   lanes: 4
 form_factor: "2280"
 capacity_gb: 2000

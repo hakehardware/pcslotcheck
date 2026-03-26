@@ -1,11 +1,11 @@
-id: wd-black-sn770-1tb
+id: lexar-nm790-4tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Lexar
+model: "NM790 4TB"
 interface:
   protocol: NVMe
   pcie_gen: 4
   lanes: 4
 form_factor: "2280"
-capacity_gb: 1000
+capacity_gb: 4000
 schema_version: "1.1"

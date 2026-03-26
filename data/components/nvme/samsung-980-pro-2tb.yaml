@@ -1,11 +1,11 @@
-id: wd-black-sn770-1tb
+id: samsung-980-pro-2tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Samsung
+model: "980 Pro 2TB"
 interface:
   protocol: NVMe
   pcie_gen: 4
   lanes: 4
 form_factor: "2280"
-capacity_gb: 1000
+capacity_gb: 2000
 schema_version: "1.1"
