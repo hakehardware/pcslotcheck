@@ -1,14 +1,14 @@
-id: amd-rx-6750-xt
+id: sapphire-pulse-rx-6750-xt
 type: gpu
 chip_manufacturer: "AMD"
-manufacturer: AMD
-model: Radeon RX 6750 XT
+manufacturer: Sapphire
+model: Pulse RX 6750 XT
 interface:
   pcie_gen: 4
   lanes: 16
 physical:
   slot_width: 2
-  length_mm: 267
+  length_mm: 280
   slots_occupied: 2
 power:
   tdp_w: 250

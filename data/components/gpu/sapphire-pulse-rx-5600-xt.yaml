@@ -1,14 +1,14 @@
-id: amd-rx-5600-xt
+id: sapphire-pulse-rx-5600-xt
 type: gpu
 chip_manufacturer: "AMD"
-manufacturer: AMD
-model: Radeon RX 5600 XT
+manufacturer: Sapphire
+model: Pulse RX 5600 XT BE
 interface:
   pcie_gen: 4
   lanes: 16
 physical:
   slot_width: 2
-  length_mm: 267
+  length_mm: 231
   slots_occupied: 2
 power:
   tdp_w: 150

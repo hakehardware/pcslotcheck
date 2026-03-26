@@ -1,0 +1,19 @@
+id: sapphire-pulse-rx-7600-xt
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: Sapphire
+model: Pulse RX 7600 XT
+interface:
+  pcie_gen: 4
+  lanes: 8
+physical:
+  slot_width: 2
+  length_mm: 250
+  slots_occupied: 2
+power:
+  tdp_w: 192
+  recommended_psu_w: 450
+  power_connectors:
+    - type: "8-pin"
+      count: 2
+schema_version: "2.0"

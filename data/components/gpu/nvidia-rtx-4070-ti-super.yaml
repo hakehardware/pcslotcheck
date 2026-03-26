@@ -7,9 +7,9 @@ interface:
   pcie_gen: 4
   lanes: 16
 physical:
-  slot_width: 2
-  length_mm: 304
-  slots_occupied: 2
+  slot_width: 3
+  length_mm: 310
+  slots_occupied: 3
 power:
   tdp_w: 285
   recommended_psu_w: 600

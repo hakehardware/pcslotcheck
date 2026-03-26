@@ -1,18 +1,18 @@
-id: intel-arc-a380
+id: sapphire-pulse-rx-5500-xt
 type: gpu
-chip_manufacturer: "Intel"
-manufacturer: Intel
-model: Arc A380
+chip_manufacturer: "AMD"
+manufacturer: Sapphire
+model: Pulse RX 5500 XT
 interface:
   pcie_gen: 4
   lanes: 8
 physical:
   slot_width: 2
-  length_mm: 222
+  length_mm: 233
   slots_occupied: 2
 power:
-  tdp_w: 75
-  recommended_psu_w: 250
+  tdp_w: 135
+  recommended_psu_w: 300
   power_connectors:
     - type: "8-pin"
       count: 1
