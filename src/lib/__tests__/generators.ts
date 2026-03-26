@@ -552,3 +552,94 @@ export const arbM2SlotWithOverrides = arbM2Slot;
 
 /** Alias for arbPCIeSlot — generates PCIe slots with optional cpu_overrides. */
 export const arbPCIeSlotWithOverrides = arbPCIeSlot;
+
+
+// -- Motherboard with mixed slots generator for CPU impact tests --------------
+
+/**
+ * Generates a Motherboard with a mix of CPU and Chipset sourced M.2 and PCIe
+ * slots, some with cpu_overrides. Useful for computeCpuImpact property tests.
+ */
+export function arbMotherboardWithSlots(): fc.Arbitrary<Motherboard> {
+  return fc
+    .record({
+      socket: fc.constantFrom(...CPU_SOCKETS),
+      idSuffix: kebabSegmentArb,
+      m2Slots: fc.array(arbM2Slot(), { minLength: 0, maxLength: 4 }),
+      pcieSlots: fc.array(arbPCIeSlot(), { minLength: 0, maxLength: 4 }),
+    })
+    .map(({ socket, idSuffix, m2Slots, pcieSlots }) => {
+      // Ensure unique slot IDs by appending index
+      const uniqueM2 = m2Slots.map((s, i) => ({ ...s, id: `m2_${i + 1}`, label: `M.2_${i + 1} (${s.source})` }));
+      const uniquePcie = pcieSlots.map((s, i) => ({ ...s, id: `pcie_${i + 1}`, label: `PCIEX${s.electrical_lanes}(G${s.gen}) #${i + 1}`, position: i + 1 }));
+
+      return {
+        id: `board-${idSuffix}`,
+        manufacturer: "TestVendor",
+        model: `Test Board ${idSuffix}`,
+        chipset: "X870E",
+        socket,
+        form_factor: "ATX",
+        memory: {
+          type: "DDR5" as const,
+          max_speed_mhz: 6400,
+          base_speed_mhz: 4800,
+          max_capacity_gb: 128,
+          ecc_support: false,
+          channels: 2,
+          slots: [],
+          recommended_population: { two_dimm: [] },
+        },
+        m2_slots: uniqueM2,
+        pcie_slots: uniquePcie,
+        sata_ports: [],
+        sources: [],
+        schema_version: "1.0",
+      } satisfies Motherboard;
+    });
+}
+
+/**
+ * Generates a Motherboard guaranteed to have at least one CPU-sourced and
+ * one Chipset-sourced slot. Useful for Property 3 (only CPU slots in results).
+ */
+export function arbMotherboardWithMixedSources(): fc.Arbitrary<Motherboard> {
+  return fc
+    .record({
+      socket: fc.constantFrom(...CPU_SOCKETS),
+      idSuffix: kebabSegmentArb,
+      cpuM2: arbM2Slot(),
+      chipsetM2: arbM2Slot(),
+      cpuPcie: arbPCIeSlot(),
+      chipsetPcie: arbPCIeSlot(),
+    })
+    .map(({ socket, idSuffix, cpuM2, chipsetM2, cpuPcie, chipsetPcie }) => ({
+      id: `board-${idSuffix}`,
+      manufacturer: "TestVendor",
+      model: `Test Board ${idSuffix}`,
+      chipset: "X870E",
+      socket,
+      form_factor: "ATX",
+      memory: {
+        type: "DDR5" as const,
+        max_speed_mhz: 6400,
+        base_speed_mhz: 4800,
+        max_capacity_gb: 128,
+        ecc_support: false,
+        channels: 2,
+        slots: [],
+        recommended_population: { two_dimm: [] },
+      },
+      m2_slots: [
+        { ...cpuM2, id: "m2_1", label: "M.2_1 (CPU)", source: "CPU" as const },
+        { ...chipsetM2, id: "m2_2", label: "M.2_2 (Chipset)", source: "Chipset" as const },
+      ],
+      pcie_slots: [
+        { ...cpuPcie, id: "pcie_1", label: `PCIEX${cpuPcie.electrical_lanes}(G${cpuPcie.gen}) #1`, source: "CPU" as const, position: 1 },
+        { ...chipsetPcie, id: "pcie_2", label: `PCIEX${chipsetPcie.electrical_lanes}(G${chipsetPcie.gen}) #2`, source: "Chipset" as const, position: 2 },
+      ],
+      sata_ports: [],
+      sources: [],
+      schema_version: "1.0",
+    } satisfies Motherboard));
+}

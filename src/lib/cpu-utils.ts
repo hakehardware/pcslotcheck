@@ -1,4 +1,24 @@
-import type { CPUOverride } from "./types";
+import type { CPUOverride, Motherboard, CPUComponent } from "./types";
+
+export interface SlotImpact {
+  slotId: string;
+  slotLabel: string;
+  source: "CPU" | "Chipset";
+  baseGen: number;
+  effectiveGen: number;
+  baseLanes: number;
+  effectiveLanes: number;
+  hasGenDowngrade: boolean;
+  hasLaneReduction: boolean;
+}
+
+export interface CpuImpactResult {
+  socketMatch: boolean;
+  cpuSocket: string;
+  motherboardSocket: string;
+  slotImpacts: SlotImpact[];
+  overallStatus: "compatible" | "warning" | "error";
+}
 
 export interface EffectiveSlotValues {
   gen: number;
@@ -46,4 +66,88 @@ export function isCpuGenDowngrade(
   slotSource: "CPU" | "Chipset"
 ): boolean {
   return slotSource === "CPU" && slotGen > cpuGen;
+}
+
+/**
+ * Compute the full CPU impact summary for a motherboard + CPU combination.
+ *
+ * Compares socket compatibility, iterates all M.2 and PCIe slots, resolves
+ * effective values via resolveEffectiveSlotValues(), and derives per-slot
+ * impact items for CPU-sourced slots only.
+ */
+export function computeCpuImpact(
+  motherboard: Motherboard,
+  cpuComponent: CPUComponent
+): CpuImpactResult {
+  const socketMatch = cpuComponent.socket === motherboard.socket;
+
+  const slotImpacts: SlotImpact[] = [];
+
+  // Process M.2 slots
+  for (const slot of motherboard.m2_slots) {
+    if (slot.source !== "CPU") continue;
+
+    const effective = resolveEffectiveSlotValues(
+      slot.gen,
+      slot.lanes,
+      slot.cpu_overrides,
+      cpuComponent.microarchitecture
+    );
+
+    slotImpacts.push({
+      slotId: slot.id,
+      slotLabel: slot.label,
+      source: slot.source,
+      baseGen: slot.gen,
+      effectiveGen: effective.gen,
+      baseLanes: slot.lanes,
+      effectiveLanes: effective.lanes,
+      hasGenDowngrade: effective.gen < slot.gen,
+      hasLaneReduction: effective.lanes < slot.lanes,
+    });
+  }
+
+  // Process PCIe slots
+  for (const slot of motherboard.pcie_slots) {
+    if (slot.source !== "CPU") continue;
+
+    const effective = resolveEffectiveSlotValues(
+      slot.gen,
+      slot.electrical_lanes,
+      slot.cpu_overrides,
+      cpuComponent.microarchitecture
+    );
+
+    slotImpacts.push({
+      slotId: slot.id,
+      slotLabel: slot.label,
+      source: slot.source,
+      baseGen: slot.gen,
+      effectiveGen: effective.gen,
+      baseLanes: slot.electrical_lanes,
+      effectiveLanes: effective.lanes,
+      hasGenDowngrade: effective.gen < slot.gen,
+      hasLaneReduction: effective.lanes < slot.electrical_lanes,
+    });
+  }
+
+  // Derive overall status
+  let overallStatus: CpuImpactResult["overallStatus"];
+  if (!socketMatch) {
+    overallStatus = "error";
+  } else if (
+    slotImpacts.some((s) => s.hasGenDowngrade || s.hasLaneReduction)
+  ) {
+    overallStatus = "warning";
+  } else {
+    overallStatus = "compatible";
+  }
+
+  return {
+    socketMatch,
+    cpuSocket: cpuComponent.socket,
+    motherboardSocket: motherboard.socket,
+    slotImpacts,
+    overallStatus,
+  };
 }

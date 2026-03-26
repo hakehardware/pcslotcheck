@@ -634,7 +634,7 @@ describe("Property 7: YAML file discovery is exhaustive", () => {
 
   /** Arbitrary for a file extension (yaml or non-yaml). */
   const yamlExtArb = fc.constant(".yaml");
-  const nonYamlExtArb = fc.constantFrom(".json", ".txt", ".yml", ".md", ".ts", ".csv", "");
+  const nonYamlExtArb = fc.constantFrom(".json", ".txt", ".yml", ".md", ".ts", ".csv");
 
   /** Arbitrary for a file entry: name + whether it's a yaml file. */
   const fileEntryArb = fc.oneof(

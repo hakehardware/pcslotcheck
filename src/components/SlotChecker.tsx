@@ -7,11 +7,13 @@ import SlotList from "./SlotList";
 import ComponentPicker from "./ComponentPicker";
 import ValidationPanel from "./ValidationPanel";
 import ShareButton from "./ShareButton";
+import CpuImpactPanel from "./CpuImpactPanel";
+import CpuStatusIcon from "./CpuStatusIcon";
 import { resolveSharingRules } from "../lib/ui-helpers";
 import { validateAssignments } from "../lib/validation-engine";
 import { encode, decode } from "../lib/sharing";
 import { getKitAssignments, getAssignedKitIds } from "../lib/stick-utils";
-import { resolveEffectiveSlotValues } from "../lib/cpu-utils";
+import { resolveEffectiveSlotValues, computeCpuImpact } from "../lib/cpu-utils";
 import type { EffectiveSlotValues } from "../lib/cpu-utils";
 import { fetchMotherboardFromSupabase, fetchComponentFromSupabase } from "../lib/supabase-queries";
 import type {
@@ -334,6 +336,12 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
     return values;
   }, [motherboard, cpuComponent]);
 
+  // Compute CPU impact summary for the impact panel and status icon
+  const cpuImpact = useMemo(() => {
+    if (!motherboard || !cpuComponent) return null;
+    return computeCpuImpact(motherboard, cpuComponent);
+  }, [motherboard, cpuComponent]);
+
   // Open the component picker for a slot
   const handleAssign = useCallback(
     (slotId: string) => {
@@ -490,7 +498,10 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
             onSelect={handleCpuSelect}
             onClose={() => {}}
             onRemove={handleCpuRemove}
+            statusIcon={cpuImpact ? <CpuStatusIcon status={cpuImpact.overallStatus} /> : undefined}
           />
+
+          {cpuImpact && <CpuImpactPanel impact={cpuImpact} />}
 
           <SlotList
             motherboard={motherboard}

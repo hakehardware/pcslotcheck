@@ -19,6 +19,8 @@ interface ComponentPickerProps {
   selectedComponentId?: string | null;
   /** Callback when user clicks remove on the selected-component card */
   onRemove?: () => void;
+  /** Optional status icon rendered adjacent to the component name in the selected card */
+  statusIcon?: React.ReactNode;
 }
 
 const SEARCH_PLACEHOLDERS: Record<SlotCategory, string> = {
@@ -56,6 +58,7 @@ export default function ComponentPicker({
   motherboardSocket,
   selectedComponentId,
   onRemove,
+  statusIcon,
 }: ComponentPickerProps) {
   // Inline mode: component manages its own open/close state
   const isInlineMode = selectedComponentId !== undefined;
@@ -218,8 +221,9 @@ export default function ComponentPicker({
           )}
         </div>
         <div className="mt-2 rounded border border-zinc-700 bg-zinc-800 px-3 py-2">
-          <div className="text-sm font-medium text-zinc-100">
-            {selectedComponent.manufacturer} {selectedComponent.model}
+          <div className="flex items-center gap-1.5 text-sm font-medium text-zinc-100">
+            {statusIcon}
+            <span>{selectedComponent.manufacturer} {selectedComponent.model}</span>
           </div>
           {specKeys.length > 0 && (
             <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-400">
