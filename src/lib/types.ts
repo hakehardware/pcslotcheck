@@ -212,24 +212,14 @@ export interface SharedBuild {
   cpuId?: string;
 }
 
-// === Manifest Type ===
+// === Component Table Types ===
 
-export interface DataManifest {
-  motherboards: {
-    id: string;
-    manufacturer: string;
-    model: string;
-    socket: string;
-    chipset: string;
-    form_factor: string;
-  }[];
-  components: {
-    id: string;
-    type: string;
-    manufacturer: string;
-    model: string;
-    specs: Record<string, unknown>;
-  }[];
+export interface ComponentSummary {
+  id: string;
+  type: string;
+  manufacturer: string;
+  model: string;
+  specs: Record<string, unknown>;
 }
 
 // === Motherboard Table Selector Types ===
@@ -241,6 +231,13 @@ export interface MotherboardSummary {
   chipset: string;
   socket: string;
   form_factor: string;
+}
+
+// === Manifest Type ===
+
+export interface DataManifest {
+  motherboards: MotherboardSummary[];
+  components: ComponentSummary[];
 }
 
 export interface MotherboardPageResult {

@@ -643,3 +643,319 @@ export function arbMotherboardWithMixedSources(): fc.Arbitrary<Motherboard> {
       schema_version: "1.0",
     } satisfies Motherboard));
 }
+
+// =============================================================================
+// Component Browser generators
+// =============================================================================
+//
+// Generators for MotherboardSummary, ComponentSummary, full Motherboard, and
+// the Component union type. Used by property tests in tasks 7.2-7.6.
+
+import type {
+  MotherboardSummary,
+  ComponentSummary,
+  GPUComponent,
+  SATAComponent,
+  SATAPort,
+  Component,
+} from "../types";
+
+// -- Value pools --------------------------------------------------------------
+
+const MB_MANUFACTURERS = ["ASUS", "MSI", "Gigabyte", "ASRock"] as const;
+const MB_CHIPSETS = ["B650", "B650E", "X670E", "X870E", "B760", "Z790", "Z890"] as const;
+const MB_SOCKETS = ["AM5", "LGA 1700", "LGA 1851"] as const;
+const MB_FORM_FACTORS = ["ATX", "Micro-ATX", "Mini-ITX", "E-ATX"] as const;
+
+const GPU_CHIP_MANUFACTURERS = ["NVIDIA", "AMD"] as const;
+const GPU_MANUFACTURERS = ["ASUS", "MSI", "Gigabyte", "EVGA", "Zotac", "Sapphire"] as const;
+const GPU_MODEL_PREFIXES = ["RTX 4070", "RTX 4080", "RTX 4090", "RX 7800 XT", "RX 7900 XTX"] as const;
+const POWER_CONNECTOR_TYPES = ["8-pin", "12VHPWR", "6-pin", "16-pin"] as const;
+
+const SATA_MANUFACTURERS = ["Samsung", "Crucial", "WD", "Seagate", "Kingston"] as const;
+const SATA_MODEL_PREFIXES = ["870 EVO", "MX500", "Blue", "BarraCuda", "A400"] as const;
+const SATA_FORM_FACTORS = ["2.5\"", "3.5\""] as const;
+const SATA_INTERFACES = ["SATA III", "SATA II"] as const;
+
+const COMPONENT_TYPES = ["cpu", "gpu", "nvme", "ram", "sata_drive"] as const;
+
+// -- MotherboardSummary -------------------------------------------------------
+
+/**
+ * Generates a MotherboardSummary with realistic field values.
+ * All fields are non-empty strings.
+ */
+export function arbMotherboardSummary(): fc.Arbitrary<MotherboardSummary> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...MB_MANUFACTURERS),
+      chipset: fc.constantFrom(...MB_CHIPSETS),
+      socket: fc.constantFrom(...MB_SOCKETS),
+      formFactor: fc.constantFrom(...MB_FORM_FACTORS),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ manufacturer, chipset, socket, formFactor, idSuffix }) => ({
+      id: `${manufacturer.toLowerCase()}-${chipset.toLowerCase()}-${idSuffix}`,
+      manufacturer,
+      model: `${manufacturer} ${chipset} ${idSuffix}`,
+      chipset,
+      socket,
+      form_factor: formFactor,
+    }));
+}
+
+// -- ComponentSummary ---------------------------------------------------------
+
+/** Generates type-appropriate specs for a ComponentSummary. */
+function arbSpecsForType(type: string): fc.Arbitrary<Record<string, unknown>> {
+  switch (type) {
+    case "cpu":
+      return fc
+        .record({
+          socket: fc.constantFrom(...MB_SOCKETS),
+          microarchitecture: fc.constantFrom(...MICROARCHITECTURES),
+          pcie_gen: fc.integer({ min: 3, max: 5 }),
+        })
+        .map((s) => s as Record<string, unknown>);
+    case "gpu":
+      return fc
+        .record({
+          pcie_gen: fc.integer({ min: 3, max: 5 }),
+          tdp_w: fc.integer({ min: 100, max: 600 }),
+          length_mm: fc.integer({ min: 200, max: 400 }),
+        })
+        .map((s) => s as Record<string, unknown>);
+    case "nvme":
+      return fc
+        .record({
+          protocol: fc.constantFrom("NVMe", "SATA"),
+          pcie_gen: fc.integer({ min: 3, max: 5 }),
+          capacity_gb: fc.constantFrom(500, 1000, 2000, 4000),
+        })
+        .map((s) => s as Record<string, unknown>);
+    case "ram":
+      return fc
+        .record({
+          type: fc.constantFrom("DDR4", "DDR5"),
+          speed_mhz: fc.constantFrom(3200, 4800, 5600, 6000, 6400),
+          total_gb: fc.constantFrom(16, 32, 64, 128),
+        })
+        .map((s) => s as Record<string, unknown>);
+    case "sata_drive":
+      return fc
+        .record({
+          form_factor: fc.constantFrom(...SATA_FORM_FACTORS),
+          capacity_gb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+        })
+        .map((s) => s as Record<string, unknown>);
+    default:
+      return fc.constant({} as Record<string, unknown>);
+  }
+}
+
+/**
+ * Generates a ComponentSummary with a random component type and
+ * type-appropriate specs.
+ */
+export function arbComponentSummary(): fc.Arbitrary<ComponentSummary> {
+  return fc.constantFrom(...COMPONENT_TYPES).chain((type) =>
+    fc
+      .record({
+        manufacturer: fc.constantFrom(
+          "AMD", "Intel", "NVIDIA", "Samsung", "Corsair", "Crucial", "WD"
+        ),
+        idSuffix: kebabSegmentArb,
+        specs: arbSpecsForType(type),
+      })
+      .map(({ manufacturer, idSuffix, specs }) => ({
+        id: `${type}-${manufacturer.toLowerCase()}-${idSuffix}`,
+        type,
+        manufacturer,
+        model: `${manufacturer} ${type.toUpperCase()} ${idSuffix}`,
+        specs,
+      }))
+  );
+}
+
+/**
+ * Generates a ComponentSummary for a specific component type.
+ */
+export function arbComponentSummaryOfType(
+  type: (typeof COMPONENT_TYPES)[number]
+): fc.Arbitrary<ComponentSummary> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(
+        "AMD", "Intel", "NVIDIA", "Samsung", "Corsair", "Crucial", "WD"
+      ),
+      idSuffix: kebabSegmentArb,
+      specs: arbSpecsForType(type),
+    })
+    .map(({ manufacturer, idSuffix, specs }) => ({
+      id: `${type}-${manufacturer.toLowerCase()}-${idSuffix}`,
+      type,
+      manufacturer,
+      model: `${manufacturer} ${type.toUpperCase()} ${idSuffix}`,
+      specs,
+    }));
+}
+
+// -- GPUComponent -------------------------------------------------------------
+
+/**
+ * Generates a GPUComponent with realistic field values.
+ */
+export function arbGPUComponent(): fc.Arbitrary<GPUComponent> {
+  return fc
+    .record({
+      chipManufacturer: fc.constantFrom(...GPU_CHIP_MANUFACTURERS),
+      manufacturer: fc.constantFrom(...GPU_MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...GPU_MODEL_PREFIXES),
+      pcieGen: fc.integer({ min: 3, max: 5 }),
+      lanes: fc.constantFrom(8, 16),
+      slotWidth: fc.constantFrom(2, 2.5, 3),
+      lengthMm: fc.integer({ min: 200, max: 400 }),
+      slotsOccupied: fc.constantFrom(2, 3),
+      tdpW: fc.integer({ min: 100, max: 600 }),
+      recommendedPsuW: fc.constantFrom(650, 750, 850, 1000),
+      connectorType: fc.constantFrom(...POWER_CONNECTOR_TYPES),
+      connectorCount: fc.integer({ min: 1, max: 3 }),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({
+      chipManufacturer, manufacturer, modelPrefix, pcieGen, lanes,
+      slotWidth, lengthMm, slotsOccupied, tdpW, recommendedPsuW,
+      connectorType, connectorCount, idSuffix,
+    }) => ({
+      id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
+      type: "gpu" as const,
+      chip_manufacturer: chipManufacturer,
+      manufacturer,
+      model: `${manufacturer} ${modelPrefix} ${idSuffix}`,
+      interface: { pcie_gen: pcieGen, lanes },
+      physical: { slot_width: slotWidth, length_mm: lengthMm, slots_occupied: slotsOccupied },
+      power: {
+        tdp_w: tdpW,
+        recommended_psu_w: recommendedPsuW,
+        power_connectors: [{ type: connectorType, count: connectorCount }],
+      },
+      schema_version: "1.0",
+    }));
+}
+
+// -- SATAComponent ------------------------------------------------------------
+
+/**
+ * Generates a SATAComponent with realistic field values.
+ */
+export function arbSATAComponent(): fc.Arbitrary<SATAComponent> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...SATA_MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...SATA_MODEL_PREFIXES),
+      formFactor: fc.constantFrom(...SATA_FORM_FACTORS),
+      capacityGb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+      sataInterface: fc.constantFrom(...SATA_INTERFACES),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ manufacturer, modelPrefix, formFactor, capacityGb, sataInterface, idSuffix }) => ({
+      id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
+      type: "sata_drive" as const,
+      manufacturer,
+      model: `${manufacturer} ${modelPrefix} ${capacityGb}GB`,
+      form_factor: formFactor,
+      capacity_gb: capacityGb,
+      interface: sataInterface,
+      schema_version: "1.0",
+    }));
+}
+
+// -- SATAPort -----------------------------------------------------------------
+
+/**
+ * Generates a SATAPort with realistic field values.
+ */
+export function arbSATAPort(): fc.Arbitrary<SATAPort> {
+  return fc
+    .record({
+      idSuffix: fc.integer({ min: 1, max: 8 }),
+      version: fc.constantFrom("SATA III", "SATA II"),
+      source: fc.constantFrom(...SLOT_SOURCES),
+    })
+    .map(({ idSuffix, version, source }) => ({
+      id: `sata_${idSuffix}`,
+      version,
+      source,
+      disabled_by: null,
+    }));
+}
+
+// -- Full Motherboard ---------------------------------------------------------
+
+/**
+ * Generates a full Motherboard object with memory config, M.2 slots,
+ * PCIe slots, and SATA ports. Suitable for detail-view property tests.
+ */
+export function arbFullMotherboard(): fc.Arbitrary<Motherboard> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...MB_MANUFACTURERS),
+      chipset: fc.constantFrom(...MB_CHIPSETS),
+      socket: fc.constantFrom(...MB_SOCKETS),
+      formFactor: fc.constantFrom(...MB_FORM_FACTORS),
+      idSuffix: kebabSegmentArb,
+      memory: arbMemoryConfig(),
+      m2Slots: fc.array(arbM2Slot(), { minLength: 1, maxLength: 4 }),
+      pcieSlots: fc.array(arbPCIeSlot(), { minLength: 1, maxLength: 4 }),
+      sataPorts: fc.array(arbSATAPort(), { minLength: 1, maxLength: 8 }),
+    })
+    .map(({ manufacturer, chipset, socket, formFactor, idSuffix, memory, m2Slots, pcieSlots, sataPorts }) => {
+      // Ensure unique IDs within each slot array
+      const uniqueM2 = m2Slots.map((s, i) => ({
+        ...s,
+        id: `m2_${i + 1}`,
+        label: `M.2_${i + 1} (${s.source})`,
+      }));
+      const uniquePcie = pcieSlots.map((s, i) => ({
+        ...s,
+        id: `pcie_${i + 1}`,
+        label: `PCIEX${s.electrical_lanes}(G${s.gen}) #${i + 1}`,
+        position: i + 1,
+      }));
+      const uniqueSata = sataPorts.map((s, i) => ({
+        ...s,
+        id: `sata_${i + 1}`,
+      }));
+
+      return {
+        id: `${manufacturer.toLowerCase()}-${chipset.toLowerCase()}-${idSuffix}`,
+        manufacturer,
+        model: `${manufacturer} ${chipset} ${idSuffix}`,
+        chipset,
+        socket,
+        form_factor: formFactor,
+        memory,
+        m2_slots: uniqueM2,
+        pcie_slots: uniquePcie,
+        sata_ports: uniqueSata,
+        sources: [{ type: "manual", url: "https://example.com" }],
+        schema_version: "1.0",
+      } satisfies Motherboard;
+    });
+}
+
+// -- Component union ----------------------------------------------------------
+
+/**
+ * Generates a Component (union of all 5 component types) with equal
+ * probability for each type.
+ */
+export function arbComponent(): fc.Arbitrary<Component> {
+  return fc.oneof(
+    arbCPUComponent(),
+    arbGPUComponent(),
+    arbNVMeComponent(),
+    arbRAMComponent(),
+    arbSATAComponent()
+  );
+}

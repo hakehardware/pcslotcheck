@@ -9,7 +9,7 @@ export default function SearchPageClient() {
   return (
     <MotherboardTable
       selectedBoardId={null}
-      onSelectBoard={(id) => router.push(`/check?board=${id}`)}
+      onSelectBoard={(id) => router.push(`/boards/${id}`)}
     />
   );
 }
