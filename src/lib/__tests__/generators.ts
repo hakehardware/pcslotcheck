@@ -818,14 +818,19 @@ export function arbGPUComponent(): fc.Arbitrary<GPUComponent> {
       slotsOccupied: fc.constantFrom(2, 3),
       tdpW: fc.integer({ min: 100, max: 600 }),
       recommendedPsuW: fc.constantFrom(650, 750, 850, 1000),
-      connectorType: fc.constantFrom(...POWER_CONNECTOR_TYPES),
-      connectorCount: fc.integer({ min: 1, max: 3 }),
+      powerConnectors: fc.oneof(
+        fc.record({
+          type: fc.constantFrom(...POWER_CONNECTOR_TYPES),
+          count: fc.integer({ min: 1, max: 3 }),
+        }).map((c) => [c]),
+        fc.constant([] as { type: string; count: number }[])
+      ),
       idSuffix: kebabSegmentArb,
     })
     .map(({
       chipManufacturer, manufacturer, modelPrefix, pcieGen, lanes,
       slotWidth, lengthMm, slotsOccupied, tdpW, recommendedPsuW,
-      connectorType, connectorCount, idSuffix,
+      powerConnectors, idSuffix,
     }) => ({
       id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
       type: "gpu" as const,
@@ -837,7 +842,7 @@ export function arbGPUComponent(): fc.Arbitrary<GPUComponent> {
       power: {
         tdp_w: tdpW,
         recommended_psu_w: recommendedPsuW,
-        power_connectors: [{ type: connectorType, count: connectorCount }],
+        power_connectors: powerConnectors,
       },
       schema_version: "1.0",
     }));
@@ -1041,14 +1046,19 @@ export function arbGpuComponentRow(): fc.Arbitrary<GpuComponentRow> {
       slotsOccupied: fc.constantFrom(2, 3),
       tdpW: fc.integer({ min: 100, max: 600 }),
       recommendedPsuW: fc.option(fc.constantFrom(650, 750, 850, 1000), { nil: null }),
-      connectorType: fc.constantFrom(...POWER_CONNECTOR_TYPES),
-      connectorCount: fc.integer({ min: 1, max: 3 }),
+      powerConnectors: fc.oneof(
+        fc.record({
+          type: fc.constantFrom(...POWER_CONNECTOR_TYPES),
+          count: fc.integer({ min: 1, max: 3 }),
+        }).map((c) => [c]),
+        fc.constant([] as { type: string; count: number }[])
+      ),
       idSuffix: kebabSegmentArb,
     })
     .map(({
       chipManufacturer, manufacturer, modelPrefix, pcieGen, lanes,
       slotWidth, lengthMm, slotsOccupied, tdpW, recommendedPsuW,
-      connectorType, connectorCount, idSuffix,
+      powerConnectors, idSuffix,
     }) => ({
       ...rowBase("gpu", manufacturer, `${modelPrefix} ${idSuffix}`, idSuffix),
       type: "gpu" as const,
@@ -1060,7 +1070,7 @@ export function arbGpuComponentRow(): fc.Arbitrary<GpuComponentRow> {
       physical_slots_occupied: slotsOccupied,
       power_tdp_w: tdpW,
       power_recommended_psu_w: recommendedPsuW,
-      power_connectors: [{ type: connectorType, count: connectorCount }],
+      power_connectors: powerConnectors,
     }));
 }
 

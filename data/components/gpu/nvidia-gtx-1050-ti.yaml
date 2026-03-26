@@ -1,0 +1,17 @@
+id: nvidia-gtx-1050-ti
+type: gpu
+chip_manufacturer: "NVIDIA"
+manufacturer: NVIDIA
+model: GeForce GTX 1050 Ti
+interface:
+  pcie_gen: 3
+  lanes: 16
+physical:
+  slot_width: 2
+  length_mm: 229
+  slots_occupied: 2
+power:
+  tdp_w: 75
+  recommended_psu_w: 300
+  power_connectors: []
+schema_version: "2.0"

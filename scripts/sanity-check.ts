@@ -205,14 +205,6 @@ export function checkGpu(
     // Validate power_connectors has at least one entry (Req 8.5)
     const connectors = power.power_connectors;
     if (Array.isArray(connectors)) {
-      if (connectors.length === 0) {
-        violations.push({
-          file,
-          field: "power.power_connectors",
-          message: "power.power_connectors must have at least one entry",
-        });
-      }
-
       // Validate each connector entry (Req 8.6)
       for (let i = 0; i < connectors.length; i++) {
         const c = connectors[i] as Record<string, unknown>;

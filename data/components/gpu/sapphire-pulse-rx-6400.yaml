@@ -1,0 +1,17 @@
+id: sapphire-pulse-rx-6400
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: Sapphire
+model: Pulse RX 6400
+interface:
+  pcie_gen: 4
+  lanes: 4
+physical:
+  slot_width: 2
+  length_mm: 193
+  slots_occupied: 2
+power:
+  tdp_w: 53
+  recommended_psu_w: 350
+  power_connectors: []
+schema_version: "2.0"
