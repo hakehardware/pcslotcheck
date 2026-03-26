@@ -11,8 +11,8 @@ physical:
   length_mm: 260
   slots_occupied: 2
 power:
-  tdp_w: 175
-  recommended_psu_w: 450
+  tdp_w: 235
+  recommended_psu_w: 500
   power_connectors:
     - type: "6-pin"
       count: 1
