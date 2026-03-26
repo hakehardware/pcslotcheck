@@ -1,0 +1,21 @@
+id: amd-rx-6700-xt
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: AMD
+model: Radeon RX 6700 XT
+interface:
+  pcie_gen: 4
+  lanes: 16
+physical:
+  slot_width: 2
+  length_mm: 267
+  slots_occupied: 2
+power:
+  tdp_w: 230
+  recommended_psu_w: 550
+  power_connectors:
+    - type: "6-pin"
+      count: 1
+    - type: "8-pin"
+      count: 1
+schema_version: "2.0"

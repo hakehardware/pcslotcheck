@@ -1,0 +1,19 @@
+id: intel-arc-b570
+type: gpu
+chip_manufacturer: "Intel"
+manufacturer: Intel
+model: Arc B570
+interface:
+  pcie_gen: 4
+  lanes: 8
+physical:
+  slot_width: 2
+  length_mm: 272
+  slots_occupied: 2
+power:
+  tdp_w: 150
+  recommended_psu_w: 450
+  power_connectors:
+    - type: "8-pin"
+      count: 1
+schema_version: "2.0"

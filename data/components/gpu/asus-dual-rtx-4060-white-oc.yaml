@@ -1,0 +1,19 @@
+id: asus-dual-rtx-4060-white-oc
+type: gpu
+chip_manufacturer: "NVIDIA"
+manufacturer: ASUS
+model: Dual RTX 4060 White OC
+interface:
+  pcie_gen: 4
+  lanes: 8
+physical:
+  slot_width: 2
+  length_mm: 227
+  slots_occupied: 2
+power:
+  tdp_w: 115
+  recommended_psu_w: 300
+  power_connectors:
+    - type: "8-pin"
+      count: 1
+schema_version: "2.0"

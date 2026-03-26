@@ -1,19 +1,21 @@
-id: nvidia-rtx-4070-ti-super
+id: amd-rx-6750-xt
 type: gpu
-chip_manufacturer: "NVIDIA"
-manufacturer: NVIDIA
-model: GeForce RTX 4070 Ti Super
+chip_manufacturer: "AMD"
+manufacturer: AMD
+model: Radeon RX 6750 XT
 interface:
   pcie_gen: 4
   lanes: 16
 physical:
   slot_width: 2
-  length_mm: 304
+  length_mm: 267
   slots_occupied: 2
 power:
-  tdp_w: 285
+  tdp_w: 250
   recommended_psu_w: 600
   power_connectors:
-    - type: "16-pin/12VHPWR"
+    - type: "6-pin"
+      count: 1
+    - type: "8-pin"
       count: 1
 schema_version: "2.0"

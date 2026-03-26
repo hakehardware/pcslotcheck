@@ -1,18 +1,18 @@
-id: nvidia-rtx-4070-ti-super
+id: gigabyte-aorus-rtx-4090-master
 type: gpu
 chip_manufacturer: "NVIDIA"
-manufacturer: NVIDIA
-model: GeForce RTX 4070 Ti Super
+manufacturer: Gigabyte
+model: Aorus RTX 4090 Master
 interface:
   pcie_gen: 4
   lanes: 16
 physical:
-  slot_width: 2
-  length_mm: 304
-  slots_occupied: 2
+  slot_width: 4
+  length_mm: 359
+  slots_occupied: 4
 power:
-  tdp_w: 285
-  recommended_psu_w: 600
+  tdp_w: 450
+  recommended_psu_w: 850
   power_connectors:
     - type: "16-pin/12VHPWR"
       count: 1

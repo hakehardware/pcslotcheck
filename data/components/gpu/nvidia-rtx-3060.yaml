@@ -1,19 +1,19 @@
-id: nvidia-rtx-4070-ti-super
+id: nvidia-rtx-3060
 type: gpu
 chip_manufacturer: "NVIDIA"
 manufacturer: NVIDIA
-model: GeForce RTX 4070 Ti Super
+model: GeForce RTX 3060 12 GB
 interface:
   pcie_gen: 4
   lanes: 16
 physical:
   slot_width: 2
-  length_mm: 304
+  length_mm: 242
   slots_occupied: 2
 power:
-  tdp_w: 285
-  recommended_psu_w: 600
+  tdp_w: 170
+  recommended_psu_w: 450
   power_connectors:
-    - type: "16-pin/12VHPWR"
+    - type: "12-pin"
       count: 1
 schema_version: "2.0"
