@@ -1,19 +1,19 @@
-id: amd-rx-7600-xt
+id: sparkle-arc-a580-orc-oc
 type: gpu
-chip_manufacturer: "AMD"
-manufacturer: AMD
-model: Radeon RX 7600 XT
+chip_manufacturer: "Intel"
+manufacturer: Sparkle
+model: Arc A580 ORC OC
 interface:
   pcie_gen: 4
-  lanes: 8
+  lanes: 16
 physical:
   slot_width: 2
-  length_mm: 204
+  length_mm: 225
   slots_occupied: 2
 power:
-  tdp_w: 190
+  tdp_w: 175
   recommended_psu_w: 450
   power_connectors:
     - type: "8-pin"
-      count: 1
+      count: 2
 schema_version: "2.0"

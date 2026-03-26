@@ -1,0 +1,21 @@
+id: sapphire-nitro-rx-590-se
+type: gpu
+chip_manufacturer: "AMD"
+manufacturer: Sapphire
+model: Nitro+ RX 590 Special Edition
+interface:
+  pcie_gen: 3
+  lanes: 16
+physical:
+  slot_width: 2
+  length_mm: 260
+  slots_occupied: 2
+power:
+  tdp_w: 235
+  recommended_psu_w: 500
+  power_connectors:
+    - type: "6-pin"
+      count: 1
+    - type: "8-pin"
+      count: 1
+schema_version: "2.0"
