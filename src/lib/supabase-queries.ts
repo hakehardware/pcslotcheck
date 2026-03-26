@@ -9,13 +9,24 @@
 import type {
   Motherboard,
   Component,
+  ComponentSummary,
+  ComponentFilterOptions,
+  ComponentPageResult,
   SharingRule,
   PCIeSlot,
   MotherboardSummary,
   MotherboardPageResult,
   FilterOptions,
 } from "./types";
-import type { MotherboardRow, SlotRow, PerTypeComponentRow } from "./db-types";
+import type {
+  MotherboardRow,
+  SlotRow,
+  PerTypeComponentRow,
+  NvmeComponentRow,
+  GpuComponentRow,
+  RamComponentRow,
+  SataComponentRow,
+} from "./db-types";
 import { COMPONENT_TABLE_MAP, reconstructComponent } from "./db-types";
 
 /**
@@ -101,6 +112,63 @@ export function assembleMotherboard(row: MotherboardRow, slotRows: SlotRow[]): M
   };
 }
 
+
+/**
+ * Maps a flat per-type DB row to a lightweight ComponentSummary.
+ *
+ * Extracts id, type, manufacturer, model and builds the specs record
+ * using keys that match COMPONENT_SPEC_COLUMNS so the table can render
+ * them directly via getSpecValue().
+ */
+export function rowToComponentSummary(row: PerTypeComponentRow): ComponentSummary {
+  const base = { id: row.id, type: row.type, manufacturer: row.manufacturer, model: row.model };
+
+  switch (row.type) {
+    case "nvme": {
+      const r = row as NvmeComponentRow;
+      return {
+        ...base,
+        specs: {
+          "interface.protocol": r.interface_protocol,
+          "interface.pcie_gen": r.interface_pcie_gen,
+          "capacity_gb": r.capacity_gb,
+        },
+      };
+    }
+    case "gpu": {
+      const r = row as GpuComponentRow;
+      return {
+        ...base,
+        specs: {
+          "interface.pcie_gen": r.interface_pcie_gen,
+          "power.tdp_w": r.power_tdp_w,
+          "physical.length_mm": r.physical_length_mm,
+        },
+      };
+    }
+    case "ram": {
+      const r = row as RamComponentRow;
+      return {
+        ...base,
+        specs: {
+          "interface.type": r.interface_type,
+          "interface.speed_mhz": r.interface_speed_mhz,
+          "capacity.total_gb": r.capacity_total_gb,
+        },
+      };
+    }
+    case "sata_drive": {
+      const r = row as SataComponentRow;
+      return {
+        ...base,
+        specs: {
+          "form_factor": r.form_factor,
+          "capacity_gb": r.capacity_gb,
+        },
+      };
+    }
+  }
+}
 
 /**
  * Fetches a motherboard and all its slots from Supabase, assembles into
@@ -248,4 +316,209 @@ export async function fetchFilterOptions(): Promise<FilterOptions> {
   const chipsets = [...new Set(rows.map((r) => r.chipset))].sort();
 
   return { manufacturers, chipsets };
+}
+
+
+/**
+ * Fetches distinct manufacturer values from all 4 per-type component tables,
+ * deduplicates and sorts alphabetically. Used to populate the manufacturer
+ * filter dropdown on the components page.
+ */
+export async function fetchComponentFilterOptions(): Promise<ComponentFilterOptions> {
+  const { supabase } = await import("./supabase");
+
+  const tableNames = Object.values(COMPONENT_TABLE_MAP);
+
+  const results = await Promise.all(
+    tableNames.map((table) =>
+      supabase.from(table).select("manufacturer")
+    )
+  );
+
+  const allManufacturers = new Set<string>();
+
+  for (const { data, error } of results) {
+    if (error) {
+      throw new Error(`Failed to fetch component filter options: ${error.message}`);
+    }
+    for (const row of data ?? []) {
+      allManufacturers.add((row as { manufacturer: string }).manufacturer);
+    }
+  }
+
+  return {
+    manufacturers: [...allManufacturers].sort(),
+  };
+}
+
+/** Parameters for fetching a paginated page of components. */
+export interface ComponentPageParams {
+  page: number;
+  pageSize: number;
+  type?: string | null;
+  manufacturer?: string | null;
+  search?: string | null;
+}
+
+/**
+ * Fetches a paginated, filtered, searchable page of components from Supabase.
+ *
+ * When `type` is provided, queries the single corresponding per-type table.
+ * When `type` is null/undefined, returns a placeholder (cross-table aggregation
+ * is implemented separately).
+ */
+export async function fetchComponentPage(
+  params: ComponentPageParams
+): Promise<ComponentPageResult> {
+  const { page, pageSize, type, manufacturer, search } = params;
+
+  // Cross-table aggregation: query all 4 tables when no type filter
+  if (!type) {
+    const { supabase } = await import("./supabase");
+
+    // Fixed table order: gpu, nvme, ram, sata_drive
+    const TABLE_ORDER: { type: string; table: string }[] = [
+      { type: "gpu", table: "components_gpu" },
+      { type: "nvme", table: "components_nvme" },
+      { type: "ram", table: "components_ram" },
+      { type: "sata_drive", table: "components_sata" },
+    ];
+
+    // Helper to apply search/manufacturer filters to a query builder
+    const applyFilters = (query: ReturnType<typeof supabase.from>, mfr?: string | null, srch?: string | null) => {
+      let q = query;
+      if (mfr) {
+        q = q.eq("manufacturer", mfr);
+      }
+      if (srch) {
+        const pattern = `%${srch}%`;
+        q = q.or(`manufacturer.ilike.${pattern},model.ilike.${pattern}`);
+      }
+      return q;
+    };
+
+    // Step 1: Parallel count-only queries to all 4 tables
+    const countResults = await Promise.all(
+      TABLE_ORDER.map(({ table }) => {
+        const q = applyFilters(
+          supabase.from(table).select("*", { count: "exact", head: true }),
+          manufacturer,
+          search
+        );
+        return q;
+      })
+    );
+
+    const tableCounts: number[] = [];
+    for (const { count, error } of countResults) {
+      if (error) {
+        throw new Error(`Failed to fetch components: ${error.message}`);
+      }
+      tableCounts.push(count ?? 0);
+    }
+
+    // Step 2: Compute totalCount
+    const totalCount = tableCounts.reduce((sum, c) => sum + c, 0);
+
+    // Step 3: Compute global offset range for the requested page
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    // Step 4: Walk tables in order, find overlapping tables
+    const allRows: ComponentSummary[] = [];
+    let cumulative = 0;
+
+    for (let i = 0; i < TABLE_ORDER.length; i++) {
+      const tableCount = tableCounts[i];
+      if (tableCount === 0) {
+        continue;
+      }
+
+      const tableStart = cumulative;
+      const tableEnd = cumulative + tableCount - 1;
+
+      // Check if the requested range [from, to] overlaps with [tableStart, tableEnd]
+      if (from > tableEnd || to < tableStart) {
+        cumulative += tableCount;
+        continue;
+      }
+
+      // Compute local from/to within this table
+      const localFrom = Math.max(0, from - tableStart);
+      const localTo = Math.min(tableCount - 1, to - tableStart);
+
+      // Step 5: Fetch rows from this overlapping table
+      let rowQuery = supabase
+        .from(TABLE_ORDER[i].table)
+        .select("*");
+
+      rowQuery = applyFilters(rowQuery, manufacturer, search);
+
+      rowQuery = rowQuery
+        .order("manufacturer", { ascending: true })
+        .order("model", { ascending: true })
+        .range(localFrom, localTo);
+
+      const { data, error } = await rowQuery;
+
+      if (error) {
+        throw new Error(`Failed to fetch components: ${error.message}`);
+      }
+
+      // Step 6: Map rows to ComponentSummary
+      const mapped = (data ?? []).map((row) =>
+        rowToComponentSummary(row as PerTypeComponentRow)
+      );
+      allRows.push(...mapped);
+
+      cumulative += tableCount;
+    }
+
+    return { rows: allRows, totalCount };
+  }
+
+  const tableName = COMPONENT_TABLE_MAP[type];
+  if (!tableName) {
+    return { rows: [], totalCount: 0 };
+  }
+
+  const { supabase } = await import("./supabase");
+
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from(tableName)
+    .select("*", { count: "exact" });
+
+  if (manufacturer) {
+    query = query.eq("manufacturer", manufacturer);
+  }
+
+  if (search) {
+    const pattern = `%${search}%`;
+    query = query.or(
+      `manufacturer.ilike.${pattern},model.ilike.${pattern}`
+    );
+  }
+
+  query = query
+    .order("manufacturer", { ascending: true })
+    .order("model", { ascending: true })
+    .range(from, to);
+
+  const { data, count, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to fetch components: ${error.message}`);
+  }
+
+  const rows = (data ?? []).map((row) =>
+    rowToComponentSummary(row as PerTypeComponentRow)
+  );
+
+  return {
+    rows,
+    totalCount: count ?? 0,
+  };
 }

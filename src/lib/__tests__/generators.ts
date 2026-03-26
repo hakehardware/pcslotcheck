@@ -959,3 +959,178 @@ export function arbComponent(): fc.Arbitrary<Component> {
     arbSATAComponent()
   );
 }
+
+// =============================================================================
+// Per-type component ROW generators (Supabase table shape)
+// =============================================================================
+//
+// These generators produce flat DB rows matching the per-type Supabase table
+// schemas (NvmeComponentRow, GpuComponentRow, RamComponentRow, SataComponentRow).
+// Used by component-pagination property tests (tasks 10.x).
+
+import type {
+  NvmeComponentRow,
+  GpuComponentRow,
+  RamComponentRow,
+  SataComponentRow,
+  PerTypeComponentRow,
+} from "../db-types";
+
+// -- Shared helpers -----------------------------------------------------------
+
+const ROW_SOURCES = [{ type: "manual" as const, url: "https://example.com" }];
+
+function rowBase(type: string, manufacturer: string, model: string, idSuffix: string) {
+  return {
+    id: `${manufacturer.toLowerCase().replace(/[^a-z0-9]/g, "")}-${type}-${idSuffix}`,
+    manufacturer,
+    model,
+    sku: null,
+    summary_line: `${manufacturer} ${model}`,
+    sources: ROW_SOURCES,
+    contributed_by: null,
+    schema_version: "1.0",
+    updated_at: new Date().toISOString(),
+  };
+}
+
+// -- NvmeComponentRow ---------------------------------------------------------
+
+/**
+ * Generates an NvmeComponentRow matching the `components_nvme` Supabase table.
+ */
+export function arbNvmeComponentRow(): fc.Arbitrary<NvmeComponentRow> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...NVME_MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...NVME_MODEL_PREFIXES),
+      protocol: fc.constantFrom("NVMe", "SATA"),
+      pcieGen: fc.option(fc.integer({ min: 3, max: 5 }), { nil: null }),
+      lanes: fc.option(fc.constantFrom(2, 4), { nil: null }),
+      formFactor: fc.constantFrom("2280", "2242", "2230"),
+      capacityGb: fc.constantFrom(500, 1000, 2000, 4000),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ manufacturer, modelPrefix, protocol, pcieGen, lanes, formFactor, capacityGb, idSuffix }) => ({
+      ...rowBase("nvme", manufacturer, `${modelPrefix} ${capacityGb}GB`, idSuffix),
+      type: "nvme" as const,
+      interface_protocol: protocol,
+      interface_pcie_gen: pcieGen,
+      interface_lanes: lanes,
+      form_factor: formFactor,
+      capacity_gb: capacityGb,
+      capacity_variant_note: null,
+    }));
+}
+
+// -- GpuComponentRow ----------------------------------------------------------
+
+/**
+ * Generates a GpuComponentRow matching the `components_gpu` Supabase table.
+ */
+export function arbGpuComponentRow(): fc.Arbitrary<GpuComponentRow> {
+  return fc
+    .record({
+      chipManufacturer: fc.constantFrom(...GPU_CHIP_MANUFACTURERS),
+      manufacturer: fc.constantFrom(...GPU_MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...GPU_MODEL_PREFIXES),
+      pcieGen: fc.integer({ min: 3, max: 5 }),
+      lanes: fc.constantFrom(8, 16),
+      slotWidth: fc.constantFrom(2, 2.5, 3),
+      lengthMm: fc.integer({ min: 200, max: 400 }),
+      slotsOccupied: fc.constantFrom(2, 3),
+      tdpW: fc.integer({ min: 100, max: 600 }),
+      recommendedPsuW: fc.option(fc.constantFrom(650, 750, 850, 1000), { nil: null }),
+      connectorType: fc.constantFrom(...POWER_CONNECTOR_TYPES),
+      connectorCount: fc.integer({ min: 1, max: 3 }),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({
+      chipManufacturer, manufacturer, modelPrefix, pcieGen, lanes,
+      slotWidth, lengthMm, slotsOccupied, tdpW, recommendedPsuW,
+      connectorType, connectorCount, idSuffix,
+    }) => ({
+      ...rowBase("gpu", manufacturer, `${modelPrefix} ${idSuffix}`, idSuffix),
+      type: "gpu" as const,
+      chip_manufacturer: chipManufacturer,
+      interface_pcie_gen: pcieGen,
+      interface_lanes: lanes,
+      physical_slot_width: slotWidth,
+      physical_length_mm: lengthMm,
+      physical_slots_occupied: slotsOccupied,
+      power_tdp_w: tdpW,
+      power_recommended_psu_w: recommendedPsuW,
+      power_connectors: [{ type: connectorType, count: connectorCount }],
+    }));
+}
+
+// -- RamComponentRow ----------------------------------------------------------
+
+/**
+ * Generates a RamComponentRow matching the `components_ram` Supabase table.
+ */
+export function arbRamComponentRow(): fc.Arbitrary<RamComponentRow> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...MODEL_PREFIXES),
+      ddrType: fc.constantFrom("DDR4", "DDR5"),
+      speedMhz: fc.constantFrom(3200, 3600, 4800, 5200, 5600, 6000, 6400, 7200),
+      baseSpeedMhz: fc.option(fc.constantFrom(2133, 2400, 3200, 4800), { nil: null }),
+      perModuleGb: fc.constantFrom(4, 8, 16, 32),
+      modules: fc.constantFrom(1, 2, 4),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ manufacturer, modelPrefix, ddrType, speedMhz, baseSpeedMhz, perModuleGb, modules, idSuffix }) => {
+      const totalGb = perModuleGb * modules;
+      return {
+        ...rowBase("ram", manufacturer, `${modelPrefix} ${ddrType}-${speedMhz} ${totalGb}GB`, idSuffix),
+        type: "ram" as const,
+        interface_type: ddrType,
+        interface_speed_mhz: speedMhz,
+        interface_base_speed_mhz: baseSpeedMhz,
+        capacity_per_module_gb: perModuleGb,
+        capacity_modules: modules,
+        capacity_total_gb: totalGb,
+      };
+    });
+}
+
+// -- SataComponentRow ---------------------------------------------------------
+
+/**
+ * Generates a SataComponentRow matching the `components_sata` Supabase table.
+ */
+export function arbSataComponentRow(): fc.Arbitrary<SataComponentRow> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...SATA_MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...SATA_MODEL_PREFIXES),
+      formFactor: fc.constantFrom(...SATA_FORM_FACTORS),
+      capacityGb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+      sataInterface: fc.constantFrom(...SATA_INTERFACES),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ manufacturer, modelPrefix, formFactor, capacityGb, sataInterface, idSuffix }) => ({
+      ...rowBase("sata_drive", manufacturer, `${modelPrefix} ${capacityGb}GB`, idSuffix),
+      type: "sata_drive" as const,
+      form_factor: formFactor,
+      capacity_gb: capacityGb,
+      interface: sataInterface,
+    }));
+}
+
+// -- Any per-type row (equal probability) -------------------------------------
+
+/**
+ * Generates any of the 4 per-type component row types with equal probability.
+ * Useful for property tests that need to exercise all row shapes.
+ */
+export function arbPerTypeComponentRow(): fc.Arbitrary<PerTypeComponentRow> {
+  return fc.oneof(
+    arbNvmeComponentRow(),
+    arbGpuComponentRow(),
+    arbRamComponentRow(),
+    arbSataComponentRow()
+  );
+}

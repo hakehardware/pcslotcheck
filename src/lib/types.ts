@@ -222,6 +222,15 @@ export interface ComponentSummary {
   specs: Record<string, unknown>;
 }
 
+export interface ComponentPageResult {
+  rows: ComponentSummary[];
+  totalCount: number;
+}
+
+export interface ComponentFilterOptions {
+  manufacturers: string[];
+}
+
 // === Motherboard Table Selector Types ===
 
 export interface MotherboardSummary {
