@@ -1,0 +1,8 @@
+id: seagate-ironwolf-pro-20tb
+type: sata_drive
+manufacturer: Seagate
+model: IronWolf Pro 20TB
+form_factor: "3.5"
+capacity_gb: 20000
+interface: SATA III
+schema_version: "2.0"

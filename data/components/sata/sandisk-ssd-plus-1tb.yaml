@@ -1,7 +1,7 @@
-id: samsung-870-evo-1tb
+id: sandisk-ssd-plus-1tb
 type: sata_drive
-manufacturer: Samsung
-model: 870 EVO 1TB
+manufacturer: SanDisk
+model: SSD Plus 1TB
 form_factor: "2.5"
 capacity_gb: 1000
 interface: SATA III

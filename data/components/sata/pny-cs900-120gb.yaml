@@ -1,0 +1,8 @@
+id: pny-cs900-120gb
+type: sata_drive
+manufacturer: PNY
+model: CS900 120GB
+form_factor: "2.5"
+capacity_gb: 120
+interface: SATA III
+schema_version: "2.0"

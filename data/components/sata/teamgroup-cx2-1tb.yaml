@@ -1,7 +1,7 @@
-id: samsung-870-evo-1tb
+id: teamgroup-cx2-1tb
 type: sata_drive
-manufacturer: Samsung
-model: 870 EVO 1TB
+manufacturer: Teamgroup
+model: CX2 1TB
 form_factor: "2.5"
 capacity_gb: 1000
 interface: SATA III

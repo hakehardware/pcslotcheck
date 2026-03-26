@@ -1,0 +1,8 @@
+id: crucial-bx500-480gb
+type: sata_drive
+manufacturer: Crucial
+model: BX500 480GB
+form_factor: "2.5"
+capacity_gb: 480
+interface: SATA III
+schema_version: "2.0"

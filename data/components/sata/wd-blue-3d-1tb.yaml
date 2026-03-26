@@ -1,7 +1,7 @@
-id: samsung-870-evo-1tb
+id: wd-blue-3d-1tb
 type: sata_drive
-manufacturer: Samsung
-model: 870 EVO 1TB
+manufacturer: Western Digital
+model: Blue 3D NAND 1TB
 form_factor: "2.5"
 capacity_gb: 1000
 interface: SATA III

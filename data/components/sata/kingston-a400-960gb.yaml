@@ -1,0 +1,8 @@
+id: kingston-a400-960gb
+type: sata_drive
+manufacturer: Kingston
+model: A400 960GB
+form_factor: "2.5"
+capacity_gb: 960
+interface: SATA III
+schema_version: "2.0"
