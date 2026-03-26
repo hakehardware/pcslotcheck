@@ -1,0 +1,8 @@
+id: kingston-a400-480gb
+type: sata_drive
+manufacturer: Kingston
+model: A400 480GB
+form_factor: "2.5"
+capacity_gb: 480
+interface: SATA III
+schema_version: "2.0"

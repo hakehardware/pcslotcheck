@@ -1,0 +1,8 @@
+id: seagate-ironwolf-pro-8tb
+type: sata_drive
+manufacturer: Seagate
+model: IronWolf Pro 8TB
+form_factor: "3.5"
+capacity_gb: 8000
+interface: SATA III
+schema_version: "2.0"

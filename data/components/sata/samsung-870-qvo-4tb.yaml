@@ -1,8 +1,8 @@
-id: samsung-870-evo-1tb
+id: samsung-870-qvo-4tb
 type: sata_drive
 manufacturer: Samsung
-model: 870 EVO 1TB
+model: 870 QVO 4TB
 form_factor: "2.5"
-capacity_gb: 1000
+capacity_gb: 4000
 interface: SATA III
 schema_version: "2.0"

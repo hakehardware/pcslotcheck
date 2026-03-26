@@ -1,0 +1,8 @@
+id: patriot-burst-elite-240gb
+type: sata_drive
+manufacturer: Patriot
+model: Burst Elite 240GB
+form_factor: "2.5"
+capacity_gb: 240
+interface: SATA III
+schema_version: "2.0"

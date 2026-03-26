@@ -1,0 +1,8 @@
+id: toshiba-x300-16tb
+type: sata_drive
+manufacturer: Toshiba
+model: X300 16TB
+form_factor: "3.5"
+capacity_gb: 16000
+interface: SATA III
+schema_version: "2.0"
