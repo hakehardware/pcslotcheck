@@ -1,0 +1,13 @@
+id: gskill-ripjaws-v-ddr4-3200-c16-64gb
+type: ram
+manufacturer: G.Skill
+model: "Ripjaws V DDR4-3200 C16 64GB (2x32GB)"
+interface:
+  type: DDR4
+  speed_mhz: 3200
+  base_speed_mhz: 3200
+capacity:
+  per_module_gb: 32
+  modules: 2
+  total_gb: 64
+schema_version: "1.0"

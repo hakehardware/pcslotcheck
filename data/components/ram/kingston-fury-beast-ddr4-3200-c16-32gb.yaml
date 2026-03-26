@@ -1,0 +1,13 @@
+id: kingston-fury-beast-ddr4-3200-c16-32gb
+type: ram
+manufacturer: Kingston
+model: "Fury Beast DDR4-3200 C16 32GB (2x16GB)"
+interface:
+  type: DDR4
+  speed_mhz: 3200
+  base_speed_mhz: 3200
+capacity:
+  per_module_gb: 16
+  modules: 2
+  total_gb: 32
+schema_version: "1.0"

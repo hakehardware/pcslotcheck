@@ -1,0 +1,13 @@
+id: gskill-ripjaws-v-ddr4-2666-c19-32gb
+type: ram
+manufacturer: G.Skill
+model: "Ripjaws V DDR4-2666 C19 32GB (2x16GB)"
+interface:
+  type: DDR4
+  speed_mhz: 2666
+  base_speed_mhz: 2666
+capacity:
+  per_module_gb: 16
+  modules: 2
+  total_gb: 32
+schema_version: "1.0"

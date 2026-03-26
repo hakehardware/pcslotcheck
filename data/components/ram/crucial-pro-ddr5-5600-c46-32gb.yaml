@@ -1,0 +1,13 @@
+id: crucial-pro-ddr5-5600-c46-32gb
+type: ram
+manufacturer: Crucial
+model: "Pro DDR5-5600 C46 32GB (2x16GB)"
+interface:
+  type: DDR5
+  speed_mhz: 5600
+  base_speed_mhz: 4800
+capacity:
+  per_module_gb: 16
+  modules: 2
+  total_gb: 32
+schema_version: "1.0"

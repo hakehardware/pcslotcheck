@@ -1,0 +1,13 @@
+id: corsair-vengeance-ddr5-6000-c30-96gb
+type: ram
+manufacturer: Corsair
+model: "Vengeance DDR5-6000 C30 96GB (2x48GB)"
+interface:
+  type: DDR5
+  speed_mhz: 6000
+  base_speed_mhz: 4800
+capacity:
+  per_module_gb: 48
+  modules: 2
+  total_gb: 96
+schema_version: "1.0"

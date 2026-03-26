@@ -1,0 +1,13 @@
+id: gskill-trident-z5-rgb-ddr5-6000-c30-32gb
+type: ram
+manufacturer: G.Skill
+model: "Trident Z5 RGB DDR5-6000 C30 32GB (2x16GB)"
+interface:
+  type: DDR5
+  speed_mhz: 6000
+  base_speed_mhz: 4800
+capacity:
+  per_module_gb: 16
+  modules: 2
+  total_gb: 32
+schema_version: "1.0"

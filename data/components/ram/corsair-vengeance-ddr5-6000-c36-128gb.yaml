@@ -1,0 +1,13 @@
+id: corsair-vengeance-ddr5-6000-c36-128gb
+type: ram
+manufacturer: Corsair
+model: "Vengeance DDR5-6000 C36 128GB (4x32GB)"
+interface:
+  type: DDR5
+  speed_mhz: 6000
+  base_speed_mhz: 4800
+capacity:
+  per_module_gb: 32
+  modules: 4
+  total_gb: 128
+schema_version: "1.0"
