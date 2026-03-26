@@ -140,7 +140,7 @@ describe("Missing JSON 404s", () => {
 
     expect(text).toContain("Motherboard not found");
 
-    const backLink = container.querySelector('a[href="/search"]');
+    const backLink = container.querySelector('a[href="/boards"]');
     expect(backLink).toBeTruthy();
   });
 

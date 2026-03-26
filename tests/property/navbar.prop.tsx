@@ -31,7 +31,7 @@ import NavBar from "../../src/components/NavBar";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/search", label: "Motherboards" },
+  { href: "/boards", label: "Browse" },
   { href: "/components", label: "Components" },
   { href: "/support", label: "Support" },
 ] as const;
@@ -71,29 +71,29 @@ function expectedActiveHref(pathname: string): string | null {
 // -- Arbitraries --
 
 // Generate a pathname that exactly matches one of the nav link hrefs
-const exactNavPathArb = fc.constantFrom("/", "/search", "/components", "/support");
+const exactNavPathArb = fc.constantFrom("/", "/boards", "/components", "/support");
 
 // Generate a sub-route pathname under one of the non-root nav links
-// e.g. /search/something, /components/cpu-123, /support/faq
+// e.g. /boards/something, /components/cpu-123, /support/faq
 const subRouteSegmentArb = fc
   .stringMatching(/^[a-z0-9][a-z0-9-]{0,20}$/)
   .filter((s) => s.length >= 1);
 
 const subRoutePathArb = fc
   .tuple(
-    fc.constantFrom("/search", "/components", "/support"),
+    fc.constantFrom("/boards", "/components", "/support"),
     subRouteSegmentArb
   )
   .map(([base, segment]) => `${base}/${segment}`);
 
 // Generate a pathname that does NOT match any nav link
-// (not "/" and not starting with /search, /components, or /support)
+// (not "/" and not starting with /boards, /components, or /support)
 const unmatchedPathArb = fc
   .stringMatching(/^\/[a-z][a-z0-9-]{0,20}$/)
   .filter(
     (p) =>
       p !== "/" &&
-      !p.startsWith("/search") &&
+      !p.startsWith("/boards") &&
       !p.startsWith("/components") &&
       !p.startsWith("/support")
   );

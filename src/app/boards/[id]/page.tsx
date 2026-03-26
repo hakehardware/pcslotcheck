@@ -30,7 +30,7 @@ export default async function BoardDetailPage({
       <div className="mx-auto max-w-5xl px-6 py-16">
         <p className="text-lg text-zinc-400">Motherboard not found.</p>
         <Link
-          href="/search"
+          href="/boards"
           className="mt-4 inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-zinc-50"
         >
           <FiArrowLeft className="h-4 w-4" />
@@ -45,7 +45,7 @@ export default async function BoardDetailPage({
       {/* Back + Slot Checker links */}
       <div className="mb-8 flex flex-wrap items-center gap-4">
         <Link
-          href="/search"
+          href="/boards"
           className="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-zinc-50"
         >
           <FiArrowLeft className="h-4 w-4" />

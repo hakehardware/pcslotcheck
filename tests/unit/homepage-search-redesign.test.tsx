@@ -135,15 +135,9 @@ describe("Homepage content", () => {
 // ---------------------------------------------------------------------------
 
 describe("Browse page", () => {
-  it('renders a heading "Browse Motherboards"', () => {
-    render(<SearchPage />);
-    const heading = screen.getByRole("heading", { level: 1 });
-    expect(heading).toHaveTextContent("Browse Motherboards");
-  });
-
-  it("renders the SearchPageClient component", () => {
-    render(<SearchPage />);
-    expect(screen.getByTestId("search-page-client-mock")).toBeInTheDocument();
+  it("redirects to /boards", () => {
+    expect(() => render(<SearchPage />)).toThrow("NEXT_REDIRECT");
+    expect(mockRedirect).toHaveBeenCalledWith("/boards");
   });
 });
 
@@ -162,7 +156,7 @@ describe("Nav header links", () => {
     );
     const nav = screen.getByRole("navigation");
     expect(within(nav).getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
-    expect(within(nav).getByRole("link", { name: "Browse" })).toHaveAttribute("href", "/search");
+    expect(within(nav).getByRole("link", { name: "Browse" })).toHaveAttribute("href", "/boards");
     expect(within(nav).getByRole("link", { name: "Support" })).toHaveAttribute("href", "/support");
   });
 

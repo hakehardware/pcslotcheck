@@ -185,6 +185,6 @@ describe("Landing page content (post-redesign)", () => {
     const browseLink = screen.getByRole("link", {
       name: /browse all motherboards/i,
     });
-    expect(browseLink).toHaveAttribute("href", "/search");
+    expect(browseLink).toHaveAttribute("href", "/boards");
   });
 });

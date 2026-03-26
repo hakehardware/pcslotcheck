@@ -20,7 +20,7 @@ export default function Home() {
       <SearchBar />
 
       <Link
-        href="/search"
+        href="/boards"
         className="text-sm text-zinc-400 transition-colors hover:text-zinc-50"
       >
         or browse all motherboards
