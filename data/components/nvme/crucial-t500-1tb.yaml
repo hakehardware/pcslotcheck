@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: crucial-t500-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Crucial
+model: "T500 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4

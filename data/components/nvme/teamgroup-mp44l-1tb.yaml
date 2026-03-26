@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: teamgroup-mp44l-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: TeamGroup
+model: "MP44L 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4

@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: sabrent-rocket-4-plus-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Sabrent
+model: "Rocket 4 Plus 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4

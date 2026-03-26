@@ -1,7 +1,7 @@
-id: wd-black-sn770-1tb
+id: kingston-nv2-1tb
 type: nvme
-manufacturer: Western Digital
-model: "WD Black SN770 1TB"
+manufacturer: Kingston
+model: "NV2 1TB"
 interface:
   protocol: NVMe
   pcie_gen: 4
