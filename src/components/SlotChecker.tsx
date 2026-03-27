@@ -45,6 +45,11 @@ function getSlotCategory(
 }
 
 export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
+  // URL state management — read ?build= param on mount
+  const searchParams = useSearchParams();
+  const hasBuildParam = searchParams.get("build") !== null;
+  const hasRestoredUrl = useRef(false);
+
   // Core state
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
   const [motherboard, setMotherboard] = useState<Motherboard | null>(null);
@@ -55,7 +60,7 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
   const [validationResults, setValidationResults] = useState<
     ValidationResult[]
   >([]);
-  const [boardLoading, setBoardLoading] = useState(false);
+  const [boardLoading, setBoardLoading] = useState(!!searchParams.get("build"));
   const [boardError, setBoardError] = useState<string | null>(null);
 
   // CPU state
@@ -74,10 +79,6 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
   // Data caches (persist across renders, survive board switches)
   const boardCache = useRef<Map<string, Motherboard>>(new Map());
   const componentCache = useRef<Map<string, Component>>(new Map());
-
-  // URL state management — read ?build= param on mount
-  const searchParams = useSearchParams();
-  const hasRestoredUrl = useRef(false);
 
   // Restore state from URL on mount
   useEffect(() => {
@@ -447,8 +448,8 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
 
   return (
     <div className="space-y-6">
-      {/* Board Selector — hidden when boardId prop is provided */}
-      {!boardId && (
+      {/* Board Selector — hidden when boardId prop is provided or board is being restored */}
+      {!boardId && !selectedBoardId && !hasBuildParam && (
         <section aria-label="Motherboard selection">
           <h2 className="mb-3 text-lg font-semibold text-zinc-100">
             Select Motherboard
@@ -551,7 +552,7 @@ export default function SlotChecker({ manifest, boardId }: SlotCheckerProps) {
       )}
 
       {/* Empty state — no board selected (only when table is shown) */}
-      {!boardId && !selectedBoardId && !boardLoading && (
+      {!boardId && !selectedBoardId && !boardLoading && !hasBuildParam && (
         <p className="py-8 text-center text-sm text-zinc-500">
           Select a motherboard above to begin checking slot compatibility.
         </p>

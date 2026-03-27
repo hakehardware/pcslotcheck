@@ -17,7 +17,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'tsx-jsdom',
-          include: ['tests/**/*.{test,prop}.tsx'],
+          include: ['tests/**/*.{test,prop}.tsx', 'src/**/__tests__/*.{test,prop}.tsx'],
           environment: 'jsdom',
         },
       },
