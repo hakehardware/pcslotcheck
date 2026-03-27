@@ -10,7 +10,8 @@ import type {
   GPUComponent,
   NVMeComponent,
   RAMComponent,
-  SATAComponent,
+  SATASSDComponent,
+  SATAHDDComponent,
 } from "../../src/lib/types";
 import {
   arbFullMotherboard,
@@ -63,7 +64,8 @@ const TYPE_LABELS: Record<string, string> = {
   gpu: "GPU",
   nvme: "NVMe",
   ram: "RAM",
-  sata_drive: "SATA Drive",
+  sata_ssd: "SATA SSD",
+  sata_hdd: "SATA HDD",
 };
 
 // Import page components after mocks are set up
@@ -265,8 +267,9 @@ describe("Property 13: Component detail view contains type-appropriate fields", 
             expect(text).toContain(`${ram.capacity.total_gb} GB`);
             break;
           }
-          case "sata_drive": {
-            const sata = component as SATAComponent;
+          case "sata_ssd":
+          case "sata_hdd": {
+            const sata = component as SATASSDComponent | SATAHDDComponent;
             expect(text).toContain(sata.form_factor);
             expect(text).toContain(`${sata.capacity_gb} GB`);
             expect(text).toContain(sata.interface);

@@ -1,8 +1,0 @@
-id: pny-cs900-2tb
-type: sata_drive
-manufacturer: PNY
-model: CS900 2TB
-form_factor: "2.5"
-capacity_gb: 2000
-interface: SATA III
-schema_version: "2.0"

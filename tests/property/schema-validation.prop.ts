@@ -18,7 +18,8 @@ const schemas = {
   nvme: loadSchema("component-nvme.schema.json"),
   gpu: loadSchema("component-gpu.schema.json"),
   ram: loadSchema("component-ram.schema.json"),
-  sata: loadSchema("component-sata.schema.json"),
+  sata_ssd: loadSchema("component-sata-ssd.schema.json"),
+  sata_hdd: loadSchema("component-sata-hdd.schema.json"),
 };
 
 function makeAjv() {
@@ -177,15 +178,29 @@ const ramArb = fc.record({
   schema_version: versionString,
 });
 
-// SATA arbitrary
-const sataArb = fc.record({
+// SATA SSD arbitrary
+const sataSsdArb = fc.record({
   id: nonEmptyString,
-  type: fc.constant("sata_drive" as const),
+  type: fc.constant("sata_ssd" as const),
   manufacturer: nonEmptyString,
   model: nonEmptyString,
   form_factor: nonEmptyString,
   capacity_gb: posNum,
   interface: nonEmptyString,
+  drive_type: fc.constant("ssd" as const),
+  schema_version: versionString,
+});
+
+// SATA HDD arbitrary
+const sataHddArb = fc.record({
+  id: nonEmptyString,
+  type: fc.constant("sata_hdd" as const),
+  manufacturer: nonEmptyString,
+  model: nonEmptyString,
+  form_factor: nonEmptyString,
+  capacity_gb: posNum,
+  interface: nonEmptyString,
+  drive_type: fc.constant("hdd" as const),
   schema_version: versionString,
 });
 
@@ -216,10 +231,16 @@ const schemaEntries = [
     requiredFields: ["id", "type", "manufacturer", "model", "interface", "capacity", "schema_version"],
   },
   {
-    name: "sata",
-    schema: schemas.sata,
-    arb: sataArb,
-    requiredFields: ["id", "type", "manufacturer", "model", "form_factor", "capacity_gb", "interface", "schema_version"],
+    name: "sata_ssd",
+    schema: schemas.sata_ssd,
+    arb: sataSsdArb,
+    requiredFields: ["id", "type", "manufacturer", "model", "form_factor", "capacity_gb", "interface", "drive_type", "schema_version"],
+  },
+  {
+    name: "sata_hdd",
+    schema: schemas.sata_hdd,
+    arb: sataHddArb,
+    requiredFields: ["id", "type", "manufacturer", "model", "form_factor", "capacity_gb", "interface", "drive_type", "schema_version"],
   },
 ] as const;
 

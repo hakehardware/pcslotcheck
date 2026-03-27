@@ -655,7 +655,8 @@ import type {
   MotherboardSummary,
   ComponentSummary,
   GPUComponent,
-  SATAComponent,
+  SATASSDComponent,
+  SATAHDDComponent,
   SATAPort,
   Component,
 } from "../types";
@@ -677,7 +678,7 @@ const SATA_MODEL_PREFIXES = ["870 EVO", "MX500", "Blue", "BarraCuda", "A400"] as
 const SATA_FORM_FACTORS = ["2.5\"", "3.5\""] as const;
 const SATA_INTERFACES = ["SATA III", "SATA II"] as const;
 
-const COMPONENT_TYPES = ["cpu", "gpu", "nvme", "ram", "sata_drive"] as const;
+const COMPONENT_TYPES = ["cpu", "gpu", "nvme", "ram", "sata_ssd", "sata_hdd"] as const;
 
 // -- MotherboardSummary -------------------------------------------------------
 
@@ -741,11 +742,20 @@ function arbSpecsForType(type: string): fc.Arbitrary<Record<string, unknown>> {
           total_gb: fc.constantFrom(16, 32, 64, 128),
         })
         .map((s) => s as Record<string, unknown>);
-    case "sata_drive":
+    case "sata_ssd":
       return fc
         .record({
-          form_factor: fc.constantFrom(...SATA_FORM_FACTORS),
+          form_factor: fc.constant("2.5\""),
           capacity_gb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+          drive_type: fc.constant("ssd"),
+        })
+        .map((s) => s as Record<string, unknown>);
+    case "sata_hdd":
+      return fc
+        .record({
+          form_factor: fc.constant("3.5\""),
+          capacity_gb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+          drive_type: fc.constant("hdd"),
         })
         .map((s) => s as Record<string, unknown>);
     default:
@@ -851,26 +861,55 @@ export function arbGPUComponent(): fc.Arbitrary<GPUComponent> {
 // -- SATAComponent ------------------------------------------------------------
 
 /**
- * Generates a SATAComponent with realistic field values.
+ * Generates a SATA SSD or HDD component with realistic field values.
+ * Randomly picks between sata_ssd and sata_hdd subtypes.
  */
-export function arbSATAComponent(): fc.Arbitrary<SATAComponent> {
+export function arbSATAComponent(): fc.Arbitrary<SATASSDComponent | SATAHDDComponent> {
+  return fc.oneof(arbSATASSDComponent(), arbSATAHDDComponent());
+}
+
+/** Generates a SATASSDComponent. */
+export function arbSATASSDComponent(): fc.Arbitrary<SATASSDComponent> {
   return fc
     .record({
       manufacturer: fc.constantFrom(...SATA_MANUFACTURERS),
       modelPrefix: fc.constantFrom(...SATA_MODEL_PREFIXES),
-      formFactor: fc.constantFrom(...SATA_FORM_FACTORS),
       capacityGb: fc.constantFrom(250, 500, 1000, 2000, 4000),
       sataInterface: fc.constantFrom(...SATA_INTERFACES),
       idSuffix: kebabSegmentArb,
     })
-    .map(({ manufacturer, modelPrefix, formFactor, capacityGb, sataInterface, idSuffix }) => ({
+    .map(({ manufacturer, modelPrefix, capacityGb, sataInterface, idSuffix }) => ({
       id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
-      type: "sata_drive" as const,
+      type: "sata_ssd" as const,
       manufacturer,
       model: `${manufacturer} ${modelPrefix} ${capacityGb}GB`,
-      form_factor: formFactor,
+      form_factor: "2.5\"",
       capacity_gb: capacityGb,
       interface: sataInterface,
+      drive_type: "ssd" as const,
+      schema_version: "1.0",
+    }));
+}
+
+/** Generates a SATAHDDComponent. */
+export function arbSATAHDDComponent(): fc.Arbitrary<SATAHDDComponent> {
+  return fc
+    .record({
+      manufacturer: fc.constantFrom(...SATA_MANUFACTURERS),
+      modelPrefix: fc.constantFrom(...SATA_MODEL_PREFIXES),
+      capacityGb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+      sataInterface: fc.constantFrom(...SATA_INTERFACES),
+      idSuffix: kebabSegmentArb,
+    })
+    .map(({ manufacturer, modelPrefix, capacityGb, sataInterface, idSuffix }) => ({
+      id: `${manufacturer.toLowerCase()}-${modelPrefix.toLowerCase().replace(/\s+/g, "-")}-${idSuffix}`,
+      type: "sata_hdd" as const,
+      manufacturer,
+      model: `${manufacturer} ${modelPrefix} ${capacityGb}GB`,
+      form_factor: "3.5\"",
+      capacity_gb: capacityGb,
+      interface: sataInterface,
+      drive_type: "hdd" as const,
       schema_version: "1.0",
     }));
 }

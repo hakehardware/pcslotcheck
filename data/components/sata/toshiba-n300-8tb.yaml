@@ -1,8 +1,0 @@
-id: toshiba-n300-8tb
-type: sata_drive
-manufacturer: Toshiba
-model: N300 NAS 8TB
-form_factor: "3.5"
-capacity_gb: 8000
-interface: SATA III
-schema_version: "2.0"

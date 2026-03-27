@@ -94,7 +94,9 @@ describe("Feature: component-picker-search, Property 7: Placeholder text matches
       fc.property(
         fc.constantFrom(...slotCategories),
         (category) => {
-          const componentType = SLOT_CATEGORY_TO_COMPONENT_TYPE[category];
+          const compatibleType = SLOT_CATEGORY_TO_COMPONENT_TYPE[category];
+          // For array mappings, use the first type to create a test component
+          const componentType = Array.isArray(compatibleType) ? compatibleType[0] : compatibleType;
 
           // Create a minimal compatible component so the search input renders
           const component: ManifestComponent = {
@@ -143,11 +145,17 @@ describe("Feature: component-picker-search, Property 6: Selected component card 
     const scenarioArb = fc
       .constantFrom(...slotCategories)
       .chain((category) => {
-        const componentType = SLOT_CATEGORY_TO_COMPONENT_TYPE[category];
-        return arbComponentOfType(componentType).map((component) => ({
-          category,
-          component,
-        }));
+        const compatibleType = SLOT_CATEGORY_TO_COMPONENT_TYPE[category];
+        // For array mappings, pick one of the types randomly
+        const typeArb = Array.isArray(compatibleType)
+          ? fc.constantFrom(...compatibleType)
+          : fc.constant(compatibleType);
+        return typeArb.chain((componentType) =>
+          arbComponentOfType(componentType).map((component) => ({
+            category,
+            component,
+          }))
+        );
       });
 
     fc.assert(

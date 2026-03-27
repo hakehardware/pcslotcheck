@@ -29,7 +29,7 @@ const motherboardSchema = loadSchema('motherboard.schema.json');
 const nvmeSchema = loadSchema('component-nvme.schema.json');
 const gpuSchema = loadSchema('component-gpu.schema.json');
 const ramSchema = loadSchema('component-ram.schema.json');
-const sataSchema = loadSchema('component-sata.schema.json');
+const sataSsdSchema = loadSchema('component-sata-ssd.schema.json');
 
 interface SeedFile {
   relPath: string;
@@ -72,10 +72,10 @@ const seedFiles: SeedFile[] = [
     schema: ramSchema,
     label: 'Corsair Vengeance DDR5-6000 32GB',
   },
-  // SATA
+  // SATA SSD
   {
-    relPath: 'data/components/sata/samsung-870-evo-1tb.yaml',
-    schema: sataSchema,
+    relPath: 'data/components/sata-ssd/samsung-870-evo-1tb.yaml',
+    schema: sataSsdSchema,
     label: 'Samsung 870 EVO 1TB',
   },
 ];

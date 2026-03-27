@@ -1,0 +1,9 @@
+id: wd-red-plus-8tb
+type: sata_hdd
+manufacturer: Western Digital
+model: Red Plus 8TB
+form_factor: "3.5"
+capacity_gb: 8000
+interface: SATA III
+drive_type: hdd
+schema_version: "2.0"

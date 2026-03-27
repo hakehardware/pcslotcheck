@@ -1,8 +1,0 @@
-id: sandisk-ssd-plus-2tb
-type: sata_drive
-manufacturer: SanDisk
-model: SSD Plus 2TB
-form_factor: "2.5"
-capacity_gb: 2000
-interface: SATA III
-schema_version: "2.0"

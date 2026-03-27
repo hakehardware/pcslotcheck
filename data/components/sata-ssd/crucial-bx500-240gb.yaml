@@ -1,0 +1,9 @@
+id: crucial-bx500-240gb
+type: sata_ssd
+manufacturer: Crucial
+model: BX500 240GB
+form_factor: "2.5"
+capacity_gb: 240
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

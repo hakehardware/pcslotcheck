@@ -1,0 +1,9 @@
+id: crucial-mx500-2tb
+type: sata_ssd
+manufacturer: Crucial
+model: MX500 2TB
+form_factor: "2.5"
+capacity_gb: 2000
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

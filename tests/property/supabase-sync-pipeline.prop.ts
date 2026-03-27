@@ -399,11 +399,11 @@ function arbRamYAML(): fc.Arbitrary<ComponentYAML> {
   });
 }
 
-/** Generate a random valid SATA drive component YAML object. */
-function arbSataDriveYAML(): fc.Arbitrary<ComponentYAML> {
+/** Generate a random valid SATA SSD component YAML object. */
+function arbSataSsdYAML(): fc.Arbitrary<ComponentYAML> {
   return fc.record({
     id: idArb,
-    type: fc.constant("sata_drive"),
+    type: fc.constant("sata_ssd"),
     manufacturer: nonEmptyStringArb,
     model: nonEmptyStringArb,
     sku: fc.option(nonEmptyStringArb, { nil: undefined }),
@@ -416,12 +416,34 @@ function arbSataDriveYAML(): fc.Arbitrary<ComponentYAML> {
     form_factor: fc.constantFrom("2.5", "3.5"),
     capacity_gb: fc.constantFrom(250, 500, 1000, 2000, 4000),
     interface: fc.constant("SATA III"),
+    drive_type: fc.constant("ssd"),
+  });
+}
+
+/** Generate a random valid SATA HDD component YAML object. */
+function arbSataHddYAML(): fc.Arbitrary<ComponentYAML> {
+  return fc.record({
+    id: idArb,
+    type: fc.constant("sata_hdd"),
+    manufacturer: nonEmptyStringArb,
+    model: nonEmptyStringArb,
+    sku: fc.option(nonEmptyStringArb, { nil: undefined }),
+    schema_version: fc.constantFrom("1.0", "2.0"),
+    sources: fc.option(
+      fc.constant([{ type: "manual", url: "https://example.com" }]),
+      { nil: undefined }
+    ),
+    contributed_by: fc.option(nonEmptyStringArb, { nil: undefined }),
+    form_factor: fc.constantFrom("2.5", "3.5"),
+    capacity_gb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+    interface: fc.constant("SATA III"),
+    drive_type: fc.constant("hdd"),
   });
 }
 
 /** Generate a random valid component YAML object of any type. */
 function arbComponentYAML(): fc.Arbitrary<ComponentYAML> {
-  return fc.oneof(arbNvmeYAML(), arbGpuYAML(), arbRamYAML(), arbSataDriveYAML());
+  return fc.oneof(arbNvmeYAML(), arbGpuYAML(), arbRamYAML(), arbSataSsdYAML(), arbSataHddYAML());
 }
 
 // ── Property 2: Component transform round-trip ──────────────────────────────
@@ -460,7 +482,9 @@ describe("Property 2: Component transform round-trip", () => {
 
         // Base fields must match
         expect(row.id).toBe(yaml.id);
-        expect(row.type).toBe(yaml.type);
+        // SATA subtypes (sata_ssd, sata_hdd) are normalized to sata_drive in the DB
+        const expectedType = (yaml.type === "sata_ssd" || yaml.type === "sata_hdd") ? "sata_drive" : yaml.type;
+        expect(row.type).toBe(expectedType);
         expect(row.manufacturer).toBe(yaml.manufacturer);
         expect(row.model).toBe(yaml.model);
         expect(row.sku).toBe(yaml.sku ?? null);
@@ -478,6 +502,12 @@ describe("Property 2: Component transform round-trip", () => {
         delete expected.contributed_by;
         delete expected.summary_line;
         delete expected.updated_at;
+
+        // SATA subtypes are normalized to sata_drive in the DB round-trip
+        if (expected.type === "sata_ssd" || expected.type === "sata_hdd") {
+          expected.type = "sata_drive";
+          delete expected.drive_type;
+        }
 
         // Normalize both sides: null and undefined are equivalent for optional fields
         expect(normalize(reconstructed)).toEqual(normalize(expected));
@@ -537,9 +567,9 @@ describe("Property 3: Summary line contains key specs", () => {
     );
   });
 
-  test("SATA drive summary line is non-empty and contains capacity", () => {
+  test("SATA SSD summary line is non-empty and contains capacity", () => {
     fc.assert(
-      fc.property(arbSataDriveYAML(), (yaml) => {
+      fc.property(arbSataSsdYAML(), (yaml) => {
         const row = transformComponent(yaml);
         expect(row.summary_line.length).toBeGreaterThan(0);
         expect(row.summary_line).toContain(String(yaml.capacity_gb));
@@ -815,7 +845,7 @@ describe("Property 8: Schema routing selects the correct schema per file path", 
   const yamlFileArb = pathSegmentArb.map((name) => name + ".yaml");
 
   /** Valid component types recognized by routeSchema. */
-  const componentTypeArb = fc.constantFrom("nvme", "gpu", "ram", "sata");
+  const componentTypeArb = fc.constantFrom("nvme", "gpu", "ram", "sata-ssd", "sata-hdd");
 
   test("motherboard paths select motherboard schema", () => {
     fc.assert(
@@ -869,7 +899,7 @@ describe("Property 8: Schema routing selects the correct schema per file path", 
           const normalized = fullPath.replace(/\\/g, "/");
           if (
             /\/data\/motherboards\//.test(normalized) ||
-            /\/data\/components\/(nvme|gpu|ram|sata)\//.test(normalized)
+            /\/data\/components\/(nvme|gpu|ram|sata-ssd|sata-hdd|sata)\//.test(normalized)
           ) {
             return; // skip — this accidentally matched a valid pattern
           }
@@ -1058,16 +1088,17 @@ describe("Property 6: Invalid files are skipped without aborting valid syncs", (
     });
   }
 
-  /** Minimal valid SATA component YAML that passes schema validation. */
-  function validSataYaml(id: string): string {
+  /** Minimal valid SATA SSD component YAML that passes schema validation. */
+  function validSataSsdYaml(id: string): string {
     return yaml.dump({
       id,
-      type: "sata_drive",
+      type: "sata_ssd",
       manufacturer: "TestSATA",
-      model: "TestDrive",
+      model: "TestSSD",
       form_factor: "2.5",
       capacity_gb: 1000,
       interface: "SATA III",
+      drive_type: "ssd",
       schema_version: "1.0",
     });
   }
@@ -1098,10 +1129,10 @@ describe("Property 6: Invalid files are skipped without aborting valid syncs", (
     expectValid: true,
   }));
 
-  /** Arbitrary for a valid SATA component file entry. */
-  const validSataFileArb = slugArb.map((slug): TestFile => ({
-    relPath: `data/components/sata/${slug}.yaml`,
-    content: validSataYaml(slug),
+  /** Arbitrary for a valid SATA SSD component file entry. */
+  const validSataSsdFileArb = slugArb.map((slug): TestFile => ({
+    relPath: `data/components/sata-ssd/${slug}.yaml`,
+    content: validSataSsdYaml(slug),
     expectValid: true,
   }));
 
@@ -1111,7 +1142,7 @@ describe("Property 6: Invalid files are skipped without aborting valid syncs", (
     fc.constantFrom(
       "data/motherboards/test",
       "data/components/gpu",
-      "data/components/sata"
+      "data/components/sata-ssd"
     ),
     fc.constantFrom(
       ":\n  - :\n    bad: [unterminated",
@@ -1132,7 +1163,7 @@ describe("Property 6: Invalid files are skipped without aborting valid syncs", (
     fc.constantFrom(
       "data/motherboards/test",
       "data/components/gpu",
-      "data/components/sata"
+      "data/components/sata-ssd"
     )
   ).map(([slug, dir]): TestFile => ({
     relPath: `${dir}/schemafail-${slug}.yaml`,
@@ -1143,7 +1174,7 @@ describe("Property 6: Invalid files are skipped without aborting valid syncs", (
 
   /** Arbitrary for a mix of valid and invalid files with unique paths. */
   const fileMixArb = fc.tuple(
-    fc.array(fc.oneof(validMbFileArb, validGpuFileArb, validSataFileArb), { minLength: 1, maxLength: 4 }),
+    fc.array(fc.oneof(validMbFileArb, validGpuFileArb, validSataSsdFileArb), { minLength: 1, maxLength: 4 }),
     fc.array(invalidYamlFileArb, { minLength: 0, maxLength: 3 }),
     fc.array(schemaFailFileArb, { minLength: 0, maxLength: 3 })
   ).map(([valid, invalid, schemaFail]) => {

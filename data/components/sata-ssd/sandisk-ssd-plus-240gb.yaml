@@ -1,0 +1,9 @@
+id: sandisk-ssd-plus-240gb
+type: sata_ssd
+manufacturer: SanDisk
+model: SSD Plus 240GB
+form_factor: "2.5"
+capacity_gb: 240
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

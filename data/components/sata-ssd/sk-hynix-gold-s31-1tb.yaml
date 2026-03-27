@@ -1,0 +1,9 @@
+id: sk-hynix-gold-s31-1tb
+type: sata_ssd
+manufacturer: SK Hynix
+model: Gold S31 1TB
+form_factor: "2.5"
+capacity_gb: 1000
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

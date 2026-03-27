@@ -160,14 +160,27 @@ export interface RAMComponent {
   schema_version: string;
 }
 
-export interface SATAComponent {
+export interface SATASSDComponent {
   id: string;
-  type: "sata_drive";
+  type: "sata_ssd";
   manufacturer: string;
   model: string;
   form_factor: string;
   capacity_gb: number;
   interface: string;
+  drive_type: "ssd";
+  schema_version: string;
+}
+
+export interface SATAHDDComponent {
+  id: string;
+  type: "sata_hdd";
+  manufacturer: string;
+  model: string;
+  form_factor: string;
+  capacity_gb: number;
+  interface: string;
+  drive_type: "hdd";
   schema_version: string;
 }
 
@@ -189,7 +202,23 @@ export interface CPUComponent {
   schema_version: string;
 }
 
-export type Component = NVMeComponent | GPUComponent | RAMComponent | SATAComponent | CPUComponent;
+export type Component = NVMeComponent | GPUComponent | RAMComponent | SATASSDComponent | SATAHDDComponent | SATAComponent | CPUComponent;
+
+/**
+ * Backward-compat alias for the legacy `sata_drive` DB row type.
+ * The database layer (Phase 2) still stores SATA components as `sata_drive`.
+ * Use SATASSDComponent or SATAHDDComponent for new code.
+ */
+export interface SATAComponent {
+  id: string;
+  type: "sata_drive";
+  manufacturer: string;
+  model: string;
+  form_factor: string;
+  capacity_gb: number;
+  interface: string;
+  schema_version: string;
+}
 
 // === Validation Types ===
 

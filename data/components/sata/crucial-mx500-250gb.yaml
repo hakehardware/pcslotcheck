@@ -1,8 +1,0 @@
-id: crucial-mx500-250gb
-type: sata_drive
-manufacturer: Crucial
-model: MX500 250GB
-form_factor: "2.5"
-capacity_gb: 250
-interface: SATA III
-schema_version: "2.0"

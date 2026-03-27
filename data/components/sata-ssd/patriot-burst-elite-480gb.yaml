@@ -1,0 +1,9 @@
+id: patriot-burst-elite-480gb
+type: sata_ssd
+manufacturer: Patriot
+model: Burst Elite 480GB
+form_factor: "2.5"
+capacity_gb: 480
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

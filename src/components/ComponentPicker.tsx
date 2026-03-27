@@ -76,14 +76,19 @@ export default function ComponentPicker({
   // Filter compatible components by type (and socket for CPU)
   const compatibleType = SLOT_CATEGORY_TO_COMPONENT_TYPE[slotCategory];
   const compatibleComponents = manifestComponents.filter((c) => {
-    if (c.type !== compatibleType) return false;
+    const isCompatible = Array.isArray(compatibleType)
+      ? compatibleType.includes(c.type)
+      : c.type === compatibleType;
+    if (!isCompatible) return false;
     if (slotCategory === "cpu" && motherboardSocket) {
       return c.specs.socket === motherboardSocket;
     }
     return true;
   });
 
-  const specKeys = SPEC_DISPLAY_KEYS[compatibleType] ?? [];
+  // For array mappings (e.g. sata -> ["sata_ssd", "sata_hdd"]), use the first type's display keys
+  const specKeyType = Array.isArray(compatibleType) ? compatibleType[0] : compatibleType;
+  const specKeys = SPEC_DISPLAY_KEYS[specKeyType] ?? [];
 
   // Find selected component
   const selectedComponent = selectedComponentId

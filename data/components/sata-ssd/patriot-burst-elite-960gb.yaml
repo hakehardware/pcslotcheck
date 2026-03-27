@@ -1,0 +1,9 @@
+id: patriot-burst-elite-960gb
+type: sata_ssd
+manufacturer: Patriot
+model: Burst Elite 960GB
+form_factor: "2.5"
+capacity_gb: 960
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

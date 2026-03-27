@@ -11,6 +11,8 @@ export const COMPONENT_TYPE_META: Record<string, ComponentTypeMeta> = {
   gpu:        { label: "GPU",        icon: FiMonitor },
   nvme:       { label: "NVMe",       icon: FiHardDrive },
   ram:        { label: "RAM",        icon: FiServer },
+  sata_ssd:   { label: "SATA SSD",   icon: FiDisc },
+  sata_hdd:   { label: "SATA HDD",   icon: FiDisc },
   sata_drive: { label: "SATA Drive", icon: FiDisc },
 };
 
@@ -35,6 +37,16 @@ export const COMPONENT_SPEC_COLUMNS: Record<string, { key: string; label: string
     { key: "interface.type", label: "DDR Type" },
     { key: "interface.speed_mhz", label: "Speed (MHz)" },
     { key: "capacity.total_gb", label: "Total (GB)" },
+  ],
+  sata_ssd: [
+    { key: "capacity_gb", label: "Capacity (GB)" },
+    { key: "form_factor", label: "Form Factor" },
+    { key: "drive_type", label: "Drive Type" },
+  ],
+  sata_hdd: [
+    { key: "capacity_gb", label: "Capacity (GB)" },
+    { key: "form_factor", label: "Form Factor" },
+    { key: "drive_type", label: "Drive Type" },
   ],
   sata_drive: [
     { key: "form_factor", label: "Form Factor" },

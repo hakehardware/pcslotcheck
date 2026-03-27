@@ -1,8 +1,0 @@
-id: pny-cs900-250gb
-type: sata_drive
-manufacturer: PNY
-model: CS900 250GB
-form_factor: "2.5"
-capacity_gb: 250
-interface: SATA III
-schema_version: "2.0"

@@ -382,7 +382,9 @@ export function transformComponent(yaml: ComponentYAML): PerTypeComponentRow {
         capacity_total_gb: capacity.total_gb,
       };
     }
-    case "sata_drive": {
+    case "sata_drive":
+    case "sata_ssd":
+    case "sata_hdd": {
       return {
         ...base,
         type: "sata_drive",
@@ -485,7 +487,7 @@ export function routeSchema(filePath: string): string | null {
     return path.join(baseDir, "data", "schema", "motherboard.schema.json");
   }
 
-  const compMatch = normalized.match(/\/data\/components\/(nvme|gpu|ram|sata)\//);
+  const compMatch = normalized.match(/\/data\/components\/(nvme|gpu|ram|sata-ssd|sata-hdd|sata)\//);
   if (compMatch) {
     const idx = normalized.indexOf("/data/components/");
     const baseDir = normalized.substring(0, idx);

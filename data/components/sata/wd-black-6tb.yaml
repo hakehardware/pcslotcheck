@@ -1,8 +1,0 @@
-id: wd-black-6tb
-type: sata_drive
-manufacturer: Western Digital
-model: Black 6TB
-form_factor: "3.5"
-capacity_gb: 6000
-interface: SATA III
-schema_version: "2.0"

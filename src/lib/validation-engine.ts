@@ -3,7 +3,8 @@ import type {
   Component,
   NVMeComponent,
   GPUComponent,
-  SATAComponent,
+  SATASSDComponent,
+  SATAHDDComponent,
   RAMComponent,
   CPUComponent,
   ValidationResult,
@@ -216,8 +217,8 @@ function isGPU(component: Component): component is GPUComponent {
   return component.type === "gpu";
 }
 
-function isSATA(component: Component): component is SATAComponent {
-  return component.type === "sata_drive";
+function isSATA(component: Component): component is SATASSDComponent | SATAHDDComponent {
+  return component.type === "sata_ssd" || component.type === "sata_hdd" || (component.type as string) === "sata_drive";
 }
 
 function isRAM(component: Component): component is RAMComponent {

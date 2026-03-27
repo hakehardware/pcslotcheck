@@ -1,8 +1,0 @@
-id: seagate-exos-x18-16tb
-type: sata_drive
-manufacturer: Seagate
-model: Exos X18 16TB
-form_factor: "3.5"
-capacity_gb: 16000
-interface: SATA III
-schema_version: "2.0"

@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "component-sata-hdd.schema.json",
+  "title": "SATA HDD Component",
+  "description": "Schema for SATA HDD component YAML data files",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "manufacturer",
+    "model",
+    "form_factor",
+    "capacity_gb",
+    "interface",
+    "drive_type",
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier matching the filename stem"
+    },
+    "type": {
+      "type": "string",
+      "const": "sata_hdd"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "form_factor": {
+      "type": "string"
+    },
+    "capacity_gb": {
+      "type": "number"
+    },
+    "interface": {
+      "type": "string"
+    },
+    "drive_type": {
+      "type": "string",
+      "const": "hdd"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  }
+}

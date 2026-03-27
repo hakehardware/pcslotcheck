@@ -8,7 +8,8 @@ import type {
   GPUComponent,
   NVMeComponent,
   RAMComponent,
-  SATAComponent,
+  SATASSDComponent,
+  SATAHDDComponent,
 } from "@/lib/types";
 
 function dash(value: unknown): string {
@@ -21,7 +22,8 @@ const TYPE_LABELS: Record<string, string> = {
   gpu: "GPU",
   nvme: "NVMe",
   ram: "RAM",
-  sata_drive: "SATA Drive",
+  sata_ssd: "SATA SSD",
+  sata_hdd: "SATA HDD",
 };
 
 function CPUDetails({ component }: { component: CPUComponent }) {
@@ -234,7 +236,7 @@ function RAMDetails({ component }: { component: RAMComponent }) {
   );
 }
 
-function SATADetails({ component }: { component: SATAComponent }) {
+function SATADetails({ component }: { component: SATASSDComponent | SATAHDDComponent }) {
   return (
     <section className="mt-10">
       <h2 className="text-xl font-semibold text-zinc-50">Drive Details</h2>
@@ -268,7 +270,8 @@ function TypeSpecificDetails({ component }: { component: Component }) {
       return <NVMeDetails component={component} />;
     case "ram":
       return <RAMDetails component={component} />;
-    case "sata_drive":
+    case "sata_ssd":
+    case "sata_hdd":
       return <SATADetails component={component} />;
     default:
       return null;

@@ -27,8 +27,8 @@ describe("GPU seed data: nvidia-rtx-4070-ti-super.yaml", () => {
     expect(gpu.chip_manufacturer).toBe("NVIDIA");
   });
 
-  it("has slots_occupied 2", () => {
-    expect((gpu.physical as Record<string, unknown>).slots_occupied).toBe(2);
+  it("has slots_occupied 3", () => {
+    expect((gpu.physical as Record<string, unknown>).slots_occupied).toBe(3);
   });
 
   it('has schema_version "2.0"', () => {

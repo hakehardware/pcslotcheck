@@ -1,8 +1,0 @@
-id: wd-gold-4tb
-type: sata_drive
-manufacturer: Western Digital
-model: Gold 4TB
-form_factor: "3.5"
-capacity_gb: 4000
-interface: SATA III
-schema_version: "2.0"

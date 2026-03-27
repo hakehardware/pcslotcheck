@@ -69,10 +69,12 @@ export function extractSpecs(data: Record<string, unknown>): Record<string, unkn
         "capacity.total_gb": capacity?.total_gb,
       };
     }
-    case "sata_drive": {
+    case "sata_ssd":
+    case "sata_hdd": {
       return {
         capacity_gb: data.capacity_gb,
         form_factor: data.form_factor,
+        drive_type: data.drive_type,
       };
     }
     case "cpu": {

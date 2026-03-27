@@ -1,0 +1,9 @@
+id: pny-cs900-500gb
+type: sata_ssd
+manufacturer: PNY
+model: CS900 500GB
+form_factor: "2.5"
+capacity_gb: 500
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

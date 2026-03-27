@@ -1,8 +1,0 @@
-id: samsung-870-qvo-4tb
-type: sata_drive
-manufacturer: Samsung
-model: 870 QVO 4TB
-form_factor: "2.5"
-capacity_gb: 4000
-interface: SATA III
-schema_version: "2.0"

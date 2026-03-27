@@ -1,0 +1,9 @@
+id: wd-blue-3d-250gb
+type: sata_ssd
+manufacturer: Western Digital
+model: Blue 3D NAND 250GB
+form_factor: "2.5"
+capacity_gb: 250
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

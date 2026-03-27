@@ -27,9 +27,15 @@ export const SPEC_DISPLAY_KEYS: Record<string, { key: string; label: string }[]>
     { key: "interface.speed_mhz", label: "Speed" },
     { key: "capacity.total_gb", label: "Capacity" },
   ],
-  sata_drive: [
+  sata_ssd: [
     { key: "capacity_gb", label: "Capacity" },
     { key: "form_factor", label: "Form Factor" },
+    { key: "drive_type", label: "Drive Type" },
+  ],
+  sata_hdd: [
+    { key: "capacity_gb", label: "Capacity" },
+    { key: "form_factor", label: "Form Factor" },
+    { key: "drive_type", label: "Drive Type" },
   ],
   cpu: [
     { key: "socket", label: "Socket" },

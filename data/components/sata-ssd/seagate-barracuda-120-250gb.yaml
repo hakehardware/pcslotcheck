@@ -1,0 +1,9 @@
+id: seagate-barracuda-120-250gb
+type: sata_ssd
+manufacturer: Seagate
+model: BarraCuda 120 SSD 250GB
+form_factor: "2.5"
+capacity_gb: 250
+interface: SATA III
+drive_type: ssd
+schema_version: "2.0"

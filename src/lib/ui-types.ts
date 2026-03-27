@@ -23,10 +23,10 @@ export interface SlotGroup {
 }
 
 /** Slot category → compatible component type mapping */
-export const SLOT_CATEGORY_TO_COMPONENT_TYPE: Record<SlotCategory, string> = {
+export const SLOT_CATEGORY_TO_COMPONENT_TYPE: Record<SlotCategory, string | string[]> = {
   memory: "ram",
   m2: "nvme",
   pcie: "gpu",
-  sata: "sata_drive",
+  sata: ["sata_ssd", "sata_hdd"],
   cpu: "cpu",
 };

@@ -750,7 +750,8 @@ import type {
   NVMeComponent,
   GPUComponent,
   RAMComponent,
-  SATAComponent,
+  SATASSDComponent,
+  SATAHDDComponent,
   Component,
 } from "../../src/lib/types";
 
@@ -821,18 +822,32 @@ function arbRAMComponent(): fc.Arbitrary<RAMComponent> {
   });
 }
 
-/** Generate a random SATAComponent. */
-function arbSATAComponent(): fc.Arbitrary<SATAComponent> {
-  return fc.record({
-    id: idArb,
-    type: fc.constant("sata_drive" as const),
-    manufacturer: nonEmptyStringArb,
-    model: nonEmptyStringArb,
-    form_factor: fc.constantFrom("2.5\"", "3.5\""),
-    capacity_gb: fc.constantFrom(250, 500, 1000, 2000, 4000),
-    interface: fc.constant("SATA III"),
-    schema_version: fc.constant("1.0"),
-  });
+/** Generate a random SATA SSD or HDD component. */
+function arbSATAComponent(): fc.Arbitrary<SATASSDComponent | SATAHDDComponent> {
+  return fc.oneof(
+    fc.record({
+      id: idArb,
+      type: fc.constant("sata_ssd" as const),
+      manufacturer: nonEmptyStringArb,
+      model: nonEmptyStringArb,
+      form_factor: fc.constant("2.5\""),
+      capacity_gb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+      interface: fc.constant("SATA III"),
+      drive_type: fc.constant("ssd" as const),
+      schema_version: fc.constant("1.0"),
+    }),
+    fc.record({
+      id: idArb,
+      type: fc.constant("sata_hdd" as const),
+      manufacturer: nonEmptyStringArb,
+      model: nonEmptyStringArb,
+      form_factor: fc.constant("3.5\""),
+      capacity_gb: fc.constantFrom(250, 500, 1000, 2000, 4000),
+      interface: fc.constant("SATA III"),
+      drive_type: fc.constant("hdd" as const),
+      schema_version: fc.constant("1.0"),
+    }),
+  );
 }
 
 /** Generate any Component (union of all four types). */
@@ -920,7 +935,7 @@ function arbManifestComponent(
   });
 }
 
-/** Generate a mixed array of manifest components with all four types. */
+/** Generate a mixed array of manifest components with all types. */
 function arbMixedManifestComponents(): fc.Arbitrary<
   { id: string; type: string; manufacturer: string; model: string; specs: Record<string, unknown> }[]
 > {
@@ -929,9 +944,10 @@ function arbMixedManifestComponents(): fc.Arbitrary<
       fc.array(arbManifestComponent("ram"), { minLength: 0, maxLength: 5 }),
       fc.array(arbManifestComponent("nvme"), { minLength: 0, maxLength: 5 }),
       fc.array(arbManifestComponent("gpu"), { minLength: 0, maxLength: 5 }),
-      fc.array(arbManifestComponent("sata_drive"), { minLength: 0, maxLength: 5 }),
+      fc.array(arbManifestComponent("sata_ssd"), { minLength: 0, maxLength: 3 }),
+      fc.array(arbManifestComponent("sata_hdd"), { minLength: 0, maxLength: 3 }),
     )
-    .map(([ram, nvme, gpu, sata]) => [...ram, ...nvme, ...gpu, ...sata]);
+    .map(([ram, nvme, gpu, sataSsd, sataHdd]) => [...ram, ...nvme, ...gpu, ...sataSsd, ...sataHdd]);
 }
 
 /** Arbitrary for a random slot category. */
@@ -954,15 +970,27 @@ describe("Property 6: Component picker filters by slot category", () => {
         arbMixedManifestComponents(),
         (slotCategory, manifestComponents) => {
           const compatibleType = SLOT_CATEGORY_TO_COMPONENT_TYPE[slotCategory];
-          const filtered = manifestComponents.filter((c) => c.type === compatibleType);
+          const filtered = manifestComponents.filter((c) =>
+            Array.isArray(compatibleType)
+              ? compatibleType.includes(c.type)
+              : c.type === compatibleType
+          );
 
-          // Every filtered component must have the compatible type
+          // Every filtered component must have a compatible type
           for (const component of filtered) {
-            expect(component.type).toBe(compatibleType);
+            if (Array.isArray(compatibleType)) {
+              expect(compatibleType).toContain(component.type);
+            } else {
+              expect(component.type).toBe(compatibleType);
+            }
           }
 
           // No component of an incompatible type should appear in the filtered list
-          const incompatible = filtered.filter((c) => c.type !== compatibleType);
+          const incompatible = filtered.filter((c) =>
+            Array.isArray(compatibleType)
+              ? !compatibleType.includes(c.type)
+              : c.type !== compatibleType
+          );
           expect(incompatible).toHaveLength(0);
         },
       ),
@@ -977,11 +1005,17 @@ describe("Property 6: Component picker filters by slot category", () => {
         arbMixedManifestComponents(),
         (slotCategory, manifestComponents) => {
           const compatibleType = SLOT_CATEGORY_TO_COMPONENT_TYPE[slotCategory];
-          const filtered = manifestComponents.filter((c) => c.type === compatibleType);
+          const filtered = manifestComponents.filter((c) =>
+            Array.isArray(compatibleType)
+              ? compatibleType.includes(c.type)
+              : c.type === compatibleType
+          );
 
           // Count how many components in the original manifest match the compatible type
-          const expectedCount = manifestComponents.filter(
-            (c) => c.type === compatibleType,
+          const expectedCount = manifestComponents.filter((c) =>
+            Array.isArray(compatibleType)
+              ? compatibleType.includes(c.type)
+              : c.type === compatibleType
           ).length;
 
           expect(filtered).toHaveLength(expectedCount);
@@ -999,7 +1033,11 @@ describe("Property 6: Component picker filters by slot category", () => {
           const allCategories: SlotCategory[] = ["memory", "m2", "pcie", "sata"];
           const filteredSets = allCategories.map((cat) => {
             const compatibleType = SLOT_CATEGORY_TO_COMPONENT_TYPE[cat];
-            return manifestComponents.filter((c) => c.type === compatibleType);
+            return manifestComponents.filter((c) =>
+              Array.isArray(compatibleType)
+                ? compatibleType.includes(c.type)
+                : c.type === compatibleType
+            );
           });
 
           // The total count across all filtered sets should equal the total manifest size
@@ -1024,7 +1062,8 @@ const SPEC_DISPLAY_KEYS: Record<string, string[]> = {
   nvme: ["capacity_gb", "interface.pcie_gen", "interface.protocol"],
   gpu: ["power.tdp_w", "interface.pcie_gen", "physical.length_mm"],
   ram: ["interface.type", "interface.speed_mhz", "capacity.total_gb"],
-  sata_drive: ["capacity_gb", "form_factor"],
+  sata_ssd: ["capacity_gb", "form_factor", "drive_type"],
+  sata_hdd: ["capacity_gb", "form_factor", "drive_type"],
 };
 
 /** Generate a manifest component with realistic specs for its type. */
@@ -1072,15 +1111,28 @@ function arbManifestComponentWithSpecs(): fc.Arbitrary<{
         "capacity.total_gb": fc.constantFrom(16, 32, 64),
       }) as fc.Arbitrary<Record<string, unknown>>,
     }),
-    // SATA drive component with specs
+    // SATA SSD component with specs
     fc.record({
       id: idArb,
-      type: fc.constant("sata_drive"),
+      type: fc.constant("sata_ssd"),
       manufacturer: nonEmptyStringArb,
       model: nonEmptyStringArb,
       specs: fc.record({
         capacity_gb: fc.constantFrom(250, 500, 1000, 2000),
-        form_factor: fc.constantFrom("2.5\"", "3.5\""),
+        form_factor: fc.constant("2.5\""),
+        drive_type: fc.constant("ssd"),
+      }) as fc.Arbitrary<Record<string, unknown>>,
+    }),
+    // SATA HDD component with specs
+    fc.record({
+      id: idArb,
+      type: fc.constant("sata_hdd"),
+      manufacturer: nonEmptyStringArb,
+      model: nonEmptyStringArb,
+      specs: fc.record({
+        capacity_gb: fc.constantFrom(500, 1000, 2000, 4000),
+        form_factor: fc.constant("3.5\""),
+        drive_type: fc.constant("hdd"),
       }) as fc.Arbitrary<Record<string, unknown>>,
     }),
   );

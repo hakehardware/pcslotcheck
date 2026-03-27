@@ -1,0 +1,9 @@
+id: toshiba-x300-12tb
+type: sata_hdd
+manufacturer: Toshiba
+model: X300 12TB
+form_factor: "3.5"
+capacity_gb: 12000
+interface: SATA III
+drive_type: hdd
+schema_version: "2.0"

@@ -5,17 +5,17 @@ import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
 
-const DATA_DIR = path.resolve(__dirname, "..", "data");
+export const DATA_DIR = path.resolve(__dirname, "..", "data");
 
 /** Map a YAML file path (relative to project root) to its schema file path. */
-function getSchemaPath(filePath: string): string | null {
+export function getSchemaPath(filePath: string): string | null {
   const rel = path.relative(DATA_DIR, filePath).replace(/\\/g, "/");
 
   if (rel.startsWith("motherboards/")) {
     return path.join(DATA_DIR, "schema", "motherboard.schema.json");
   }
 
-  const componentMatch = rel.match(/^components\/(nvme|gpu|ram|sata|cpu)\//);
+  const componentMatch = rel.match(/^components\/(nvme|gpu|ram|sata-ssd|sata-hdd|cpu)\//);
   if (componentMatch) {
     return path.join(DATA_DIR, "schema", `component-${componentMatch[1]}.schema.json`);
   }
@@ -175,4 +175,6 @@ function main(): void {
   process.exit(0);
 }
 
-main();
+if (require.main === module) {
+  main();
+}

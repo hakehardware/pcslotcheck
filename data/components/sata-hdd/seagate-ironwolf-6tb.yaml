@@ -1,0 +1,9 @@
+id: seagate-ironwolf-6tb
+type: sata_hdd
+manufacturer: Seagate
+model: IronWolf 6TB
+form_factor: "3.5"
+capacity_gb: 6000
+interface: SATA III
+drive_type: hdd
+schema_version: "2.0"

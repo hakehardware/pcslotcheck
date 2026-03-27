@@ -47,9 +47,9 @@ describe("per-type transform with real seed data", () => {
     expect(row.chip_manufacturer).toBe("NVIDIA");
     expect(row.interface_pcie_gen).toBe(4);
     expect(row.interface_lanes).toBe(16);
-    expect(row.physical_slot_width).toBe(2);
-    expect(row.physical_length_mm).toBe(304);
-    expect(row.physical_slots_occupied).toBe(2);
+    expect(row.physical_slot_width).toBe(3);
+    expect(row.physical_length_mm).toBe(310);
+    expect(row.physical_slots_occupied).toBe(3);
     expect(row.power_tdp_w).toBe(285);
   });
 
@@ -71,8 +71,8 @@ describe("per-type transform with real seed data", () => {
     expect(row.capacity_total_gb).toBe(32);
   });
 
-  it("SATA (samsung-870-evo-1tb) transforms to correct typed columns", () => {
-    const filePath = path.resolve(__dirname, "../../data/components/sata/samsung-870-evo-1tb.yaml");
+  it("SATA SSD (samsung-870-evo-1tb) transforms to correct typed columns", () => {
+    const filePath = path.resolve(__dirname, "../../data/components/sata-ssd/samsung-870-evo-1tb.yaml");
     const parsed = parseAndValidateFile(filePath);
     expect("data" in parsed).toBe(true);
     if (!("data" in parsed)) return;

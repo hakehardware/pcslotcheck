@@ -1,8 +1,0 @@
-id: wd-gold-14tb
-type: sata_drive
-manufacturer: Western Digital
-model: Gold 14TB
-form_factor: "3.5"
-capacity_gb: 14000
-interface: SATA III
-schema_version: "2.0"

@@ -46,7 +46,8 @@ export const EXPECTED_SCHEMA_VERSIONS: Record<string, string> = {
   nvme: "1.1",
   motherboard: "2.0",
   ram: "1.0",
-  sata: "1.0",
+  "sata-ssd": "2.0",
+  "sata-hdd": "2.0",
 };
 
 export interface SanityViolation {
@@ -303,13 +304,13 @@ export function checkSchemaVersion(
 export function getDataType(
   filePath: string,
   dataDir: string = DATA_DIR
-): "motherboard" | "nvme" | "gpu" | "ram" | "sata" | null {
+): "motherboard" | "nvme" | "gpu" | "ram" | "sata-ssd" | "sata-hdd" | null {
   const rel = path.relative(dataDir, filePath).replace(/\\/g, "/");
 
   if (rel.startsWith("motherboards/")) return "motherboard";
 
-  const componentMatch = rel.match(/^components\/(nvme|gpu|ram|sata)\//);
-  if (componentMatch) return componentMatch[1] as "nvme" | "gpu" | "ram" | "sata";
+  const componentMatch = rel.match(/^components\/(sata-ssd|sata-hdd|nvme|gpu|ram)\//);
+  if (componentMatch) return componentMatch[1] as "nvme" | "gpu" | "ram" | "sata-ssd" | "sata-hdd";
 
   return null;
 }
@@ -355,7 +356,8 @@ function main(): void {
       case "gpu":
         checkGpu(violations, relPath, record);
         break;
-      case "sata":
+      case "sata-ssd":
+      case "sata-hdd":
         checkSata(violations, relPath, record);
         break;
       case "ram":

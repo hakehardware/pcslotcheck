@@ -1,8 +1,0 @@
-id: seagate-exos-x18-12tb
-type: sata_drive
-manufacturer: Seagate
-model: Exos X18 12TB
-form_factor: "3.5"
-capacity_gb: 12000
-interface: SATA III
-schema_version: "2.0"
