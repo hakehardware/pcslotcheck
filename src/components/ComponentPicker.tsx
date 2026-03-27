@@ -7,6 +7,16 @@ import type { SlotCategory } from "../lib/ui-types";
 import { SPEC_DISPLAY_KEYS, searchComponents } from "../lib/component-search";
 import { GITHUB_ISSUES_URL } from "../lib/github-links";
 import type { DataManifest } from "../lib/types";
+import CompactCard from "./CompactCard";
+import { getThumbnailIcon } from "../lib/thumbnail";
+
+export const SLOT_CATEGORY_ICON_TYPE: Record<SlotCategory, string> = {
+  cpu: "cpu",
+  m2: "nvme",
+  pcie: "gpu",
+  memory: "ram",
+  sata: "sata_drive",
+};
 
 interface ComponentPickerProps {
   slotCategory: SlotCategory;
@@ -112,6 +122,9 @@ export default function ComponentPicker({
 
   // Determine if picker is effectively open
   const pickerIsOpen = isInlineMode ? isOpen : true;
+
+  // Resolve the category icon for CompactCard rendering
+  const categoryIcon = getThumbnailIcon(SLOT_CATEGORY_ICON_TYPE[slotCategory]);
 
   // Close handler: in inline mode, close internally; in modal mode, call prop
   const handleClose = useCallback(() => {
@@ -341,34 +354,33 @@ export default function ComponentPicker({
                 aria-label="Compatible components"
                 className="space-y-2"
               >
-                {displayItems.map((component, index) => (
-                  <li
-                    key={component.id}
-                    role="option"
-                    aria-selected={false}
-                    tabIndex={-1}
-                    className="cursor-pointer rounded border border-zinc-700 bg-zinc-800 px-3 py-2.5 outline-none hover:border-zinc-500 hover:bg-zinc-750 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    onClick={() => handleSelect(component.id)}
-                    onKeyDown={(e) => handleItemKeyDown(e, index, component.id)}
-                  >
-                    <div className="text-sm font-medium text-zinc-100">
-                      {component.manufacturer} {component.model}
-                    </div>
-                    {specKeys.length > 0 && (
-                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-400">
-                        {specKeys.map(({ key, label }) => {
-                          const value = component.specs[key];
-                          if (value == null) return null;
-                          return (
-                            <span key={key}>
-                              {label}: {formatSpecValue(key, value)}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </li>
-                ))}
+                {displayItems.map((component, index) => {
+                  const specLabels = specKeys
+                    .map(({ key, label }) => {
+                      const value = component.specs[key];
+                      if (value == null) return null;
+                      return `${label}: ${formatSpecValue(key, value)}`;
+                    })
+                    .filter((s): s is string => s !== null);
+
+                  return (
+                    <li
+                      key={component.id}
+                      role="option"
+                      aria-selected={false}
+                      tabIndex={-1}
+                      className="cursor-pointer outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 rounded-lg"
+                      onClick={() => handleSelect(component.id)}
+                      onKeyDown={(e) => handleItemKeyDown(e, index, component.id)}
+                    >
+                      <CompactCard
+                        icon={categoryIcon}
+                        title={`${component.manufacturer} ${component.model}`}
+                        specs={specLabels}
+                      />
+                    </li>
+                  );
+                })}
               </ul>
 
               {/* Count indicator */}

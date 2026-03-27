@@ -7,6 +7,8 @@ interface CompactCardProps {
   specs: string[];
   onClick?: () => void;
   action?: React.ReactNode;
+  role?: string;
+  ariaSelected?: boolean;
 }
 
 export default function CompactCard({
@@ -15,6 +17,8 @@ export default function CompactCard({
   specs,
   onClick,
   action,
+  role,
+  ariaSelected,
 }: CompactCardProps) {
   const isClickable = !!onClick;
 
@@ -37,11 +41,16 @@ export default function CompactCard({
       ].join(" ")}
       {...(isClickable
         ? {
-            tabIndex: 0,
-            role: "button",
+            tabIndex: role === "option" ? -1 : 0,
+            role: role ?? "button",
             onClick,
             onKeyDown: handleKeyDown,
           }
+        : role
+          ? { role }
+          : {})}
+      {...(ariaSelected !== undefined
+        ? { "aria-selected": ariaSelected }
         : {})}
     >
       <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">

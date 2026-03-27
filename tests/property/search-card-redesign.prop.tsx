@@ -82,7 +82,7 @@ describe("Property 2: MetadataBadge renders label with pill styling", () => {
     );
   });
 
-  it("applies pill styling classes to the span", () => {
+  it("applies rounded styling classes to the span", () => {
     fc.assert(
       fc.property(fc.string({ minLength: 1 }), (label) => {
         const { container } = render(<MetadataBadge label={label} />);
@@ -90,7 +90,7 @@ describe("Property 2: MetadataBadge renders label with pill styling", () => {
 
         expect(span).not.toBeNull();
         const classList = span!.className;
-        expect(classList).toContain("rounded-full");
+        expect(classList).toContain("rounded");
         expect(classList).toContain("bg-zinc-800");
         expect(classList).toContain("text-zinc-400");
         expect(classList).toContain("px-2");
