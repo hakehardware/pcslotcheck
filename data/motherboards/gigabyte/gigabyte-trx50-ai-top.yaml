@@ -1,0 +1,189 @@
+id: gigabyte-trx50-ai-top
+manufacturer: Gigabyte
+model: TRX50 AI TOP
+chipset: AMD TRX50
+socket: sTR5
+form_factor: E-ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: None
+  base_speed_mhz: 4800
+  max_capacity_gb: 2048
+  ecc_support: true
+  channels: 8
+  slots:
+    - id: ddr5_a1
+      channel: A
+      position: 1
+      recommended: true
+    - id: ddr5_b1
+      channel: B
+      position: 1
+      recommended: true
+    - id: ddr5_c1
+      channel: C
+      position: 1
+      recommended: true
+    - id: ddr5_d1
+      channel: D
+      position: 1
+      recommended: true
+    - id: ddr5_e1
+      channel: E
+      position: 1
+      recommended: true
+    - id: ddr5_f1
+      channel: F
+      position: 1
+      recommended: true
+    - id: ddr5_g1
+      channel: G
+      position: 1
+      recommended: true
+    - id: ddr5_h1
+      channel: H
+      position: 1
+      recommended: true
+  recommended_population:
+    four_dimm:
+      - ddr5_a1
+      - ddr5_c1
+      - ddr5_e1
+      - ddr5_g1
+    eight_dimm:
+      - ddr5_a1
+      - ddr5_b1
+      - ddr5_c1
+      - ddr5_d1
+      - ddr5_e1
+      - ddr5_f1
+      - ddr5_g1
+      - ddr5_h1
+
+m2_slots:
+  - id: m2a_cpu
+    label: M2A_CPU (Gen5/4 x4)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2b_cpu
+    label: M2B_CPU (Gen5/4 x4)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2c_cpu
+    label: M2C_CPU (Gen5/4 x4)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2d_cpu
+    label: M2D_CPU (Gen5 x4, PRO only)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: cpu_dependent
+        targets:
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2d_cpu
+          logic: any_populated
+        condition: AMD Ryzen Threadripper 9000/7000 (non-PRO) installed
+        effect: M2D_CPU connector becomes unavailable
+
+pcie_slots:
+  - id: pciex16_1
+    label: PCIEX16_1 (Gen5 x16)
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_2
+    label: PCIEX16_2 (Gen5 x16)
+    position: 2
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_3
+    label: PCIEX16_3 (Gen5 x16)
+    position: 3
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_4
+    label: PCIEX16_4 (Gen5/4 x16)
+    position: 4
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+sata_ports:
+  - id: sata3_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manual
+    url: research/motherboards/gigabyte/trx50-ai-top/manual.pdf
+  - type: spec_page
+    url: https://www.gigabyte.com/Motherboard/TRX50-AI-TOP/sp#sp

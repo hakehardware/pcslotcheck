@@ -1,0 +1,22 @@
+id: gigabyte-x399-aorus-xtreme
+manufacturer: Gigabyte
+model: X399 AORUS Xtreme
+chipset: AMD X399
+socket: sTR4
+form_factor: E-ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR4
+  max_speed_mhz: 2933
+  base_speed_mhz: 2666
+  max_capacity_gb: 128
+  ecc_support: true
+  channels: 4
+  slots:
+
+m2_slots:
+
+pcie_slots:
+
+sata_ports:

@@ -1,0 +1,186 @@
+id: msi-creator-trx40
+manufacturer: MSI
+model: Creator TRX40
+chipset: AMD TRX40
+socket: sTRX4
+form_factor: E-ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR4
+  max_speed_mhz: 4666
+  base_speed_mhz: 3200
+  max_capacity_gb: 256
+  ecc_support: true
+  channels: 4
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: true
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: false
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: false
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: true
+    - id: dimm_c1
+      channel: C
+      position: 1
+      recommended: false
+    - id: dimm_c2
+      channel: C
+      position: 2
+      recommended: true
+    - id: dimm_d1
+      channel: D
+      position: 1
+      recommended: false
+    - id: dimm_d2
+      channel: D
+      position: 2
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_d2
+      - dimm_b2
+    four_dimm:
+      - dimm_d2
+      - dimm_c2
+      - dimm_a1
+      - dimm_b2
+    eight_dimm:
+      - dimm_d2
+      - dimm_d1
+      - dimm_c2
+      - dimm_c1
+      - dimm_a1
+      - dimm_a2
+      - dimm_b1
+      - dimm_b2
+
+m2_slots:
+  - id: m2_1
+    label: M2_1 (PCIe 4.0 x4 / SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2_2 (PCIe 4.0 x4 / SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_3
+    label: M2_3 (PCIe 4.0 x4 / SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+pcie_slots:
+  - id: pci_e1
+    label: PCI_E1 (Gen4 x16)
+    position: 1
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pci_e2
+    label: PCI_E2 (Gen4 x8)
+    position: 2
+    gen: 4
+    electrical_lanes: 8
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pci_e3
+    label: PCI_E3 (Gen4 x16)
+    position: 3
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pci_e4
+    label: PCI_E4 (Gen4 x8)
+    position: 4
+    gen: 4
+    electrical_lanes: 8
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_6
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: spec_page
+    url: https://us.msi.com/Motherboard/Creator-TRX40/Specification

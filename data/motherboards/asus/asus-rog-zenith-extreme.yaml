@@ -1,0 +1,22 @@
+id: asus-rog-zenith-extreme
+manufacturer: ASUS
+model: ROG Zenith Extreme
+chipset: AMD X399
+socket: sTR4
+form_factor: E-ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR4
+  max_speed_mhz: 3600
+  base_speed_mhz: 2666
+  max_capacity_gb: 128
+  ecc_support: true
+  channels: 4
+  slots:
+
+m2_slots:
+
+pcie_slots:
+
+sata_ports:

@@ -1,0 +1,180 @@
+id: asus-pro-ws-trx50-sage-wifi-a
+manufacturer: ASUS
+model: Pro WS TRX50-SAGE WIFI A
+chipset: AMD TRX50
+socket: sTR5
+form_factor: CEB
+schema_version: "1.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: None
+  base_speed_mhz: 4800
+  max_capacity_gb: 1024
+  ecc_support: true
+  channels: 4
+  slots:
+    - id: dimm_a
+      channel: A
+      position: 1
+      recommended: true
+    - id: dimm_c
+      channel: C
+      position: 1
+      recommended: true
+    - id: dimm_e
+      channel: E
+      position: 1
+      recommended: true
+    - id: dimm_g
+      channel: G
+      position: 1
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimm_a
+      - dimm_c
+    four_dimm:
+      - dimm_a
+      - dimm_c
+      - dimm_e
+      - dimm_g
+
+m2_slots:
+  - id: m2_1
+    label: M.2_1 (Gen5 x4)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M.2_2 (Gen5 x4)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_3
+    label: M.2_3 (Gen4 x4, shared w/ SlimSAS_2)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: disables
+        targets:
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_3
+          logic: any_populated
+        condition: M.2_3 slot is populated
+        effect: SlimSAS_2 is disabled
+
+  - id: m2_4
+    label: M.2_4 (Gen5 x4, PRO only)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: cpu_dependent
+        targets:
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_4
+          logic: any_populated
+        condition: AMD Ryzen Threadripper 9000/7000 (non-PRO) installed
+        effect: M.2_4 slot becomes unavailable
+
+pcie_slots:
+  - id: pciex16_g5_1
+    label: PCIEX16(G5)_1
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_g5_2
+    label: PCIEX16(G5)_2
+    position: 2
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_g5_3
+    label: PCIEX16(G5)_3
+    position: 3
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_g4_1
+    label: PCIEX16(G4)_1
+    position: 4
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+sata_ports:
+  - id: sata6g_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: spec_page
+    url: https://www.asus.com/us/motherboards-components/motherboards/workstation/pro-ws-trx50-sage-wifi-a/techspec/

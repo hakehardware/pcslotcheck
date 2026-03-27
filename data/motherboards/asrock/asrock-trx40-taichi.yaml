@@ -1,0 +1,180 @@
+id: asrock-trx40-taichi
+manufacturer: ASRock
+model: TRX40 Taichi
+chipset: AMD TRX40
+socket: sTRX4
+form_factor: ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR4
+  max_speed_mhz: 4666
+  base_speed_mhz: 3200
+  max_capacity_gb: 256
+  ecc_support: true
+  channels: 4
+  slots:
+    - id: ddr4_a1
+      channel: A
+      position: 1
+      recommended: true
+    - id: ddr4_a2
+      channel: A
+      position: 2
+      recommended: false
+    - id: ddr4_b1
+      channel: B
+      position: 1
+      recommended: true
+    - id: ddr4_b2
+      channel: B
+      position: 2
+      recommended: false
+    - id: ddr4_c1
+      channel: C
+      position: 1
+      recommended: true
+    - id: ddr4_c2
+      channel: C
+      position: 2
+      recommended: false
+    - id: ddr4_d1
+      channel: D
+      position: 1
+      recommended: true
+    - id: ddr4_d2
+      channel: D
+      position: 2
+      recommended: false
+  recommended_population:
+    two_dimm:
+      - ddr4_a2
+      - ddr4_b2
+    four_dimm:
+      - ddr4_a2
+      - ddr4_b2
+      - ddr4_c2
+      - ddr4_d2
+    eight_dimm:
+      - ddr4_a1
+      - ddr4_a2
+      - ddr4_b1
+      - ddr4_b2
+      - ddr4_c1
+      - ddr4_c2
+      - ddr4_d1
+      - ddr4_d2
+
+m2_slots:
+  - id: m2_1
+    label: M2_1 Hyper M.2 (PCIe 4.0 x4)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M2_2 Hyper M.2 (PCIe 4.0 x4 / SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+pcie_slots:
+  - id: pcie1
+    label: PCIE1 (Gen4 x16)
+    position: 1
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie3
+    label: PCIE3 (Gen4 x16)
+    position: 2
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie4
+    label: PCIE4 (Gen4 x16)
+    position: 3
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_x1
+    label: PCIe 4.0 x1
+    position: 4
+    gen: 4
+    electrical_lanes: 1
+    physical_size: x1
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata3_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_6
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_7
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_8
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: spec_page
+    url: https://www.asrock.com/mb/AMD/TRX40%20Taichi/index.us.asp

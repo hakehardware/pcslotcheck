@@ -1,0 +1,176 @@
+id: asus-pro-ws-wrx80e-sage-se-wifi
+manufacturer: ASUS
+model: Pro WS WRX80E-SAGE SE WIFI
+chipset: AMD WRX80
+socket: sWRX8
+form_factor: E-ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR4
+  max_speed_mhz: 3200
+  base_speed_mhz: 3200
+  max_capacity_gb: 2048
+  ecc_support: true
+  channels: 8
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: true
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: true
+    - id: dimm_c1
+      channel: C
+      position: 1
+      recommended: true
+    - id: dimm_d1
+      channel: D
+      position: 1
+      recommended: true
+    - id: dimm_e1
+      channel: E
+      position: 1
+      recommended: true
+    - id: dimm_f1
+      channel: F
+      position: 1
+      recommended: true
+    - id: dimm_g1
+      channel: G
+      position: 1
+      recommended: true
+    - id: dimm_h1
+      channel: H
+      position: 1
+      recommended: true
+  recommended_population:
+    four_dimm:
+      - dimm_a1
+      - dimm_c1
+      - dimm_e1
+      - dimm_g1
+    eight_dimm:
+      - dimm_a1
+      - dimm_b1
+      - dimm_c1
+      - dimm_d1
+      - dimm_e1
+      - dimm_f1
+      - dimm_g1
+      - dimm_h1
+
+m2_slots:
+  - id: m2_1
+    label: M.2_1 (PCIe 4.0 x4 / SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M.2_2 (PCIe 4.0 x4 / SATA, shared U.2_1)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: true
+    heatsink_included: true
+    sharing:
+      - type: disables
+        targets:
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_2
+          logic: any_populated
+        condition: M.2_2 slot is populated
+        effect: U.2_1 is disabled
+
+  - id: m2_3
+    label: M.2_3 (PCIe 4.0 x4 / SATA, shared U.2_2)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: Chipset
+    supports_sata: true
+    heatsink_included: true
+    sharing:
+      - type: disables
+        targets:
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_3
+          logic: any_populated
+        condition: M.2_3 slot is populated
+        effect: U.2_2 is disabled
+
+pcie_slots:
+
+sata_ports:
+  - id: sata6g_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_e1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_e2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_e3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_e4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: manual
+    url: research/motherboards/asus/pro-ws-wrx80e-sage-se-wifi/manual.pdf
+  - type: spec_page
+    url: https://www.asus.com/us/motherboards-components/motherboards/workstation/pro-ws-wrx80e-sage-se-wifi/techspec/

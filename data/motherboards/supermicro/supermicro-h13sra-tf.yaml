@@ -1,0 +1,134 @@
+id: supermicro-h13sra-tf
+manufacturer: Supermicro
+model: H13SRA-TF
+chipset: AMD TRX50
+socket: sTR5
+form_factor: ATX
+schema_version: "1.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 5200
+  base_speed_mhz: 4800
+  max_capacity_gb: 1024
+  ecc_support: true
+  channels: 4
+  slots:
+    - id: dimma1
+      channel: A
+      position: 1
+      recommended: true
+    - id: dimmc1
+      channel: C
+      position: 1
+      recommended: true
+    - id: dimme1
+      channel: E
+      position: 1
+      recommended: true
+    - id: dimmg1
+      channel: G
+      position: 1
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - dimma1
+      - dimmc1
+    four_dimm:
+      - dimma1
+      - dimmc1
+      - dimme1
+      - dimmg1
+
+m2_slots:
+  - id: m2_1
+    label: M.2_1 (PCIe 4.0 x4)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: false
+    sharing: null
+
+  - id: m2_2
+    label: M.2_2 (PCIe 4.0 x4)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: false
+    sharing: null
+
+pcie_slots:
+  - id: pcie_x16_1
+    label: PCIe 5.0 x16 Slot 1
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_x16_2
+    label: PCIe 5.0 x16 Slot 2
+    position: 2
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pcie_x8_1
+    label: PCIe 5.0 x8 Slot 1 (open rear)
+    position: 3
+    gen: 5
+    electrical_lanes: 8
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pcie_x8_2
+    label: PCIe 5.0 x8 Slot 2 (open rear)
+    position: 4
+    gen: 5
+    electrical_lanes: 8
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+sources:
+  - type: spec_page
+    url: https://www.supermicro.com/en/products/motherboard/h13sra-tf
