@@ -169,92 +169,92 @@ slot_positions:
     slot_id: dimm_a1
     x_pct: 72.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.5
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_a2
-    x_pct: 74.5
+    x_pct: 75.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.5
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_b1
-    x_pct: 77.0
+    x_pct: 78.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.5
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_b2
-    x_pct: 79.5
+    x_pct: 81.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.5
     height_pct: 38.0
 
   - slot_type: m2
     slot_id: m2_1
     x_pct: 20.0
     y_pct: 40.0
-    width_pct: 26.0
-    height_pct: 2.0
+    width_pct: 26.2
+    height_pct: 9.0
 
   - slot_type: m2
     slot_id: m2_2
     x_pct: 22.0
     y_pct: 55.0
-    width_pct: 18.0
-    height_pct: 2.0
+    width_pct: 26.2
+    height_pct: 9.0
 
   - slot_type: m2
     slot_id: m2_3
     x_pct: 18.0
     y_pct: 70.0
-    width_pct: 22.0
-    height_pct: 2.0
+    width_pct: 26.2
+    height_pct: 9.0
 
   - slot_type: m2
     slot_id: m2_4
     x_pct: 48.0
     y_pct: 70.0
-    width_pct: 18.0
-    height_pct: 2.0
+    width_pct: 26.2
+    height_pct: 9.0
 
   - slot_type: pcie
     slot_id: pcie_1
     x_pct: 3.0
     y_pct: 47.0
-    width_pct: 58.0
-    height_pct: 2.5
+    width_pct: 29.2
+    height_pct: 3.5
 
   - slot_type: pcie
     slot_id: pcie_2
     x_pct: 3.0
     y_pct: 58.0
-    width_pct: 58.0
-    height_pct: 2.0
+    width_pct: 29.2
+    height_pct: 3.0
 
   - slot_type: pcie
     slot_id: pcie_3
     x_pct: 3.0
     y_pct: 67.0
-    width_pct: 58.0
-    height_pct: 2.0
+    width_pct: 29.2
+    height_pct: 3.0
 
   - slot_type: pcie
     slot_id: pcie_4
     x_pct: 3.0
     y_pct: 82.0
-    width_pct: 58.0
-    height_pct: 2.0
+    width_pct: 29.2
+    height_pct: 3.0
 
   - slot_type: sata_group
     slot_id: sata_group_1
     x_pct: 88.0
     y_pct: 55.0
-    width_pct: 5.0
-    height_pct: 10.0
+    width_pct: 6.0
+    height_pct: 12.0
 
 sources:
   - type: manual

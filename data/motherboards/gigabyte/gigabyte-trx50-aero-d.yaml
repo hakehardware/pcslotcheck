@@ -170,93 +170,93 @@ slot_positions:
   - slot_type: cpu
     slot_id: cpu_socket
     x_pct: 30.0
-    y_pct: 18.0
+    y_pct: 15.0
     width_pct: 14.0
-    height_pct: 16.0
+    height_pct: 15.0
 
   - slot_type: dimm
     slot_id: ddr5_a1
-    x_pct: 72.0
+    x_pct: 68.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.5
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: ddr5_b1
-    x_pct: 74.5
+    x_pct: 71.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.5
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: ddr5_c1
-    x_pct: 77.0
+    x_pct: 74.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.5
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: ddr5_d1
-    x_pct: 79.5
+    x_pct: 77.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.5
     height_pct: 38.0
 
   - slot_type: m2
     slot_id: m2a_cpu
-    x_pct: 25.0
+    x_pct: 8.0
     y_pct: 42.0
-    width_pct: 26.0
-    height_pct: 2.0
+    width_pct: 26.2
+    height_pct: 8.3
 
   - slot_type: m2
     slot_id: m2b_cpu
-    x_pct: 15.0
-    y_pct: 55.0
-    width_pct: 22.0
-    height_pct: 2.0
+    x_pct: 8.0
+    y_pct: 52.0
+    width_pct: 26.2
+    height_pct: 8.3
 
   - slot_type: m2
     slot_id: m2c_cpu
-    x_pct: 48.0
-    y_pct: 55.0
-    width_pct: 18.0
-    height_pct: 2.0
+    x_pct: 8.0
+    y_pct: 62.0
+    width_pct: 26.2
+    height_pct: 8.3
 
   - slot_type: m2
     slot_id: m2d_cpu
-    x_pct: 15.0
-    y_pct: 63.0
-    width_pct: 22.0
-    height_pct: 2.0
+    x_pct: 8.0
+    y_pct: 72.0
+    width_pct: 26.2
+    height_pct: 8.3
 
   - slot_type: pcie
     slot_id: pciex16_1
     x_pct: 3.0
     y_pct: 48.0
-    width_pct: 58.0
+    width_pct: 24.0
     height_pct: 2.5
 
   - slot_type: pcie
     slot_id: pciex16_2
     x_pct: 3.0
-    y_pct: 70.0
-    width_pct: 58.0
+    y_pct: 58.0
+    width_pct: 24.0
     height_pct: 2.5
 
   - slot_type: pcie
     slot_id: pciex16_3
     x_pct: 3.0
-    y_pct: 84.0
-    width_pct: 58.0
+    y_pct: 78.0
+    width_pct: 24.0
     height_pct: 2.5
 
   - slot_type: sata_group
     slot_id: sata_group_1
     x_pct: 88.0
-    y_pct: 60.0
-    width_pct: 5.0
-    height_pct: 12.0
+    y_pct: 50.0
+    width_pct: 6.0
+    height_pct: 20.0
 
 sources:
   - type: spec_page

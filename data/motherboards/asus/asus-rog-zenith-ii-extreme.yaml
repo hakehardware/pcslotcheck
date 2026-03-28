@@ -230,127 +230,127 @@ slot_positions:
     slot_id: cpu_socket
     x_pct: 28.0
     y_pct: 18.0
-    width_pct: 14.0
-    height_pct: 16.0
+    width_pct: 13.0
+    height_pct: 14.0
 
   - slot_type: dimm
     slot_id: dimm_a1
     x_pct: 62.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.0
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_a2
     x_pct: 64.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.0
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_b1
     x_pct: 66.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.0
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_b2
     x_pct: 68.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.0
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_c1
     x_pct: 70.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.0
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_c2
     x_pct: 72.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.0
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_d1
     x_pct: 74.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.0
     height_pct: 38.0
 
   - slot_type: dimm
     slot_id: dimm_d2
     x_pct: 76.0
     y_pct: 8.0
-    width_pct: 1.8
+    width_pct: 2.0
     height_pct: 38.0
 
   - slot_type: m2
     slot_id: dimm2_1
-    x_pct: 82.0
-    y_pct: 10.0
-    width_pct: 4.0
-    height_pct: 18.0
+    x_pct: 25.0
+    y_pct: 38.0
+    width_pct: 25.8
+    height_pct: 7.9
 
   - slot_type: m2
     slot_id: dimm2_2
-    x_pct: 88.0
-    y_pct: 10.0
-    width_pct: 4.0
-    height_pct: 18.0
+    x_pct: 25.0
+    y_pct: 42.0
+    width_pct: 25.8
+    height_pct: 7.9
 
   - slot_type: m2
     slot_id: m2_2
-    x_pct: 15.0
-    y_pct: 55.0
-    width_pct: 22.0
-    height_pct: 2.0
+    x_pct: 12.0
+    y_pct: 62.0
+    width_pct: 25.8
+    height_pct: 7.9
 
   - slot_type: m2
     slot_id: m2_3
-    x_pct: 15.0
-    y_pct: 63.0
-    width_pct: 22.0
-    height_pct: 2.0
+    x_pct: 12.0
+    y_pct: 70.0
+    width_pct: 25.8
+    height_pct: 7.9
 
   - slot_type: pcie
     slot_id: pciex16_1
     x_pct: 3.0
     y_pct: 48.0
-    width_pct: 58.0
-    height_pct: 2.5
+    width_pct: 28.7
+    height_pct: 3.0
 
   - slot_type: pcie
     slot_id: pciex16_2
     x_pct: 3.0
-    y_pct: 60.0
-    width_pct: 58.0
-    height_pct: 2.5
+    y_pct: 56.0
+    width_pct: 28.7
+    height_pct: 3.0
 
   - slot_type: pcie
-    slot_id: pciex16_3
+    slot_id: pciex8_1
     x_pct: 3.0
-    y_pct: 72.0
-    width_pct: 58.0
-    height_pct: 2.5
+    y_pct: 68.0
+    width_pct: 28.7
+    height_pct: 3.0
 
   - slot_type: pcie
-    slot_id: pciex16_4
+    slot_id: pciex8_2
     x_pct: 3.0
-    y_pct: 84.0
-    width_pct: 58.0
-    height_pct: 2.5
+    y_pct: 78.0
+    width_pct: 28.7
+    height_pct: 3.0
 
   - slot_type: sata_group
     slot_id: sata_group_1
     x_pct: 88.0
     y_pct: 55.0
-    width_pct: 5.0
-    height_pct: 12.0
+    width_pct: 6.0
+    height_pct: 20.0
 
 sources:
   - type: spec_page
