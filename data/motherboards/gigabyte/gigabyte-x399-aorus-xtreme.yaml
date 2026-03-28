@@ -1,0 +1,293 @@
+id: gigabyte-x399-aorus-xtreme
+manufacturer: Gigabyte
+model: X399 AORUS Xtreme
+chipset: AMD X399
+socket: sTR4
+form_factor: E-ATX
+length_mm: 305
+width_mm: 269
+schema_version: "1.0"
+
+memory:
+  type: DDR4
+  max_speed_mhz: 2933
+  base_speed_mhz: 2666
+  max_capacity_gb: 128
+  ecc_support: true
+  channels: 4
+  slots:
+    - id: ddr4_1_1a
+      channel: A
+      position: 1
+      recommended: true
+    - id: ddr4_2_2a
+      channel: A
+      position: 2
+      recommended: false
+    - id: ddr4_3_1b
+      channel: B
+      position: 1
+      recommended: true
+    - id: ddr4_4_2b
+      channel: B
+      position: 2
+      recommended: false
+    - id: ddr4_5_1c
+      channel: C
+      position: 1
+      recommended: true
+    - id: ddr4_6_2c
+      channel: C
+      position: 2
+      recommended: false
+    - id: ddr4_7_1d
+      channel: D
+      position: 1
+      recommended: true
+    - id: ddr4_8_2d
+      channel: D
+      position: 2
+      recommended: false
+
+m2_slots:
+  - id: m2m
+    label: M2M (PCIe 3.0 x4/SATA)
+    interface: PCIe
+    gen: 3
+    lanes: 4
+    form_factors:
+    source: CPU
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+  - id: m2p
+    label: M2P (PCIe 3.0 x4/SATA)
+    interface: PCIe
+    gen: 3
+    lanes: 4
+    form_factors:
+    source: Chipset
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+  - id: m2q
+    label: M2Q (PCIe 3.0 x4/SATA)
+    interface: PCIe
+    gen: 3
+    lanes: 4
+    form_factors:
+    source: CPU
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+pcie_slots:
+  - id: pciex16_1
+    label: PCIEX16_1
+    position: 1
+    gen: 3
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex8_1
+    label: PCIEX8_1
+    position: 2
+    gen: 3
+    electrical_lanes: 8
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pciex16_2
+    label: PCIEX16_2
+    position: 3
+    gen: 3
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex8_2
+    label: PCIEX8_2
+    position: 4
+    gen: 3
+    electrical_lanes: 8
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pciex1_1
+    label: PCIEX1_1
+    position: 5
+    gen: 3
+    electrical_lanes: 1
+    physical_size: x1
+    source: Chipset
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: sata3_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_5
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+slot_positions:
+  - slot_type: cpu
+    slot_id: cpu_socket
+    x_pct: 28.0
+    y_pct: 18.0
+    width_pct: 14.0
+    height_pct: 16.0
+
+  - slot_type: dimm
+    slot_id: ddr4_1_1a
+    x_pct: 62.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr4_2_2a
+    x_pct: 64.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr4_3_1b
+    x_pct: 67.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr4_4_2b
+    x_pct: 69.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr4_5_1c
+    x_pct: 72.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr4_6_2c
+    x_pct: 74.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr4_7_1d
+    x_pct: 77.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr4_8_2d
+    x_pct: 79.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: m2
+    slot_id: m2m
+    x_pct: 15.0
+    y_pct: 42.0
+    width_pct: 26.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2p
+    x_pct: 15.0
+    y_pct: 72.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2q
+    x_pct: 15.0
+    y_pct: 58.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: pcie
+    slot_id: pciex16_1
+    x_pct: 3.0
+    y_pct: 48.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pciex16_2
+    x_pct: 3.0
+    y_pct: 65.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pciex1_1
+    x_pct: 3.0
+    y_pct: 85.0
+    width_pct: 15.0
+    height_pct: 1.5
+
+  - slot_type: pcie
+    slot_id: pciex8_1
+    x_pct: 3.0
+    y_pct: 55.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pciex8_2
+    x_pct: 3.0
+    y_pct: 75.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: sata_group
+    slot_id: sata_group_1
+    x_pct: 88.0
+    y_pct: 60.0
+    width_pct: 5.0
+    height_pct: 10.0

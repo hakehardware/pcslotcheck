@@ -4,7 +4,9 @@ model: B760 AORUS ELITE
 chipset: Intel B760
 socket: LGA 1700
 form_factor: ATX
-schema_version: "2.0"
+length_mm: 305
+width_mm: 244
+schema_version: "1.0"
 
 memory:
   type: DDR5
@@ -131,6 +133,91 @@ sata_ports:
     version: "3.0"
     source: Chipset
     disabled_by: null
+
+slot_positions:
+  - slot_type: cpu
+    slot_id: cpu_socket
+    x_pct: 28.0
+    y_pct: 18.0
+    width_pct: 14.0
+    height_pct: 16.0
+
+  - slot_type: dimm
+    slot_id: ddr5_a1
+    x_pct: 73.0
+    y_pct: 10.0
+    width_pct: 1.8
+    height_pct: 35.0
+
+  - slot_type: dimm
+    slot_id: ddr5_a2
+    x_pct: 75.5
+    y_pct: 10.0
+    width_pct: 1.8
+    height_pct: 35.0
+
+  - slot_type: dimm
+    slot_id: ddr5_b1
+    x_pct: 68.0
+    y_pct: 10.0
+    width_pct: 1.8
+    height_pct: 35.0
+
+  - slot_type: dimm
+    slot_id: ddr5_b2
+    x_pct: 70.5
+    y_pct: 10.0
+    width_pct: 1.8
+    height_pct: 35.0
+
+  - slot_type: m2
+    slot_id: m2_1
+    x_pct: 15.0
+    y_pct: 42.0
+    width_pct: 26.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2_2
+    x_pct: 15.0
+    y_pct: 58.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2_3
+    x_pct: 15.0
+    y_pct: 72.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: pcie
+    slot_id: pcie_1
+    x_pct: 3.0
+    y_pct: 48.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pcie_2
+    x_pct: 3.0
+    y_pct: 65.0
+    width_pct: 15.0
+    height_pct: 1.5
+
+  - slot_type: pcie
+    slot_id: pcie_3
+    x_pct: 3.0
+    y_pct: 80.0
+    width_pct: 15.0
+    height_pct: 1.5
+
+  - slot_type: sata_group
+    slot_id: sata_group_1
+    x_pct: 88.0
+    y_pct: 62.0
+    width_pct: 5.0
+    height_pct: 10.0
 
 sources:
   - type: manual

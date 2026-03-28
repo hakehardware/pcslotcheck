@@ -1,0 +1,265 @@
+id: gigabyte-trx50-aero-d
+manufacturer: Gigabyte
+model: TRX50 AERO D
+chipset: AMD TRX50
+socket: sTR5
+form_factor: E-ATX
+length_mm: 305
+width_mm: 264
+schema_version: "1.0"
+
+memory:
+  type: DDR5
+  max_speed_mhz: 8000
+  base_speed_mhz: 4800
+  max_capacity_gb: 1024
+  ecc_support: true
+  channels: 4
+  slots:
+    - id: ddr5_a1
+      channel: A
+      position: 1
+      recommended: true
+    - id: ddr5_b1
+      channel: B
+      position: 1
+      recommended: true
+    - id: ddr5_c1
+      channel: C
+      position: 1
+      recommended: true
+    - id: ddr5_d1
+      channel: D
+      position: 1
+      recommended: true
+  recommended_population:
+    two_dimm:
+      - ddr5_a1
+      - ddr5_b1
+    four_dimm:
+      - ddr5_a1
+      - ddr5_b1
+      - ddr5_c1
+      - ddr5_d1
+
+m2_slots:
+  - id: m2a_cpu
+    label: M2A_CPU (Gen5 x4)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2b_cpu
+    label: M2B_CPU (Gen5 x4)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2c_cpu
+    label: M2C_CPU (Gen5 x4)
+    interface: PCIe
+    gen: 5
+    lanes: 4
+    form_factors:
+      - "2280"
+      - "25110"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+  - id: m2d_cpu
+    label: M2D_CPU (Gen4 x4)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2280"
+    source: Chipset
+    supports_sata: false
+    heatsink_included: true
+    sharing: null
+
+pcie_slots:
+  - id: pciex16_1
+    label: PCIEX16_1 (Gen5 x16)
+    position: 1
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_2
+    label: PCIEX16_2 (Gen5 x16)
+    position: 2
+    gen: 5
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pciex16_3
+    label: PCIEX16_3 (Gen4 x16)
+    position: 3
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+sata_ports:
+  - id: a_sata3_0
+    version: "3.0"
+    source: CPU
+    disabled_by: null
+
+  - id: a_sata3_1
+    version: "3.0"
+    source: CPU
+    disabled_by: null
+
+  - id: a_sata3_2
+    version: "3.0"
+    source: CPU
+    disabled_by: null
+
+  - id: a_sata3_3
+    version: "3.0"
+    source: CPU
+    disabled_by: null
+
+  - id: sata3_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata3_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+slot_positions:
+  - slot_type: cpu
+    slot_id: cpu_socket
+    x_pct: 30.0
+    y_pct: 18.0
+    width_pct: 14.0
+    height_pct: 16.0
+
+  - slot_type: dimm
+    slot_id: ddr5_a1
+    x_pct: 72.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr5_b1
+    x_pct: 74.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr5_c1
+    x_pct: 77.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: ddr5_d1
+    x_pct: 79.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: m2
+    slot_id: m2a_cpu
+    x_pct: 25.0
+    y_pct: 42.0
+    width_pct: 26.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2b_cpu
+    x_pct: 15.0
+    y_pct: 55.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2c_cpu
+    x_pct: 48.0
+    y_pct: 55.0
+    width_pct: 18.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2d_cpu
+    x_pct: 15.0
+    y_pct: 63.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: pcie
+    slot_id: pciex16_1
+    x_pct: 3.0
+    y_pct: 48.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pciex16_2
+    x_pct: 3.0
+    y_pct: 70.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pciex16_3
+    x_pct: 3.0
+    y_pct: 84.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: sata_group
+    slot_id: sata_group_1
+    x_pct: 88.0
+    y_pct: 60.0
+    width_pct: 5.0
+    height_pct: 12.0
+
+sources:
+  - type: manual
+    url: research/motherboards/gigabyte/trx50-aero-d/manual.pdf
+  - type: spec_page
+    url: https://www.gigabyte.com/Motherboard/TRX50-AERO-D-rev-10/sp#sp

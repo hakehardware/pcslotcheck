@@ -4,7 +4,9 @@ model: A620M GAMING X AX
 chipset: AMD A620
 socket: AM5
 form_factor: Micro-ATX
-schema_version: "2.0"
+length_mm: 244
+width_mm: 244
+schema_version: "1.0"
 
 memory:
   type: DDR5
@@ -95,6 +97,70 @@ sata_ports:
     version: "3.0"
     source: Chipset
     disabled_by: null
+
+slot_positions:
+  - slot_type: cpu
+    slot_id: cpu
+    x_pct: 30.0
+    y_pct: 15.0
+    width_pct: 14.0
+    height_pct: 16.0
+
+  - slot_type: dimm
+    slot_id: dimm_a1
+    x_pct: 72.0
+    y_pct: 5.0
+    width_pct: 1.8
+    height_pct: 42.0
+
+  - slot_type: dimm
+    slot_id: dimm_a2
+    x_pct: 74.5
+    y_pct: 5.0
+    width_pct: 1.8
+    height_pct: 42.0
+
+  - slot_type: dimm
+    slot_id: dimm_b1
+    x_pct: 77.0
+    y_pct: 5.0
+    width_pct: 1.8
+    height_pct: 42.0
+
+  - slot_type: dimm
+    slot_id: dimm_b2
+    x_pct: 79.5
+    y_pct: 5.0
+    width_pct: 1.8
+    height_pct: 42.0
+
+  - slot_type: m2
+    slot_id: m2_1
+    x_pct: 15.0
+    y_pct: 42.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: pcie
+    slot_id: pcie_1
+    x_pct: 3.0
+    y_pct: 50.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pcie_2
+    x_pct: 3.0
+    y_pct: 72.0
+    width_pct: 15.0
+    height_pct: 1.5
+
+  - slot_type: sata_group
+    slot_id: sata_group
+    x_pct: 88.0
+    y_pct: 55.0
+    width_pct: 5.0
+    height_pct: 10.0
 
 sources:
   - type: manufacturer
