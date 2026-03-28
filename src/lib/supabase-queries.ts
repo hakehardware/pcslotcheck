@@ -43,7 +43,7 @@ export function assembleMotherboard(row: MotherboardRow, slotRows: SlotRow[]): M
     .filter(s => s.category === "memory")
     .map(s => ({
       id: s.id,
-      channel: s.dimm_channel as "A" | "B",
+      channel: s.dimm_channel as "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H",
       position: s.dimm_position!,
       recommended: s.dimm_recommended!,
     }));

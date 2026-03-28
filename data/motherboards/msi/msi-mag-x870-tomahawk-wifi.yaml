@@ -6,7 +6,7 @@ socket: AM5
 form_factor: ATX
 length_mm: 304.8
 width_mm: 243.84
-schema_version: "1.0"
+schema_version: "2.0"
 
 memory:
   type: DDR5

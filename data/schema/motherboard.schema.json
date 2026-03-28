@@ -38,7 +38,7 @@
     },
     "form_factor": {
       "type": "string",
-      "enum": ["ATX", "Micro-ATX", "Mini-ITX", "E-ATX"]
+      "enum": ["ATX", "Micro-ATX", "Mini-ITX", "E-ATX", "CEB", "SSI-EEB", "SSI-CEB"]
     },
     "memory": {
       "$ref": "#/definitions/MemoryConfig"
@@ -96,7 +96,7 @@
       "additionalProperties": false,
       "properties": {
         "id": { "type": "string" },
-        "channel": { "type": "string", "enum": ["A", "B"] },
+        "channel": { "type": "string", "enum": ["A", "B", "C", "D", "E", "F", "G", "H"] },
         "position": { "type": "integer" },
         "recommended": { "type": "boolean" }
       }
@@ -130,7 +130,6 @@
         },
         "recommended_population": {
           "type": "object",
-          "required": ["two_dimm"],
           "additionalProperties": false,
           "properties": {
             "two_dimm": {
@@ -138,6 +137,10 @@
               "items": { "type": "string" }
             },
             "four_dimm": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "eight_dimm": {
               "type": "array",
               "items": { "type": "string" }
             }

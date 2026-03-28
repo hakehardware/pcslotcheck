@@ -40,7 +40,7 @@ export interface MotherboardYAML {
     channels: number;
     slots: {
       id: string;
-      channel: "A" | "B";
+      channel: "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
       position: number;
       recommended: boolean;
     }[];

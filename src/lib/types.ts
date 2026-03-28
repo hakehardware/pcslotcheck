@@ -14,7 +14,7 @@ export interface SlotPosition {
 
 export interface MemorySlot {
   id: string;
-  channel: "A" | "B";
+  channel: "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
   position: number;
   recommended: boolean;
 }
