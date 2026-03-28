@@ -117,64 +117,64 @@ sata_ports:
 slot_positions:
   - slot_type: cpu
     slot_id: cpu_socket
-    x_pct: 28.0
-    y_pct: 15.0
-    width_pct: 16.0
-    height_pct: 16.0
+    x_pct: 30.0
+    y_pct: 14.0
+    width_pct: 16.4
+    height_pct: 16.4
 
   - slot_type: dimm
     slot_id: dimm_a1
-    x_pct: 63.0
-    y_pct: 5.0
+    x_pct: 55.0
+    y_pct: 8.0
     width_pct: 2.5
-    height_pct: 42.0
+    height_pct: 44.0
 
   - slot_type: dimm
     slot_id: dimm_a2
-    x_pct: 69.0
-    y_pct: 5.0
+    x_pct: 61.0
+    y_pct: 8.0
     width_pct: 2.5
-    height_pct: 42.0
+    height_pct: 44.0
 
   - slot_type: dimm
     slot_id: dimm_b1
-    x_pct: 66.0
-    y_pct: 5.0
+    x_pct: 58.0
+    y_pct: 8.0
     width_pct: 2.5
-    height_pct: 42.0
+    height_pct: 44.0
 
   - slot_type: dimm
     slot_id: dimm_b2
-    x_pct: 72.0
-    y_pct: 5.0
+    x_pct: 64.0
+    y_pct: 8.0
     width_pct: 2.5
-    height_pct: 42.0
+    height_pct: 44.0
 
   - slot_type: m2
     slot_id: m2_1
-    x_pct: 15.0
-    y_pct: 48.0
+    x_pct: 12.0
+    y_pct: 49.0
     width_pct: 32.8
     height_pct: 9.0
 
   - slot_type: m2
     slot_id: m2_2
-    x_pct: 10.0
-    y_pct: 68.0
-    width_pct: 32.8
-    height_pct: 9.0
+    x_pct: 33.0
+    y_pct: 66.0
+    width_pct: 9.0
+    height_pct: 32.8
 
   - slot_type: m2
     slot_id: m2_3
-    x_pct: 55.0
-    y_pct: 85.0
+    x_pct: 62.0
+    y_pct: 88.0
     width_pct: 32.8
     height_pct: 9.0
 
   - slot_type: pcie
     slot_id: pcie_1
-    x_pct: 3.0
-    y_pct: 58.0
+    x_pct: 4.0
+    y_pct: 56.0
     width_pct: 36.5
     height_pct: 3.5
 
