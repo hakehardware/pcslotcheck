@@ -259,7 +259,5 @@ slot_positions:
     height_pct: 12.0
 
 sources:
-  - type: manual
-    url: research/motherboards/gigabyte/trx50-aero-d/manual.pdf
   - type: spec_page
     url: https://www.gigabyte.com/Motherboard/TRX50-AERO-D-rev-10/sp#sp

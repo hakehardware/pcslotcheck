@@ -10,9 +10,8 @@ schema_version: "1.0"
 
 memory:
   type: DDR5
-  max_speed_mhz: None
   base_speed_mhz: 4800
-  max_capacity_gb: None
+  max_capacity_gb: 1024
   ecc_support: true
   channels: 4
   slots:
@@ -49,6 +48,10 @@ m2_slots:
     gen: 5
     lanes: 4
     form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
     source: CPU
     supports_sata: false
     heatsink_included: true
@@ -60,6 +63,10 @@ m2_slots:
     gen: 5
     lanes: 4
     form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
     source: CPU
     supports_sata: false
     heatsink_included: true
@@ -71,35 +78,19 @@ m2_slots:
     gen: 4
     lanes: 4
     form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
     source: Chipset
     supports_sata: false
     heatsink_included: true
     sharing: null
 
 pcie_slots:
-  - id: pciex16_g4_1
-    label: PCIEX16(G4)_1
-    position: None
-    gen: 4
-    electrical_lanes: 16
-    physical_size: x16
-    source: CPU
-    reinforced: false
-    sharing: null
-
-  - id: pciex16_g4_2
-    label: PCIEX16(G4)_2
-    position: None
-    gen: 4
-    electrical_lanes: 4
-    physical_size: x16
-    source: CPU
-    reinforced: false
-    sharing: null
-
   - id: pciex16_g5_1
     label: PCIEX16(G5)_1
-    position: None
+    position: 1
     gen: 5
     electrical_lanes: 16
     physical_size: x16
@@ -109,7 +100,7 @@ pcie_slots:
 
   - id: pciex16_g5_2
     label: PCIEX16(G5)_2
-    position: None
+    position: 2
     gen: 5
     electrical_lanes: 16
     physical_size: x16
@@ -119,12 +110,32 @@ pcie_slots:
 
   - id: pciex16_g5_3
     label: PCIEX16(G5)_3
-    position: None
+    position: 3
     gen: 5
     electrical_lanes: 8
     physical_size: x16
     source: CPU
     reinforced: true
+    sharing: null
+
+  - id: pciex16_g4_1
+    label: PCIEX16(G4)_1
+    position: 4
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: pciex16_g4_2
+    label: PCIEX16(G4)_2
+    position: 5
+    gen: 4
+    electrical_lanes: 4
+    physical_size: x16
+    source: CPU
+    reinforced: false
     sharing: null
 
 sata_ports:
@@ -248,12 +259,6 @@ slot_positions:
     height_pct: 10.0
 
 sources:
-  - type: manual
-    url: research/motherboards/asus/pro-ws-trx50-sage-wifi/manual.pdf
-  - type: manual
-    url: research/motherboards/asus/pro-ws-trx50-sage-wifi/manual.pdf
-  - type: manual
-    url: research/motherboards/asus/pro-ws-trx50-sage-wifi/manual.pdf
   - type: spec_page
     url: https://www.asus.com/us/motherboards-components/motherboards/workstation/pro-ws-trx50-sage-wifi/techspec/
   - type: spec_page

@@ -135,7 +135,6 @@ m2_slots:
     heatsink_included: true
     sharing:
       - type: disables
-        targets:
         direction: m2_to_pcie
         trigger:
           slot_ids:

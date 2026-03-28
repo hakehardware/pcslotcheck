@@ -316,7 +316,3 @@ slot_positions:
     y_pct: 60.0
     width_pct: 5.0
     height_pct: 10.0
-
-sources:
-  - type: manual
-    url: research/motherboards/gigabyte/wrx80-su8-ipmi/manual.pdf

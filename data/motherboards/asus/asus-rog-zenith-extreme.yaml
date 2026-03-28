@@ -48,6 +48,12 @@ memory:
       channel: D
       position: 2
       recommended: false
+  recommended_population:
+    four_dimm:
+      - dimm_a1
+      - dimm_b1
+      - dimm_c1
+      - dimm_d1
 
 m2_slots:
   - id: dimm2_1
@@ -56,6 +62,10 @@ m2_slots:
     gen: 3
     lanes: 4
     form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
     source: CPU
     supports_sata: true
     heatsink_included: true
@@ -67,6 +77,10 @@ m2_slots:
     gen: 3
     lanes: 4
     form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
     source: CPU
     supports_sata: true
     heatsink_included: true
@@ -78,6 +92,9 @@ m2_slots:
     gen: 3
     lanes: 4
     form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
     source: Chipset
     supports_sata: true
     heatsink_included: true
@@ -291,3 +308,7 @@ slot_positions:
     y_pct: 60.0
     width_pct: 5.0
     height_pct: 10.0
+
+sources:
+  - type: manufacturer
+    url: https://rog.asus.com/motherboards/rog-zenith/rog-zenith-extreme-model/spec/

@@ -10,7 +10,6 @@ schema_version: "1.0"
 
 memory:
   type: DDR5
-  max_speed_mhz: None
   base_speed_mhz: 4800
   max_capacity_gb: 2048
   ecc_support: true
@@ -112,8 +111,7 @@ m2_slots:
     supports_sata: false
     heatsink_included: true
     sharing:
-      - type: cpu_dependent
-        targets:
+      - type: disables
         direction: m2_to_pcie
         trigger:
           slot_ids:
@@ -312,7 +310,5 @@ slot_positions:
     height_pct: 10.0
 
 sources:
-  - type: manual
-    url: research/motherboards/gigabyte/trx50-ai-top/manual.pdf
   - type: spec_page
     url: https://www.gigabyte.com/Motherboard/TRX50-AI-TOP/sp#sp
