@@ -316,3 +316,7 @@ slot_positions:
     y_pct: 60.0
     width_pct: 5.0
     height_pct: 10.0
+
+sources:
+  - type: manufacturer
+    url: https://www.gigabyte.com/Enterprise/Server-Motherboard/WRX80-SU8-IPMI-rev-10/sp#sp

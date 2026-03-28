@@ -10,6 +10,7 @@ schema_version: "1.0"
 
 memory:
   type: DDR5
+  max_speed_mhz: 4800
   base_speed_mhz: 4800
   max_capacity_gb: 1024
   ecc_support: true
