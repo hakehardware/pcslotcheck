@@ -1,0 +1,358 @@
+id: asus-rog-zenith-ii-extreme
+manufacturer: ASUS
+model: ROG Zenith II Extreme
+chipset: AMD TRX40
+socket: sTRX4
+form_factor: E-ATX
+length_mm: 310
+width_mm: 277
+schema_version: "1.0"
+
+memory:
+  type: DDR4
+  max_speed_mhz: 4733
+  base_speed_mhz: 3200
+  max_capacity_gb: 256
+  ecc_support: true
+  channels: 4
+  slots:
+    - id: dimm_a1
+      channel: A
+      position: 1
+      recommended: true
+    - id: dimm_a2
+      channel: A
+      position: 2
+      recommended: false
+    - id: dimm_b1
+      channel: B
+      position: 1
+      recommended: true
+    - id: dimm_b2
+      channel: B
+      position: 2
+      recommended: false
+    - id: dimm_c1
+      channel: C
+      position: 1
+      recommended: true
+    - id: dimm_c2
+      channel: C
+      position: 2
+      recommended: false
+    - id: dimm_d1
+      channel: D
+      position: 1
+      recommended: true
+    - id: dimm_d2
+      channel: D
+      position: 2
+      recommended: false
+  recommended_population:
+    two_dimm:
+      - dimm_a1
+      - dimm_c1
+    four_dimm:
+      - dimm_a1
+      - dimm_b1
+      - dimm_c1
+      - dimm_d1
+    eight_dimm:
+      - dimm_a1
+      - dimm_a2
+      - dimm_b1
+      - dimm_b2
+      - dimm_c1
+      - dimm_c2
+      - dimm_d1
+      - dimm_d2
+
+m2_slots:
+  - id: dimm2_1
+    label: DIMM.2 Slot 1 (PCIe 4.0 x4/SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+  - id: dimm2_2
+    label: DIMM.2 Slot 2 (PCIe 4.0 x4/SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "22110"
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: true
+    heatsink_included: true
+    sharing: null
+
+  - id: m2_2
+    label: M.2_2 (PCIe 4.0 x4)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: bandwidth_split
+        target: pciex16_4
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_2
+          logic: any_populated
+        condition: M.2_2 operating in PCIe mode
+        effect: PCIEX16_4 runs at x4 mode
+
+  - id: m2_3
+    label: M.2_3 (PCIe 4.0 x4/x2)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2260"
+      - "2280"
+    source: CPU
+    supports_sata: false
+    heatsink_included: true
+    sharing:
+      - type: disables
+        targets:
+        direction: m2_to_pcie
+        trigger:
+          slot_ids:
+            - m2_3
+          logic: any_populated
+        condition: M.2_3 operating in PCIe x4 mode
+        effect: SATA6G_E1-E4 disabled
+
+pcie_slots:
+  - id: pciex16_1
+    label: PCIEX16_1 (Gen4 x16)
+    position: 1
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_2
+    label: PCIEX16_2 (Gen4 x16/x8)
+    position: 2
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_3
+    label: PCIEX16_3 (Gen4 x16)
+    position: 3
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: pciex16_4
+    label: PCIEX16_4 (Gen4 x16/x8/x4)
+    position: 4
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+sata_ports:
+  - id: sata6g_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_e1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_e2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_e3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata6g_e4
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+slot_positions:
+  - slot_type: cpu
+    slot_id: cpu_socket
+    x_pct: 28.0
+    y_pct: 18.0
+    width_pct: 14.0
+    height_pct: 16.0
+
+  - slot_type: dimm
+    slot_id: dimm_a1
+    x_pct: 62.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: dimm_a2
+    x_pct: 64.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: dimm_b1
+    x_pct: 66.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: dimm_b2
+    x_pct: 68.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: dimm_c1
+    x_pct: 70.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: dimm_c2
+    x_pct: 72.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: dimm_d1
+    x_pct: 74.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: dimm_d2
+    x_pct: 76.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: m2
+    slot_id: dimm2_1
+    x_pct: 82.0
+    y_pct: 10.0
+    width_pct: 4.0
+    height_pct: 18.0
+
+  - slot_type: m2
+    slot_id: dimm2_2
+    x_pct: 88.0
+    y_pct: 10.0
+    width_pct: 4.0
+    height_pct: 18.0
+
+  - slot_type: m2
+    slot_id: m2_2
+    x_pct: 15.0
+    y_pct: 55.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2_3
+    x_pct: 15.0
+    y_pct: 63.0
+    width_pct: 22.0
+    height_pct: 2.0
+
+  - slot_type: pcie
+    slot_id: pciex16_1
+    x_pct: 3.0
+    y_pct: 48.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pciex16_2
+    x_pct: 3.0
+    y_pct: 60.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pciex16_3
+    x_pct: 3.0
+    y_pct: 72.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: pciex16_4
+    x_pct: 3.0
+    y_pct: 84.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: sata_group
+    slot_id: sata_group_1
+    x_pct: 88.0
+    y_pct: 55.0
+    width_pct: 5.0
+    height_pct: 12.0
+
+sources:
+  - type: spec_page
+    url: https://rog.asus.com/motherboards/rog-zenith/rog-zenith-ii-extreme-model/spec/

@@ -1,0 +1,322 @@
+id: gigabyte-wrx80-su8-ipmi
+manufacturer: Gigabyte
+model: WRX80-SU8-IPMI
+chipset: AMD WRX80
+socket: sWRX8
+form_factor: CEB
+length_mm: 305
+width_mm: 267
+schema_version: "1.0"
+
+memory:
+  type: DDR4
+  max_speed_mhz: 3200
+  base_speed_mhz: 3200
+  max_capacity_gb: 1024
+  ecc_support: true
+  channels: 8
+  slots:
+    - id: p1_dimm_a1
+      channel: A
+      position: 1
+      recommended: true
+    - id: p1_dimm_b1
+      channel: B
+      position: 1
+      recommended: true
+    - id: p1_dimm_c1
+      channel: C
+      position: 1
+      recommended: true
+    - id: p1_dimm_d1
+      channel: D
+      position: 1
+      recommended: true
+    - id: p1_dimm_e1
+      channel: E
+      position: 1
+      recommended: true
+    - id: p1_dimm_f1
+      channel: F
+      position: 1
+      recommended: true
+    - id: p1_dimm_g1
+      channel: G
+      position: 1
+      recommended: true
+    - id: p1_dimm_h1
+      channel: H
+      position: 1
+      recommended: true
+  recommended_population:
+    four_dimm:
+      - p1_dimm_a1
+      - p1_dimm_c1
+      - p1_dimm_e1
+      - p1_dimm_g1
+    eight_dimm:
+      - p1_dimm_a1
+      - p1_dimm_b1
+      - p1_dimm_c1
+      - p1_dimm_d1
+      - p1_dimm_e1
+      - p1_dimm_f1
+      - p1_dimm_g1
+      - p1_dimm_h1
+
+m2_slots:
+  - id: m2_1
+    label: M.2_1 (PCIe 4.0 x4 / SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2280"
+    source: CPU
+    supports_sata: true
+    heatsink_included: false
+    sharing: null
+
+  - id: m2_2
+    label: M.2_2 (PCIe 4.0 x4 / SATA)
+    interface: PCIe
+    gen: 4
+    lanes: 4
+    form_factors:
+      - "2242"
+      - "2280"
+    source: CPU
+    supports_sata: true
+    heatsink_included: false
+    sharing: null
+
+pcie_slots:
+  - id: slot1
+    label: Slot1 (Gen4 x16)
+    position: 1
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: slot2
+    label: Slot2 (Gen4 x8)
+    position: 2
+    gen: 4
+    electrical_lanes: 8
+    physical_size: x16
+    source: CPU
+    reinforced: false
+    sharing: null
+
+  - id: slot3
+    label: Slot3 (Gen4 x16)
+    position: 3
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: slot4
+    label: Slot4 (Gen4 x16)
+    position: 4
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: slot5
+    label: Slot5 (Gen4 x16)
+    position: 5
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: slot6
+    label: Slot6 (Gen4 x16)
+    position: 6
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+  - id: slot7
+    label: Slot7 (Gen4 x16)
+    position: 7
+    gen: 4
+    electrical_lanes: 16
+    physical_size: x16
+    source: CPU
+    reinforced: true
+    sharing: null
+
+sata_ports:
+  - id: sata_0
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_1
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_2
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+  - id: sata_3
+    version: "3.0"
+    source: Chipset
+    disabled_by: null
+
+slot_positions:
+  - slot_type: cpu
+    slot_id: cpu_socket
+    x_pct: 35.0
+    y_pct: 18.0
+    width_pct: 14.0
+    height_pct: 16.0
+
+  - slot_type: dimm
+    slot_id: p1_dimm_a1
+    x_pct: 10.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: p1_dimm_b1
+    x_pct: 12.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: p1_dimm_c1
+    x_pct: 15.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: p1_dimm_d1
+    x_pct: 17.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: p1_dimm_e1
+    x_pct: 60.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: p1_dimm_f1
+    x_pct: 62.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: p1_dimm_g1
+    x_pct: 65.0
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: dimm
+    slot_id: p1_dimm_h1
+    x_pct: 67.5
+    y_pct: 8.0
+    width_pct: 1.8
+    height_pct: 38.0
+
+  - slot_type: m2
+    slot_id: m2_1
+    x_pct: 25.0
+    y_pct: 42.0
+    width_pct: 26.0
+    height_pct: 2.0
+
+  - slot_type: m2
+    slot_id: m2_2
+    x_pct: 25.0
+    y_pct: 50.0
+    width_pct: 26.0
+    height_pct: 2.0
+
+  - slot_type: pcie
+    slot_id: slot1
+    x_pct: 3.0
+    y_pct: 48.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: slot2
+    x_pct: 3.0
+    y_pct: 54.0
+    width_pct: 42.0
+    height_pct: 2.0
+
+  - slot_type: pcie
+    slot_id: slot3
+    x_pct: 3.0
+    y_pct: 60.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: slot4
+    x_pct: 3.0
+    y_pct: 66.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: slot5
+    x_pct: 3.0
+    y_pct: 72.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: slot6
+    x_pct: 3.0
+    y_pct: 78.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: pcie
+    slot_id: slot7
+    x_pct: 3.0
+    y_pct: 84.0
+    width_pct: 58.0
+    height_pct: 2.5
+
+  - slot_type: sata_group
+    slot_id: sata_group_1
+    x_pct: 88.0
+    y_pct: 60.0
+    width_pct: 5.0
+    height_pct: 10.0
+
+sources:
+  - type: manual
+    url: research/motherboards/gigabyte/wrx80-su8-ipmi/manual.pdf
