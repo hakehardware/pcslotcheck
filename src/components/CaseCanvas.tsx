@@ -23,13 +23,19 @@ interface CaseCanvasProps {
   sataDriveConflictMessages: Record<string, string>;
 }
 
-/** Height reserved for the drive bay area at the bottom of the canvas. */
-const DRIVE_BAY_HEIGHT_PX = 80;
+/** Width reserved for the drive bay area on the right side of the canvas. */
+const DRIVE_BAY_WIDTH_PX = 110;
 
 /**
  * Fixed-pixel case interior frame that hosts the motherboard at physical
- * scale, PCIe bracket slots along the rear edge, and a drive bay area
- * at the front (bottom) edge.
+ * scale, PCIe bracket slots along the rear (left) edge, and a drive bay
+ * area at the front (right) edge.
+ *
+ * Orientation (case laid flat, facing user):
+ *   Left  = rear (I/O panel, PCIe bracket openings)
+ *   Right = front (drive bays, front panel connectors)
+ *   Top   = top of case
+ *   Bottom = bottom of case
  */
 export default function CaseCanvas({
   mode,
@@ -72,16 +78,22 @@ export default function CaseCanvas({
       className="relative border border-zinc-600 bg-zinc-950"
       style={{ width: CANVAS_PX.width, height: CANVAS_PX.height }}
     >
-      {/* Orientation label: I/O Panel (rear / top edge) */}
-      <div className="absolute inset-x-0 top-0 flex h-[28px] items-center justify-center">
-        <span className="text-[0.65rem] tracking-widest text-zinc-500 uppercase">
+      {/* Orientation label: I/O Panel (rear / left edge) */}
+      <div className="absolute left-0 inset-y-0 flex w-[36px] items-center justify-center">
+        <span
+          className="text-[0.65rem] tracking-widest text-zinc-500 uppercase"
+          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+        >
           I/O Panel
         </span>
       </div>
 
-      {/* Orientation label: Front Panel (front / bottom edge) */}
-      <div className="absolute inset-x-0 bottom-0 flex h-[28px] items-center justify-center">
-        <span className="text-[0.65rem] tracking-widest text-zinc-500 uppercase">
+      {/* Orientation label: Front Panel (front / right edge) */}
+      <div className="absolute right-0 inset-y-0 flex w-[36px] items-center justify-center">
+        <span
+          className="text-[0.65rem] tracking-widest text-zinc-500 uppercase"
+          style={{ writingMode: "vertical-rl" }}
+        >
           Front Panel
         </span>
       </div>
@@ -109,24 +121,26 @@ export default function CaseCanvas({
         />
       </div>
 
-      {/* PCIe bracket slots along the rear (top) edge */}
+      {/* PCIe bracket slots along the rear (left) edge */}
       <PCIeBracketSlots
         bracketCount={bracketCount}
+        boardOffsetX={boardOffsetX}
         boardOffsetY={boardOffsetY}
         pixelsPerMm={pixelsPerMm}
         pcieSlotPositions={pcieSlotPositions}
+        boardWidthPx={boardWidthPx}
         boardHeightPx={boardHeightPx}
         gpuPlacements={gpuPlacements}
       />
 
-      {/* Drive bay area at the front (bottom) of the case */}
+      {/* Drive bay area at the front (right) of the case */}
       <div
         data-testid="drive-bay-region"
-        className="absolute inset-x-0"
+        className="absolute inset-y-0"
         style={{
-          bottom: 28,
-          height: DRIVE_BAY_HEIGHT_PX,
-          padding: "0 8px",
+          right: 36,
+          width: DRIVE_BAY_WIDTH_PX,
+          padding: "8px 0",
         }}
       >
         <DriveBayArea

@@ -93,7 +93,7 @@ export default function DriveBayArea({
   return (
     <div
       data-testid="drive-bay-area"
-      className="flex h-full flex-wrap items-start gap-1.5 rounded bg-zinc-900/60 p-2"
+      className="flex h-full flex-col items-stretch gap-1.5 overflow-y-auto rounded bg-zinc-900/60 p-2"
     >
       {sataPorts.map((port) => {
         const assignmentId = assignments[port.id];
