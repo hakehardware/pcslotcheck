@@ -10,13 +10,16 @@ interface LayoutSidebarProps {
   onKeyboardSelect: (componentId: string) => void;
 }
 
-const COMPONENT_GROUPS = ["gpu", "nvme", "ram", "cpu"] as const;
+const COMPONENT_GROUPS = ["gpu", "nvme", "ram", "cpu", "sata_ssd", "sata_hdd", "sata_drive"] as const;
 
 const GROUP_LABELS: Record<string, string> = {
   gpu: "GPU",
   nvme: "NVMe",
   ram: "RAM",
   cpu: "CPU",
+  sata_ssd: "SATA SSD",
+  sata_hdd: "SATA HDD",
+  sata_drive: "SATA Drive",
 };
 
 function filterComponents(
@@ -28,6 +31,9 @@ function filterComponents(
     nvme: [],
     ram: [],
     cpu: [],
+    sata_ssd: [],
+    sata_hdd: [],
+    sata_drive: [],
   };
 
   for (const component of components) {
@@ -47,6 +53,12 @@ function filterComponents(
       if (socket && socket === motherboard.socket) {
         grouped.cpu.push(component);
       }
+    } else if (type === "sata_ssd") {
+      grouped.sata_ssd.push(component);
+    } else if (type === "sata_hdd") {
+      grouped.sata_hdd.push(component);
+    } else if (type === "sata_drive") {
+      grouped.sata_drive.push(component);
     }
   }
 

@@ -31,10 +31,14 @@ export default function BoardView({
     // Removal handled by BoardLayout via state lifting.
   }, []);
 
+  // Filter out sata_group entries -- SATA drives are rendered in the DriveBayArea instead
+  const filteredSlotPositions = slotPositions.filter(
+    (sp) => sp.slot_type !== "sata_group",
+  );
+
   return (
     <div
-      className="relative w-full overflow-visible rounded border border-zinc-600 bg-zinc-800"
-      style={{ aspectRatio: `${boardWidthMm} / ${boardHeightMm}` }}
+      className="relative h-full w-full overflow-visible rounded border border-zinc-600 bg-zinc-800"
       role="img"
       aria-label={`${motherboard.manufacturer} ${motherboard.model} board layout`}
     >
@@ -46,7 +50,7 @@ export default function BoardView({
       </div>
 
       {/* Slot overlays */}
-      {slotPositions.map((sp) => (
+      {filteredSlotPositions.map((sp) => (
         <SlotOverlay
           key={sp.slot_id}
           position={sp}
@@ -58,7 +62,7 @@ export default function BoardView({
       ))}
 
       {/* Component overlays for placed components */}
-      {slotPositions.map((sp) => {
+      {filteredSlotPositions.map((sp) => {
         const componentId = assignments[sp.slot_id];
         if (!componentId) return null;
         const component = loadedComponents[componentId];

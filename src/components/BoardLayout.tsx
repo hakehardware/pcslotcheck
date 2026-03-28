@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
 import Link from "next/link";
 import BoardSelector from "./BoardSelector";
-import BoardView from "./BoardView";
+import CaseCanvas from "./CaseCanvas";
 import LayoutSidebar from "./LayoutSidebar";
 import {
   fetchMotherboardFromSupabase,
@@ -21,10 +21,13 @@ import { resolveSharingRules } from "@/lib/ui-helpers";
 import type { DataManifest, Motherboard, Component, ComponentSummary } from "@/lib/types";
 
 const DRAG_OVERLAY_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  gpu:  { bg: "bg-blue-500/20",    border: "border-blue-400/60",    text: "text-blue-300" },
-  nvme: { bg: "bg-purple-500/20",  border: "border-purple-400/60",  text: "text-purple-300" },
-  ram:  { bg: "bg-emerald-500/20", border: "border-emerald-400/60", text: "text-emerald-300" },
-  cpu:  { bg: "bg-cyan-500/20",    border: "border-cyan-400/60",    text: "text-cyan-300" },
+  gpu:        { bg: "bg-blue-500/20",    border: "border-blue-400/60",    text: "text-blue-300" },
+  nvme:       { bg: "bg-purple-500/20",  border: "border-purple-400/60",  text: "text-purple-300" },
+  ram:        { bg: "bg-emerald-500/20", border: "border-emerald-400/60", text: "text-emerald-300" },
+  cpu:        { bg: "bg-cyan-500/20",    border: "border-cyan-400/60",    text: "text-cyan-300" },
+  sata_ssd:   { bg: "bg-orange-500/20",  border: "border-orange-400/60",  text: "text-orange-300" },
+  sata_hdd:   { bg: "bg-orange-500/20",  border: "border-orange-400/60",  text: "text-orange-300" },
+  sata_drive: { bg: "bg-orange-500/20",  border: "border-orange-400/60",  text: "text-orange-300" },
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -32,6 +35,9 @@ const TYPE_LABELS: Record<string, string> = {
   nvme: "NVMe",
   ram: "RAM",
   cpu: "CPU",
+  sata_ssd: "SATA SSD",
+  sata_hdd: "SATA HDD",
+  sata_drive: "SATA Drive",
 };
 
 function findComponentInManifest(
@@ -57,6 +63,8 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(
     boardId ?? null
   );
+  const [sataDriveAssignments, setSataDriveAssignments] = useState<Record<string, string>>({});
+  const [sataDriveComponents, setSataDriveComponents] = useState<Record<string, Component>>({});
 
   // Fetch motherboard data when selectedBoardId changes
   useEffect(() => {
@@ -65,6 +73,8 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
       setAssignments({});
       setLoadedComponents({});
       setConflicts([]);
+      setSataDriveAssignments({});
+      setSataDriveComponents({});
       return;
     }
 
@@ -78,6 +88,8 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
         setAssignments({});
         setLoadedComponents({});
         setConflicts([]);
+        setSataDriveAssignments({});
+        setSataDriveComponents({});
         setLoading(false);
       }
     }
@@ -123,11 +135,14 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
   }
 
   // Merge sharing rule results into visual states
+  let disabledSlots = new Set<string>();
   if (motherboard) {
-    const { disabledSlots, bandwidthWarnings } = resolveSharingRules(
+    const sharingResult = resolveSharingRules(
       motherboard,
       assignments
     );
+    disabledSlots = sharingResult.disabledSlots;
+    const { bandwidthWarnings } = sharingResult;
 
     for (const slotId of disabledSlots) {
       const sharingState = sharingRuleToVisualState("disables");
@@ -147,6 +162,20 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
       ) {
         visualStates[slotId] = sharingState;
         conflictMessages[slotId] = effect;
+      }
+    }
+  }
+
+  // Compute SATA drive bay visual states from sharing rules
+  const sataDriveVisualStates: Record<string, VisualState> = {};
+  const sataDriveConflictMessages: Record<string, string> = {};
+  if (motherboard) {
+    for (const port of motherboard.sata_ports) {
+      if (disabledSlots.has(port.id)) {
+        sataDriveVisualStates[port.id] = "blocked";
+        sataDriveConflictMessages[port.id] = "Disabled by sharing rule";
+      } else if (sataDriveAssignments[port.id]) {
+        sataDriveVisualStates[port.id] = "populated";
       }
     }
   }
@@ -190,6 +219,29 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
 
       if (!componentType) return;
 
+      const sataTypes = ["sata_ssd", "sata_hdd", "sata_drive"];
+
+      // Check if this is a drive bay drop (SATA port ID)
+      const isSataPort = motherboard?.sata_ports.some(p => p.id === slotId);
+      if (isSataPort) {
+        // Only accept SATA component types
+        if (!sataTypes.includes(componentType)) return;
+        // Reject if port is blocked by sharing rule
+        if (sataDriveVisualStates[slotId] === "blocked") return;
+        // Update SATA drive assignments
+        setSataDriveAssignments(prev => ({ ...prev, [slotId]: componentId }));
+        // Fetch component if not loaded
+        if (!sataDriveComponents[componentId]) {
+          fetchComponentFromSupabase(componentId, componentType).then(comp => {
+            if (comp) setSataDriveComponents(prev => ({ ...prev, [componentId]: comp }));
+          });
+        }
+        return;
+      }
+
+      // Reject SATA types on board slots
+      if (sataTypes.includes(componentType)) return;
+
       // Validate compatibility: check if the component type can go in this slot
       const compatibleTypes = getCompatibleSlotTypes(
         componentType as Component["type"]
@@ -221,7 +273,7 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
         );
       }
     },
-    [motherboard, loadedComponents]
+    [motherboard, loadedComponents, sataDriveVisualStates, sataDriveComponents]
   );
 
   // Loading state
@@ -313,17 +365,33 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
         </div>
 
         <div className="flex gap-6">
-          <div className="flex-1">
-            <BoardView
+          <div className="hidden md:block flex-1">
+            <CaseCanvas
+              mode="display"
               motherboard={motherboard}
+              boardWidthMm={dims.widthMm}
+              boardHeightMm={dims.heightMm}
               slotPositions={motherboard.slot_positions}
               assignments={assignments}
               loadedComponents={loadedComponents}
               visualStates={visualStates}
               conflictMessages={conflictMessages}
-              boardWidthMm={dims.widthMm}
-              boardHeightMm={dims.heightMm}
+              sataDriveAssignments={sataDriveAssignments}
+              sataDriveComponents={sataDriveComponents}
+              sataDriveVisualStates={sataDriveVisualStates}
+              sataDriveConflictMessages={sataDriveConflictMessages}
             />
+          </div>
+          <div className="block md:hidden flex-1 py-8 text-center">
+            <p className="text-sm text-zinc-400">
+              The interactive board layout is available on desktop.
+            </p>
+            <Link
+              href={`/check?board=${motherboard.id}`}
+              className="mt-2 inline-block text-sm text-blue-400 underline hover:text-blue-300"
+            >
+              Use Slot Checker on mobile
+            </Link>
           </div>
           <div className="w-72 shrink-0">
             <LayoutSidebar
