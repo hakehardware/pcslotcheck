@@ -96,6 +96,8 @@ export default function SlotOverlay({
         top: `${position.y_pct}%`,
         width: `${position.width_pct}%`,
         height: `${position.height_pct}%`,
+        minWidth: "2rem",
+        minHeight: "1.25rem",
       }}
     >
       <span className="pointer-events-none select-none text-[0.45rem] leading-tight text-zinc-300 sm:text-[0.55rem]">

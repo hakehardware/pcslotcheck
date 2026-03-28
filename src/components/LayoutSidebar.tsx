@@ -38,7 +38,7 @@ function filterComponents(
     } else if (type === "nvme") {
       grouped.nvme.push(component);
     } else if (type === "ram") {
-      const interfaceType = component.specs.interface_type as string | undefined;
+      const interfaceType = (component.specs["interface.type"] ?? component.specs.interface_type) as string | undefined;
       if (interfaceType && interfaceType === motherboard.memory.type) {
         grouped.ram.push(component);
       }

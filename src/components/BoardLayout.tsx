@@ -180,7 +180,8 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
     (event: any) => {
       if (event.canceled) return;
 
-      const { source, target } = event.operation;
+      const source = event.operation?.source ?? event.source;
+      const target = event.operation?.target ?? event.target;
       if (!source || !target) return;
 
       const componentId = String(source.id);
