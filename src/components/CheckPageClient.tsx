@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import SlotChecker from "./SlotChecker";
+import DataDisclaimer from "./DataDisclaimer";
 import { fetchMotherboardSummaryById } from "@/lib/supabase-queries";
 import type { DataManifest, MotherboardSummary } from "@/lib/types";
 
@@ -114,6 +115,8 @@ export default function CheckPageClient({
           Slot Checker
         </h1>
       )}
+
+      {boardId && <DataDisclaimer />}
 
       <SlotChecker manifest={manifest} boardId={boardId} />
     </>
