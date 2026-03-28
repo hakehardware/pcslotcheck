@@ -339,7 +339,5 @@ slot_positions:
     height_pct: 12.0
 
 sources:
-  - type: manual
-    url: research/motherboards/asrock/wrx80-creator/manual.pdf
   - type: spec_page
     url: https://www.asrock.com/mb/AMD/WRX80%20Creator/index.asp

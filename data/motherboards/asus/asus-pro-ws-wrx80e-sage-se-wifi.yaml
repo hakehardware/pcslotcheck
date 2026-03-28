@@ -95,7 +95,6 @@ m2_slots:
     heatsink_included: true
     sharing:
       - type: disables
-        targets:
         direction: m2_to_pcie
         trigger:
           slot_ids:
@@ -119,7 +118,6 @@ m2_slots:
     heatsink_included: true
     sharing:
       - type: disables
-        targets:
         direction: m2_to_pcie
         trigger:
           slot_ids:
@@ -382,7 +380,5 @@ slot_positions:
     height_pct: 10.0
 
 sources:
-  - type: manual
-    url: research/motherboards/asus/pro-ws-wrx80e-sage-se-wifi/manual.pdf
   - type: spec_page
     url: https://www.asus.com/us/motherboards-components/motherboards/workstation/pro-ws-wrx80e-sage-se-wifi/techspec/

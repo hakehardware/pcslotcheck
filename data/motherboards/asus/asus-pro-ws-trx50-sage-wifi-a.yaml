@@ -83,7 +83,6 @@ m2_slots:
     heatsink_included: true
     sharing:
       - type: disables
-        targets:
         direction: m2_to_pcie
         trigger:
           slot_ids:
@@ -105,8 +104,7 @@ m2_slots:
     supports_sata: false
     heatsink_included: true
     sharing:
-      - type: cpu_dependent
-        targets:
+      - type: disables
         direction: m2_to_pcie
         trigger:
           slot_ids:

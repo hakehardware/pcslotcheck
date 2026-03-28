@@ -344,7 +344,5 @@ slot_positions:
     height_pct: 10.0
 
 sources:
-  - type: manual
-    url: research/motherboards/supermicro/m12swa-tf/manual.pdf
   - type: spec_page
     url: https://www.supermicro.com/en/products/motherboard/M12SWA-TF
