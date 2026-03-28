@@ -152,8 +152,8 @@ slot_positions:
 
   - slot_type: m2
     slot_id: m2_1
-    x_pct: 10.0
-    y_pct: 43.0
+    x_pct: 15.0
+    y_pct: 48.0
     width_pct: 32.8
     height_pct: 9.0
 
