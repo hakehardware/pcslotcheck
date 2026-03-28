@@ -6,7 +6,7 @@ socket: LGA 1851
 form_factor: ATX
 length_mm: 305
 width_mm: 244
-schema_version: "1.0"
+schema_version: "2.0"
 
 memory:
   type: DDR5
