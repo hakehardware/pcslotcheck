@@ -1,3 +1,15 @@
+// === Slot Position Types ===
+
+/** Percentage-based slot position on the board */
+export interface SlotPosition {
+  slot_type: "cpu" | "dimm" | "pcie" | "m2" | "sata_group";
+  slot_id: string;
+  x_pct: number;   // 0-100, left edge
+  y_pct: number;   // 0-100, top edge
+  width_pct: number;  // 0-100
+  height_pct: number; // 0-100
+}
+
 // === Motherboard Types ===
 
 export interface MemorySlot {
@@ -99,6 +111,9 @@ export interface Motherboard {
   sata_ports: SATAPort[];
   sources: { type: string; url: string }[];
   schema_version: string;
+  length_mm?: number;
+  width_mm?: number;
+  slot_positions?: SlotPosition[];
 }
 
 // === Component Types ===

@@ -85,7 +85,7 @@ export function assembleMotherboard(row: MotherboardRow, slotRows: SlotRow[]): M
       disabled_by: s.disabled_by,
     }));
 
-  return {
+  const motherboard: Motherboard = {
     id: row.id,
     manufacturer: row.manufacturer,
     model: row.model,
@@ -110,6 +110,18 @@ export function assembleMotherboard(row: MotherboardRow, slotRows: SlotRow[]): M
     sources: row.sources,
     schema_version: row.schema_version,
   };
+
+  if (row.length_mm !== null) {
+    motherboard.length_mm = row.length_mm;
+  }
+  if (row.width_mm !== null) {
+    motherboard.width_mm = row.width_mm;
+  }
+  if (row.slot_positions !== null) {
+    motherboard.slot_positions = row.slot_positions;
+  }
+
+  return motherboard;
 }
 
 

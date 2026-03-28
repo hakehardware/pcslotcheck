@@ -1,4 +1,4 @@
-import { FiCpu, FiMonitor, FiHardDrive, FiServer, FiDisc } from "react-icons/fi";
+import { FiCpu, FiGrid, FiHardDrive, FiServer, FiDisc } from "react-icons/fi";
 import type { IconType } from "react-icons";
 
 export interface ComponentTypeMeta {
@@ -8,7 +8,7 @@ export interface ComponentTypeMeta {
 
 export const COMPONENT_TYPE_META: Record<string, ComponentTypeMeta> = {
   cpu:        { label: "CPU",        icon: FiCpu },
-  gpu:        { label: "GPU",        icon: FiMonitor },
+  gpu:        { label: "GPU",        icon: FiGrid },
   nvme:       { label: "NVMe",       icon: FiHardDrive },
   ram:        { label: "RAM",        icon: FiServer },
   sata_ssd:   { label: "SATA SSD",   icon: FiDisc },
@@ -48,6 +48,8 @@ export const COMPONENT_SPEC_COLUMNS: Record<string, { key: string; label: string
     { key: "form_factor", label: "Form Factor" },
     { key: "drive_type", label: "Drive Type" },
   ],
+  // Legacy DB type — sync pipeline normalizes sata_ssd/sata_hdd to sata_drive
+  // in Supabase. Kept here so rowToComponentSummary output aligns with spec columns.
   sata_drive: [
     { key: "form_factor", label: "Form Factor" },
     { key: "capacity_gb", label: "Capacity (GB)" },

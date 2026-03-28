@@ -70,6 +70,23 @@
     },
     "schema_version": {
       "type": "string"
+    },
+    "length_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Board physical length in mm (horizontal dimension)"
+    },
+    "width_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Board physical width in mm (vertical dimension)"
+    },
+    "slot_positions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SlotPosition"
+      },
+      "description": "Percentage-based slot positions for the interactive board layout view"
     }
   },
   "definitions": {
@@ -346,6 +363,41 @@
       "properties": {
         "type": { "type": "string" },
         "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "SlotPosition": {
+      "type": "object",
+      "required": ["slot_type", "slot_id", "x_pct", "y_pct", "width_pct", "height_pct"],
+      "additionalProperties": false,
+      "properties": {
+        "slot_type": {
+          "type": "string",
+          "enum": ["cpu", "dimm", "pcie", "m2", "sata_group"]
+        },
+        "slot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "x_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "y_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "width_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "height_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
       }
     }
   }

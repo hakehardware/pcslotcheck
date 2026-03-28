@@ -17,7 +17,7 @@ import * as yaml from "js-yaml";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { createClient } from "@supabase/supabase-js";
-import type { SharingRule } from "../src/lib/types";
+import type { SharingRule, SlotPosition } from "../src/lib/types";
 
 // ─── YAML Input Types ────────────────────────────────────────────────
 
@@ -91,6 +91,9 @@ export interface MotherboardYAML {
   sources: { type: string; url: string }[];
   contributed_by?: string;
   last_verified?: string;
+  length_mm?: number;
+  width_mm?: number;
+  slot_positions?: SlotPosition[];
 }
 
 /** Shape of a component YAML file after parsing. */
@@ -164,6 +167,9 @@ export function transformMotherboard(yaml: MotherboardYAML): MotherboardRow {
     sources: yaml.sources,
     contributed_by: yaml.contributed_by ?? null,
     last_verified: yaml.last_verified ?? null,
+    length_mm: yaml.length_mm ?? null,
+    width_mm: yaml.width_mm ?? null,
+    slot_positions: yaml.slot_positions ?? null,
     schema_version: yaml.schema_version,
     updated_at: new Date().toISOString(),
   };

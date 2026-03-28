@@ -85,12 +85,21 @@ export default function CheckPageClient({
           <h1 className="text-3xl font-bold tracking-tight text-zinc-50">
             {boardSummary.manufacturer} {boardSummary.model}
           </h1>
-          <Link
-            href="/search"
-            className="mt-2 inline-block text-sm text-zinc-400 transition-colors hover:text-zinc-50"
-          >
-            Change Motherboard
-          </Link>
+          <div className="mt-2 flex items-center gap-3">
+            <Link
+              href="/search"
+              className="text-sm text-zinc-400 transition-colors hover:text-zinc-50"
+            >
+              Change Motherboard
+            </Link>
+            <span className="text-zinc-600" aria-hidden="true">|</span>
+            <Link
+              href={`/layout?board=${boardId}`}
+              className="text-sm text-zinc-400 transition-colors hover:text-zinc-50"
+            >
+              View Board Layout
+            </Link>
+          </div>
         </div>
       )}
 

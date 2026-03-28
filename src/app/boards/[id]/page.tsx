@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import Link from "next/link";
-import { FiArrowLeft, FiExternalLink } from "react-icons/fi";
+import { FiArrowLeft } from "react-icons/fi";
 import type { Motherboard } from "@/lib/types";
 
 function dash(value: unknown): string {
@@ -53,10 +53,9 @@ export default async function BoardDetailPage({
         </Link>
         <Link
           href={`/check?board=${board.id}`}
-          className="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-zinc-50"
+          className="inline-flex items-center gap-2 rounded-md bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-50 transition-colors hover:bg-zinc-700"
         >
-          <FiExternalLink className="h-4 w-4" />
-          Open in Slot Checker
+          Check Slots
         </Link>
       </div>
 

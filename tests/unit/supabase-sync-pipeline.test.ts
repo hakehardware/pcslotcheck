@@ -157,6 +157,9 @@ describe("transformMotherboard", () => {
       "sources",
       "contributed_by",
       "last_verified",
+      "length_mm",
+      "width_mm",
+      "slot_positions",
       "schema_version",
       "updated_at",
     ];

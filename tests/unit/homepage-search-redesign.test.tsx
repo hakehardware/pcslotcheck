@@ -142,13 +142,13 @@ describe("Browse page", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 3. Nav header contains "Home", "Browse", "Support" links and no
+// 3. Nav header contains "Home", "Boards", "Support" links and no
 //    "Slot Checker" link
 // Requirements: 4.1, 4.2
 // ---------------------------------------------------------------------------
 
 describe("Nav header links", () => {
-  it('contains "Home", "Browse", and "Support" links', () => {
+  it('contains "Home", "Boards", and "Support" links', () => {
     render(
       <RootLayout>
         <div />
@@ -156,7 +156,7 @@ describe("Nav header links", () => {
     );
     const nav = screen.getByRole("navigation");
     expect(within(nav).getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
-    expect(within(nav).getByRole("link", { name: "Browse" })).toHaveAttribute("href", "/boards");
+    expect(within(nav).getByRole("link", { name: "Boards" })).toHaveAttribute("href", "/boards");
     expect(within(nav).getByRole("link", { name: "Support" })).toHaveAttribute("href", "/support");
   });
 
@@ -309,7 +309,7 @@ describe("Nav header on check page", () => {
 
     const nav = screen.getByRole("navigation");
     expect(within(nav).getByRole("link", { name: "Home" })).toBeInTheDocument();
-    expect(within(nav).getByRole("link", { name: "Browse" })).toBeInTheDocument();
+    expect(within(nav).getByRole("link", { name: "Boards" })).toBeInTheDocument();
     expect(within(nav).getByRole("link", { name: "Support" })).toBeInTheDocument();
   });
 });

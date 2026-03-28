@@ -31,7 +31,7 @@ import NavBar from "../../src/components/NavBar";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/boards", label: "Browse" },
+  { href: "/boards", label: "Boards" },
   { href: "/components", label: "Components" },
   { href: "/support", label: "Support" },
 ] as const;

@@ -15,7 +15,7 @@ export const SLOT_CATEGORY_ICON_TYPE: Record<SlotCategory, string> = {
   m2: "nvme",
   pcie: "gpu",
   memory: "ram",
-  sata: "sata_drive",
+  sata: "sata_ssd",
 };
 
 interface ComponentPickerProps {

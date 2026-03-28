@@ -149,7 +149,7 @@ describe("Navigation bar", () => {
     expect(supportLink).toHaveAttribute("href", "/support");
   });
 
-  it('displays "Home", "Browse", and "Support" links', () => {
+  it('displays "Home", "Boards", and "Support" links', () => {
     render(
       <RootLayout>
         <div />
@@ -158,7 +158,7 @@ describe("Navigation bar", () => {
     const nav = screen.getByRole("navigation");
     expect(within(nav).getByRole("link", { name: "Home" })).toBeInTheDocument();
     expect(
-      within(nav).getByRole("link", { name: "Browse" })
+      within(nav).getByRole("link", { name: "Boards" })
     ).toBeInTheDocument();
     expect(
       within(nav).getByRole("link", { name: "Support" })

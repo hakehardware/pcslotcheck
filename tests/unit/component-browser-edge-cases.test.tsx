@@ -39,7 +39,7 @@ vi.mock("react-icons/fi", () => ({
   FiChevronUp: () => <span data-testid="icon-chevron-up" />,
   FiChevronDown: () => <span data-testid="icon-chevron-down" />,
   FiCpu: () => <span data-testid="icon-cpu" />,
-  FiMonitor: () => <span data-testid="icon-monitor" />,
+  FiGrid: () => <span data-testid="icon-grid" />,
   FiHardDrive: () => <span data-testid="icon-hard-drive" />,
   FiServer: () => <span data-testid="icon-server" />,
   FiDisc: () => <span data-testid="icon-disc" />,

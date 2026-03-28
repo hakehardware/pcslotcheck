@@ -1,0 +1,81 @@
+"use client";
+
+import { useCallback } from "react";
+import type { Motherboard, SlotPosition, Component } from "@/lib/types";
+import type { VisualState } from "@/lib/physical-conflict-engine";
+import SlotOverlay from "./SlotOverlay";
+import ComponentOverlay from "./ComponentOverlay";
+
+interface BoardViewProps {
+  motherboard: Motherboard;
+  slotPositions: SlotPosition[];
+  assignments: Record<string, string>;
+  loadedComponents: Record<string, Component>;
+  visualStates: Record<string, VisualState>;
+  conflictMessages: Record<string, string>;
+  boardWidthMm: number;
+  boardHeightMm: number;
+}
+
+export default function BoardView({
+  motherboard,
+  slotPositions,
+  assignments,
+  loadedComponents,
+  visualStates,
+  conflictMessages,
+  boardWidthMm,
+  boardHeightMm,
+}: BoardViewProps) {
+  const handleRemove = useCallback((_slotId: string) => {
+    // Removal handled by BoardLayout via state lifting.
+  }, []);
+
+  return (
+    <div
+      className="relative w-full overflow-visible rounded border border-zinc-600 bg-zinc-800"
+      style={{ aspectRatio: `${boardWidthMm} / ${boardHeightMm}` }}
+      role="img"
+      aria-label={`${motherboard.manufacturer} ${motherboard.model} board layout`}
+    >
+      {/* Rear I/O panel indicator -- thin vertical bar on the left edge */}
+      <div className="absolute top-0 left-0 flex h-full w-[3%] items-center justify-center rounded-l bg-zinc-700">
+        <span className="text-[0.5rem] font-semibold tracking-wide text-zinc-400 [writing-mode:vertical-lr]">
+          I/O
+        </span>
+      </div>
+
+      {/* Slot overlays */}
+      {slotPositions.map((sp) => (
+        <SlotOverlay
+          key={sp.slot_id}
+          position={sp}
+          visualState={visualStates[sp.slot_id] ?? "empty"}
+          conflictMessage={conflictMessages[sp.slot_id]}
+          slotLabel={sp.slot_id}
+          isDropTarget={false}
+        />
+      ))}
+
+      {/* Component overlays for placed components */}
+      {slotPositions.map((sp) => {
+        const componentId = assignments[sp.slot_id];
+        if (!componentId) return null;
+        const component = loadedComponents[componentId];
+        if (!component) return null;
+
+        return (
+          <ComponentOverlay
+            key={`component-${sp.slot_id}`}
+            componentId={componentId}
+            component={component}
+            slotPosition={sp}
+            boardWidthMm={boardWidthMm}
+            boardHeightMm={boardHeightMm}
+            onRemove={handleRemove}
+          />
+        );
+      })}
+    </div>
+  );
+}

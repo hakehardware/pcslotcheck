@@ -9,6 +9,7 @@
 
 import type {
   SharingRule,
+  SlotPosition,
   Component,
   NVMeComponent,
   GPUComponent,
@@ -39,6 +40,9 @@ export interface MotherboardRow {
   sources: { type: string; url: string }[];
   contributed_by: string | null;
   last_verified: string | null;
+  length_mm: number | null;
+  width_mm: number | null;
+  slot_positions: SlotPosition[] | null;
   schema_version: string;
   updated_at: string;
 }
