@@ -21,6 +21,8 @@ interface CaseCanvasProps {
   sataDriveComponents: Record<string, Component>;
   sataDriveVisualStates: Record<string, VisualState>;
   sataDriveConflictMessages: Record<string, string>;
+  onSlotClick?: (slotId: string, slotType: SlotPosition["slot_type"]) => void;
+  onBayClick?: (portId: string) => void;
 }
 
 /** Width reserved for the drive bay area on the right side of the canvas. */
@@ -51,6 +53,8 @@ export default function CaseCanvas({
   sataDriveComponents,
   sataDriveVisualStates,
   sataDriveConflictMessages,
+  onSlotClick,
+  onBayClick,
 }: CaseCanvasProps) {
   const { pixelsPerMm, boardWidthPx, boardHeightPx, boardOffsetX, boardOffsetY } =
     computeCaseScale(boardWidthMm, boardHeightMm);
@@ -118,6 +122,7 @@ export default function CaseCanvas({
           conflictMessages={conflictMessages}
           boardWidthMm={boardWidthMm}
           boardHeightMm={boardHeightMm}
+          onSlotClick={onSlotClick}
         />
       </div>
 
@@ -150,6 +155,7 @@ export default function CaseCanvas({
           visualStates={sataDriveVisualStates}
           conflictMessages={sataDriveConflictMessages}
           mode={mode}
+          onBayClick={onBayClick}
         />
       </div>
     </div>

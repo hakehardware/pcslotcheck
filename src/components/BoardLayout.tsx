@@ -1,51 +1,32 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
 import Link from "next/link";
-import BoardSelector from "./BoardSelector";
+import { IoTrashOutline, IoRefreshOutline } from "react-icons/io5";
 import CaseCanvas from "./CaseCanvas";
-import LayoutSidebar from "./LayoutSidebar";
+import SearchModal from "./SearchModal";
+import type { SearchModalMode } from "./SearchModal";
 import {
   fetchMotherboardFromSupabase,
   fetchComponentFromSupabase,
 } from "@/lib/supabase-queries";
 import {
   computeAllConflicts,
-  getCompatibleSlotTypes,
   sharingRuleToVisualState,
 } from "@/lib/physical-conflict-engine";
 import type { VisualState, ConflictResult } from "@/lib/physical-conflict-engine";
 import { getBoardDimensions } from "@/lib/board-dimensions";
 import { resolveSharingRules } from "@/lib/ui-helpers";
-import type { DataManifest, Motherboard, Component, ComponentSummary } from "@/lib/types";
+import type {
+  DataManifest,
+  Motherboard,
+  Component,
+  SlotPosition,
+  MotherboardSummary,
+  ComponentSummary,
+} from "@/lib/types";
 
-const DRAG_OVERLAY_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  gpu:        { bg: "bg-blue-500/20",    border: "border-blue-400/60",    text: "text-blue-300" },
-  nvme:       { bg: "bg-purple-500/20",  border: "border-purple-400/60",  text: "text-purple-300" },
-  ram:        { bg: "bg-emerald-500/20", border: "border-emerald-400/60", text: "text-emerald-300" },
-  cpu:        { bg: "bg-cyan-500/20",    border: "border-cyan-400/60",    text: "text-cyan-300" },
-  sata_ssd:   { bg: "bg-orange-500/20",  border: "border-orange-400/60",  text: "text-orange-300" },
-  sata_hdd:   { bg: "bg-orange-500/20",  border: "border-orange-400/60",  text: "text-orange-300" },
-  sata_drive: { bg: "bg-orange-500/20",  border: "border-orange-400/60",  text: "text-orange-300" },
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  gpu: "GPU",
-  nvme: "NVMe",
-  ram: "RAM",
-  cpu: "CPU",
-  sata_ssd: "SATA SSD",
-  sata_hdd: "SATA HDD",
-  sata_drive: "SATA Drive",
-};
-
-function findComponentInManifest(
-  manifest: DataManifest,
-  id: string | number
-): ComponentSummary | undefined {
-  return manifest.components.find((c) => c.id === String(id));
-}
+type ModalState = null | { mode: SearchModalMode };
 
 interface BoardLayoutProps {
   manifest: DataManifest;
@@ -65,9 +46,13 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
   );
   const [sataDriveAssignments, setSataDriveAssignments] = useState<Record<string, string>>({});
   const [sataDriveComponents, setSataDriveComponents] = useState<Record<string, Component>>({});
+  const [modalState, setModalState] = useState<ModalState>(null);
 
   // Fetch motherboard data when selectedBoardId changes
   useEffect(() => {
+    // Close modal on board change
+    setModalState(null);
+
     if (!selectedBoardId) {
       setMotherboard(null);
       setAssignments({});
@@ -137,16 +122,12 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
   // Merge sharing rule results into visual states
   let disabledSlots = new Set<string>();
   if (motherboard) {
-    const sharingResult = resolveSharingRules(
-      motherboard,
-      assignments
-    );
+    const sharingResult = resolveSharingRules(motherboard, assignments);
     disabledSlots = sharingResult.disabledSlots;
     const { bandwidthWarnings } = sharingResult;
 
     for (const slotId of disabledSlots) {
       const sharingState = sharingRuleToVisualState("disables");
-      // Sharing-rule "blocked" overrides physical states except existing "blocked"
       if (visualStates[slotId] !== "blocked") {
         visualStates[slotId] = sharingState;
         conflictMessages[slotId] = "Disabled by sharing rule";
@@ -155,7 +136,6 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
 
     for (const [slotId, effect] of bandwidthWarnings) {
       const sharingState = sharingRuleToVisualState("bandwidth_split");
-      // Only apply if not already in a more severe state
       if (
         visualStates[slotId] !== "blocked" &&
         visualStates[slotId] !== "covered"
@@ -180,20 +160,90 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
     }
   }
 
-  const handleSelectBoard = useCallback((id: string) => {
-    setSelectedBoardId(id);
-  }, []);
+  // --- Click handlers ---
 
-  const handleKeyboardSelect = useCallback(
-    async (componentId: string) => {
-      // Keyboard select is handled by LayoutSidebar (Task 8)
-      // This callback will be wired up when LayoutSidebar is implemented
-      void componentId;
+  const handleSlotClick = useCallback(
+    (slotId: string, slotType: SlotPosition["slot_type"]) => {
+      if (!motherboard) return;
+      setModalState({
+        mode: { kind: "component", slotId, slotType, motherboard },
+      });
     },
-    []
+    [motherboard]
   );
 
-  // Used by ComponentOverlay remove button (wired in Task 7)
+  const handleBayClick = useCallback(
+    (portId: string) => {
+      if (!motherboard) return;
+      setModalState({
+        mode: {
+          kind: "component",
+          slotId: portId,
+          slotType: "sata_group",
+          motherboard,
+        },
+      });
+    },
+    [motherboard]
+  );
+
+  const handleEmptyCaseClick = useCallback(() => {
+    setModalState({ mode: { kind: "board" } });
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setModalState(null);
+  }, []);
+
+  const handleModalSelect = useCallback(
+    (item: MotherboardSummary | ComponentSummary) => {
+      if (modalState?.mode.kind === "board") {
+        // Board selection
+        const mb = item as MotherboardSummary;
+        setSelectedBoardId(mb.id);
+        setModalState(null);
+        return;
+      }
+
+      if (modalState?.mode.kind === "component") {
+        const comp = item as ComponentSummary;
+        const { slotId, slotType } = modalState.mode;
+
+        if (slotType === "sata_group") {
+          // SATA drive assignment
+          setSataDriveAssignments((prev) => ({ ...prev, [slotId]: comp.id }));
+          if (!sataDriveComponents[comp.id]) {
+            fetchComponentFromSupabase(comp.id, comp.type).then((full) => {
+              if (full) {
+                setSataDriveComponents((prev) => ({
+                  ...prev,
+                  [comp.id]: full,
+                }));
+              }
+            });
+          }
+        } else {
+          // Regular slot assignment
+          setAssignments((prev) => ({ ...prev, [slotId]: comp.id }));
+          if (!loadedComponents[comp.id]) {
+            fetchComponentFromSupabase(comp.id, comp.type).then((full) => {
+              if (full) {
+                setLoadedComponents((prev) => ({
+                  ...prev,
+                  [comp.id]: full,
+                }));
+              }
+            });
+          }
+        }
+
+        setModalState(null);
+      }
+    },
+    [modalState, loadedComponents, sataDriveComponents]
+  );
+
+  // Used by ComponentOverlay remove button
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleRemoveComponent = useCallback((slotId: string) => {
     setAssignments((prev) => {
@@ -203,78 +253,18 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
     });
   }, []);
 
-  // onDragEnd handler for DragDropProvider
-  const handleDragEnd = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (event: any) => {
-      if (event.canceled) return;
+  // --- Reset handlers ---
 
-      const source = event.operation?.source ?? event.source;
-      const target = event.operation?.target ?? event.target;
-      if (!source || !target) return;
+  const handleClearComponents = useCallback(() => {
+    setAssignments({});
+    setSataDriveAssignments({});
+    setLoadedComponents({});
+    setSataDriveComponents({});
+  }, []);
 
-      const componentId = String(source.id);
-      const componentType = source.data?.type as string | undefined;
-      const slotId = String(target.id);
-
-      if (!componentType) return;
-
-      const sataTypes = ["sata_ssd", "sata_hdd", "sata_drive"];
-
-      // Check if this is a drive bay drop (SATA port ID)
-      const isSataPort = motherboard?.sata_ports.some(p => p.id === slotId);
-      if (isSataPort) {
-        // Only accept SATA component types
-        if (!sataTypes.includes(componentType)) return;
-        // Reject if port is blocked by sharing rule
-        if (sataDriveVisualStates[slotId] === "blocked") return;
-        // Update SATA drive assignments
-        setSataDriveAssignments(prev => ({ ...prev, [slotId]: componentId }));
-        // Fetch component if not loaded
-        if (!sataDriveComponents[componentId]) {
-          fetchComponentFromSupabase(componentId, componentType).then(comp => {
-            if (comp) setSataDriveComponents(prev => ({ ...prev, [componentId]: comp }));
-          });
-        }
-        return;
-      }
-
-      // Reject SATA types on board slots
-      if (sataTypes.includes(componentType)) return;
-
-      // Validate compatibility: check if the component type can go in this slot
-      const compatibleTypes = getCompatibleSlotTypes(
-        componentType as Component["type"]
-      );
-      const slotPosition = motherboard?.slot_positions?.find(
-        (sp) => sp.slot_id === slotId
-      );
-      if (!slotPosition || !compatibleTypes.includes(slotPosition.slot_type)) {
-        return;
-      }
-
-      // Update assignments
-      setAssignments((prev) => ({
-        ...prev,
-        [slotId]: componentId,
-      }));
-
-      // Fetch component data if not already loaded
-      if (!loadedComponents[componentId] && componentType) {
-        fetchComponentFromSupabase(componentId, componentType).then(
-          (component) => {
-            if (component) {
-              setLoadedComponents((prev) => ({
-                ...prev,
-                [componentId]: component,
-              }));
-            }
-          }
-        );
-      }
-    },
-    [motherboard, loadedComponents, sataDriveVisualStates, sataDriveComponents]
-  );
+  const handleResetBuild = useCallback(() => {
+    setSelectedBoardId(null);
+  }, []);
 
   // Loading state
   if (loading) {
@@ -288,7 +278,7 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
     );
   }
 
-  // No board selected: show board selector
+  // No board selected: show empty case with clickable prompt
   if (!selectedBoardId || !motherboard) {
     return (
       <div>
@@ -298,11 +288,28 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
         <p className="mb-4 text-sm text-zinc-400">
           Select a motherboard to view its physical layout.
         </p>
-        <BoardSelector
-          boards={manifest.motherboards}
-          selectedBoardId={selectedBoardId}
-          onSelectBoard={handleSelectBoard}
-        />
+        <div
+          role="button"
+          tabIndex={0}
+          data-testid="empty-case-prompt"
+          onClick={handleEmptyCaseClick}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleEmptyCaseClick();
+          }}
+          className="flex h-64 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-zinc-600 bg-zinc-900/50 transition-colors hover:border-zinc-400 hover:bg-zinc-800/50"
+        >
+          <span className="text-lg text-zinc-400">
+            Click to select a motherboard
+          </span>
+        </div>
+        {modalState && (
+          <SearchModal
+            mode={modalState.mode}
+            manifest={manifest}
+            onSelect={handleModalSelect}
+            onClose={handleModalClose}
+          />
+        )}
       </div>
     );
   }
@@ -350,12 +357,30 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
   }
 
   return (
-    <DragDropProvider onDragEnd={handleDragEnd}>
-      <div>
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-50">
-            {motherboard.manufacturer} {motherboard.model}
-          </h1>
+    <div>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-50">
+          {motherboard.manufacturer} {motherboard.model}
+        </h1>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            data-testid="clear-components-btn"
+            onClick={handleClearComponents}
+            className="flex items-center gap-1.5 rounded border border-zinc-600 px-3 py-1.5 text-sm text-zinc-300 transition-colors hover:border-zinc-400 hover:text-zinc-100"
+          >
+            <IoTrashOutline className="h-4 w-4" />
+            Clear Components
+          </button>
+          <button
+            type="button"
+            data-testid="reset-build-btn"
+            onClick={handleResetBuild}
+            className="flex items-center gap-1.5 rounded border border-zinc-600 px-3 py-1.5 text-sm text-zinc-300 transition-colors hover:border-zinc-400 hover:text-zinc-100"
+          >
+            <IoRefreshOutline className="h-4 w-4" />
+            Reset Build
+          </button>
           <Link
             href={`/check?board=${motherboard.id}`}
             className="text-sm text-zinc-400 transition-colors hover:text-zinc-50"
@@ -363,71 +388,49 @@ export default function BoardLayout({ manifest, boardId }: BoardLayoutProps) {
             Switch to Slot Checker
           </Link>
         </div>
+      </div>
 
-        <div className="flex gap-6">
-          <div className="hidden md:block flex-1">
-            <CaseCanvas
-              mode="display"
-              motherboard={motherboard}
-              boardWidthMm={dims.widthMm}
-              boardHeightMm={dims.heightMm}
-              slotPositions={motherboard.slot_positions}
-              assignments={assignments}
-              loadedComponents={loadedComponents}
-              visualStates={visualStates}
-              conflictMessages={conflictMessages}
-              sataDriveAssignments={sataDriveAssignments}
-              sataDriveComponents={sataDriveComponents}
-              sataDriveVisualStates={sataDriveVisualStates}
-              sataDriveConflictMessages={sataDriveConflictMessages}
-            />
-          </div>
-          <div className="block md:hidden flex-1 py-8 text-center">
-            <p className="text-sm text-zinc-400">
-              The interactive board layout is available on desktop.
-            </p>
-            <Link
-              href={`/check?board=${motherboard.id}`}
-              className="mt-2 inline-block text-sm text-blue-400 underline hover:text-blue-300"
-            >
-              Use Slot Checker on mobile
-            </Link>
-          </div>
-          <div className="w-72 shrink-0">
-            <LayoutSidebar
-              manifest={manifest}
-              motherboard={motherboard}
-              onKeyboardSelect={handleKeyboardSelect}
-            />
-          </div>
+      <div className="flex justify-center">
+        <div className="hidden md:block">
+          <CaseCanvas
+            mode="display"
+            motherboard={motherboard}
+            boardWidthMm={dims.widthMm}
+            boardHeightMm={dims.heightMm}
+            slotPositions={motherboard.slot_positions}
+            assignments={assignments}
+            loadedComponents={loadedComponents}
+            visualStates={visualStates}
+            conflictMessages={conflictMessages}
+            sataDriveAssignments={sataDriveAssignments}
+            sataDriveComponents={sataDriveComponents}
+            sataDriveVisualStates={sataDriveVisualStates}
+            sataDriveConflictMessages={sataDriveConflictMessages}
+            onSlotClick={handleSlotClick}
+            onBayClick={handleBayClick}
+          />
+        </div>
+        <div className="block md:hidden flex-1 py-8 text-center">
+          <p className="text-sm text-zinc-400">
+            The interactive board layout is available on desktop.
+          </p>
+          <Link
+            href={`/check?board=${motherboard.id}`}
+            className="mt-2 inline-block text-sm text-blue-400 underline hover:text-blue-300"
+          >
+            Use Slot Checker on mobile
+          </Link>
         </div>
       </div>
 
-      <DragOverlay>
-        {(source) => {
-          if (!source) return null;
-          const componentType = (source.data?.type as string) ?? "";
-          const colors = DRAG_OVERLAY_COLORS[componentType] ?? DRAG_OVERLAY_COLORS.gpu;
-          const typeLabel = TYPE_LABELS[componentType] ?? componentType;
-          const match = findComponentInManifest(manifest, source.id);
-          const label = match
-            ? `${match.manufacturer} ${match.model}`
-            : String(source.id);
-
-          return (
-            <div
-              className={`w-[200px] rounded-lg border px-3 py-2 shadow-lg backdrop-blur-sm ${colors.bg} ${colors.border}`}
-            >
-              <p className={`text-xs font-medium uppercase tracking-wide ${colors.text}`}>
-                {typeLabel}
-              </p>
-              <p className="mt-0.5 text-sm font-semibold text-zinc-100 truncate">
-                {label}
-              </p>
-            </div>
-          );
-        }}
-      </DragOverlay>
-    </DragDropProvider>
+      {modalState && (
+        <SearchModal
+          mode={modalState.mode}
+          manifest={manifest}
+          onSelect={handleModalSelect}
+          onClose={handleModalClose}
+        />
+      )}
+    </div>
   );
 }

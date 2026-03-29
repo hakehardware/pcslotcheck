@@ -15,6 +15,7 @@ interface BoardViewProps {
   conflictMessages: Record<string, string>;
   boardWidthMm: number;
   boardHeightMm: number;
+  onSlotClick?: (slotId: string, slotType: SlotPosition["slot_type"]) => void;
 }
 
 export default function BoardView({
@@ -26,6 +27,7 @@ export default function BoardView({
   conflictMessages,
   boardWidthMm,
   boardHeightMm,
+  onSlotClick,
 }: BoardViewProps) {
   const handleRemove = useCallback((_slotId: string) => {
     // Removal handled by BoardLayout via state lifting.
@@ -57,7 +59,8 @@ export default function BoardView({
           visualState={visualStates[sp.slot_id] ?? "empty"}
           conflictMessage={conflictMessages[sp.slot_id]}
           slotLabel={sp.slot_id}
-          isDropTarget={false}
+          onSlotClick={onSlotClick}
+          mode="display"
         />
       ))}
 

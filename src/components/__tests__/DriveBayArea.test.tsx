@@ -1,18 +1,12 @@
 // Unit and property tests for DriveBayArea component.
 
 import { describe, it, expect, vi } from "vitest";
-import { render, cleanup } from "@testing-library/react";
+import { render, cleanup, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import * as fc from "fast-check";
 import DriveBayArea from "../DriveBayArea";
 import type { SATAPort, Component, SATASSDComponent } from "@/lib/types";
 import type { VisualState } from "@/lib/physical-conflict-engine";
-
-vi.mock("@dnd-kit/react", () => ({
-  useDroppable: () => ({
-    ref: () => {},
-    isDropTarget: false,
-  }),
-}));
 
 // ===================================================================
 // Generators
@@ -257,6 +251,241 @@ describe("Property 6: Sharing rule disabled SATA -> blocked drive bay", () => {
           expect(bay!.className).toContain("border-red-400");
           expect(bay!.className).toContain("bg-red-400/20");
         }
+      }),
+      { numRuns: 100 },
+    );
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// Shared arbitraries for click behavior tests
+// ---------------------------------------------------------------------------
+
+/** Visual states that should NOT trigger the onBayClick callback. */
+const NON_CLICKABLE_BAY_STATES: VisualState[] = ["blocked", "populated"];
+
+const arbNonClickableBayState: fc.Arbitrary<VisualState> = fc.constantFrom(
+  ...NON_CLICKABLE_BAY_STATES,
+);
+
+const arbPortId: fc.Arbitrary<string> = fc
+  .integer({ min: 1, max: 20 })
+  .map((n) => `sata_${n}`);
+
+/** Generate a single SATA port with a given id. */
+function makeSataPort(id: string): SATAPort {
+  return {
+    id,
+    version: "SATA III",
+    source: "Chipset",
+    disabled_by: null,
+  };
+}
+
+/** Generate a SATA SSD component stub for populated bays. */
+function makeSataComponent(id: string): SATASSDComponent {
+  return {
+    id,
+    type: "sata_ssd",
+    manufacturer: "TestMfr",
+    model: "TestModel",
+    form_factor: "2.5",
+    capacity_gb: 500,
+    interface: "SATA III",
+    drive_type: "ssd",
+    schema_version: "1.0",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Feature: click-to-assign-interaction, Property 12: Non-clickable bay states do not invoke callback
+// **Validates: Requirements 9.3, 9.4**
+// ---------------------------------------------------------------------------
+
+describe("Property 12: Non-clickable bay states do not invoke callback", () => {
+  it("click on blocked bay does not invoke onBayClick", () => {
+    fc.assert(
+      fc.property(arbPortId, (portId) => {
+        cleanup();
+        const onBayClick = vi.fn();
+        const port = makeSataPort(portId);
+
+        render(
+          <DriveBayArea
+            sataPorts={[port]}
+            assignments={{}}
+            loadedComponents={{}}
+            visualStates={{ [portId]: "blocked" }}
+            conflictMessages={{}}
+            mode="display"
+            onBayClick={onBayClick}
+          />,
+        );
+
+        const bay = screen.getByTestId(`drive-bay-${portId}`);
+        fireEvent.click(bay);
+        expect(onBayClick).not.toHaveBeenCalled();
+        cleanup();
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  it("click on populated bay does not invoke onBayClick", () => {
+    fc.assert(
+      fc.property(arbPortId, (portId) => {
+        cleanup();
+        const onBayClick = vi.fn();
+        const port = makeSataPort(portId);
+        const compId = `comp-${portId}`;
+        const comp = makeSataComponent(compId);
+
+        render(
+          <DriveBayArea
+            sataPorts={[port]}
+            assignments={{ [portId]: compId }}
+            loadedComponents={{ [compId]: comp }}
+            visualStates={{ [portId]: "populated" }}
+            conflictMessages={{}}
+            mode="display"
+            onBayClick={onBayClick}
+          />,
+        );
+
+        const bay = screen.getByTestId(`drive-bay-${portId}`);
+        fireEvent.click(bay);
+        expect(onBayClick).not.toHaveBeenCalled();
+        cleanup();
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  it("Enter keypress on non-clickable bay states does not invoke onBayClick", () => {
+    fc.assert(
+      fc.property(
+        arbPortId,
+        arbNonClickableBayState,
+        (portId, visualState) => {
+          cleanup();
+          const onBayClick = vi.fn();
+          const port = makeSataPort(portId);
+
+          const assignments: Record<string, string> =
+            visualState === "populated" ? { [portId]: `comp-${portId}` } : {};
+          const loadedComponents: Record<string, Component> =
+            visualState === "populated"
+              ? { [`comp-${portId}`]: makeSataComponent(`comp-${portId}`) }
+              : {};
+
+          render(
+            <DriveBayArea
+              sataPorts={[port]}
+              assignments={assignments}
+              loadedComponents={loadedComponents}
+              visualStates={{ [portId]: visualState }}
+              conflictMessages={{}}
+              mode="display"
+              onBayClick={onBayClick}
+            />,
+          );
+
+          const bay = screen.getByTestId(`drive-bay-${portId}`);
+          fireEvent.keyDown(bay, { key: "Enter" });
+          expect(onBayClick).not.toHaveBeenCalled();
+          cleanup();
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Feature: click-to-assign-interaction, Property 13: Empty bay activation invokes callback with correct port ID
+// **Validates: Requirements 9.2, 9.5**
+// ---------------------------------------------------------------------------
+
+describe("Property 13: Empty bay activation invokes callback with correct port ID", () => {
+  it("click on empty, non-blocked bay invokes onBayClick with correct port ID", () => {
+    fc.assert(
+      fc.property(arbPortId, (portId) => {
+        cleanup();
+        const onBayClick = vi.fn();
+        const port = makeSataPort(portId);
+
+        render(
+          <DriveBayArea
+            sataPorts={[port]}
+            assignments={{}}
+            loadedComponents={{}}
+            visualStates={{ [portId]: "empty" }}
+            conflictMessages={{}}
+            mode="display"
+            onBayClick={onBayClick}
+          />,
+        );
+
+        const bay = screen.getByTestId(`drive-bay-${portId}`);
+        fireEvent.click(bay);
+        expect(onBayClick).toHaveBeenCalledTimes(1);
+        expect(onBayClick).toHaveBeenCalledWith(portId);
+        cleanup();
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  it("Enter keypress on empty, non-blocked bay invokes onBayClick with correct port ID", () => {
+    fc.assert(
+      fc.property(arbPortId, (portId) => {
+        cleanup();
+        const onBayClick = vi.fn();
+        const port = makeSataPort(portId);
+
+        render(
+          <DriveBayArea
+            sataPorts={[port]}
+            assignments={{}}
+            loadedComponents={{}}
+            visualStates={{ [portId]: "empty" }}
+            conflictMessages={{}}
+            mode="display"
+            onBayClick={onBayClick}
+          />,
+        );
+
+        const bay = screen.getByTestId(`drive-bay-${portId}`);
+        fireEvent.keyDown(bay, { key: "Enter" });
+        expect(onBayClick).toHaveBeenCalledTimes(1);
+        expect(onBayClick).toHaveBeenCalledWith(portId);
+        cleanup();
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  it("empty bay has cursor-pointer class", () => {
+    fc.assert(
+      fc.property(arbPortId, (portId) => {
+        cleanup();
+        const port = makeSataPort(portId);
+
+        render(
+          <DriveBayArea
+            sataPorts={[port]}
+            assignments={{}}
+            loadedComponents={{}}
+            visualStates={{ [portId]: "empty" }}
+            conflictMessages={{}}
+            mode="display"
+          />,
+        );
+
+        const bay = screen.getByTestId(`drive-bay-${portId}`);
+        expect(bay.className).toContain("cursor-pointer");
+        cleanup();
       }),
       { numRuns: 100 },
     );

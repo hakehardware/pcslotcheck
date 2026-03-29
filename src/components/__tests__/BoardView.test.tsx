@@ -6,13 +6,6 @@ import * as fc from "fast-check";
 import BoardView from "../BoardView";
 import type { Motherboard, SlotPosition } from "@/lib/types";
 
-vi.mock("@dnd-kit/react", () => ({
-  useDroppable: () => ({
-    ref: () => {},
-    isDropTarget: false,
-  }),
-}));
-
 vi.mock("@/lib/physical-conflict-engine", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/physical-conflict-engine")>();
   return {

@@ -1,6 +1,5 @@
 "use client";
 
-import { useDroppable } from "@dnd-kit/react";
 import type { SATAPort, Component } from "@/lib/types";
 import type { VisualState } from "@/lib/physical-conflict-engine";
 
@@ -11,19 +10,19 @@ interface DriveBayAreaProps {
   visualStates: Record<string, VisualState>;
   conflictMessages: Record<string, string>;
   mode: "display" | "edit";
+  onBayClick?: (portId: string) => void;
 }
 
 /** Visual state CSS class map for drive bay slots. */
 const BAY_STATE_CLASSES: Record<string, string> = {
   empty: "border-dashed border-zinc-500",
-  "drop-target": "border-green-400 bg-green-400/20",
   populated: "border-zinc-400 bg-zinc-600/40",
   blocked: "border-red-400 bg-red-400/20",
 };
 
 /**
- * A single drive bay slot. In display mode it registers as a droppable
- * target via @dnd-kit/react. In edit mode it renders but is not interactive.
+ * A single drive bay slot. Renders the bay and supports click-to-assign
+ * interaction when the bay is empty and not blocked.
  */
 function DriveBaySlot({
   port,
@@ -31,33 +30,41 @@ function DriveBaySlot({
   component,
   visualState,
   conflictMessage,
-  mode,
+  onBayClick,
 }: {
   port: SATAPort;
   assignment: string | undefined;
   component: Component | undefined;
   visualState: VisualState;
   conflictMessage: string | undefined;
-  mode: "display" | "edit";
+  onBayClick?: (portId: string) => void;
 }) {
-  const { ref, isDropTarget: isOver } = useDroppable({ id: port.id });
-
-  const effectiveState: VisualState =
-    mode === "display" && isOver ? "drop-target" : visualState;
-
   const stateClasses =
-    BAY_STATE_CLASSES[effectiveState] ?? BAY_STATE_CLASSES.empty;
+    BAY_STATE_CLASSES[visualState] ?? BAY_STATE_CLASSES.empty;
 
-  // Determine display text: model name if populated, port id otherwise
-  const displayText =
-    assignment && component ? component.model : port.id;
+  const isClickable = !assignment && visualState !== "blocked" && visualState !== "populated";
+
+  const handleActivate = () => {
+    if (isClickable && onBayClick) {
+      onBayClick(port.id);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleActivate();
+    }
+  };
 
   return (
     <div
-      ref={mode === "display" ? ref : undefined}
+      role="button"
+      tabIndex={0}
       data-testid={`drive-bay-${port.id}`}
       title={conflictMessage || undefined}
-      className={`flex items-center gap-2 rounded border-2 px-2 py-1 text-xs transition-colors ${stateClasses}`}
+      onClick={handleActivate}
+      onKeyDown={handleKeyDown}
+      className={`flex items-center gap-2 rounded border-2 px-2 py-1 text-xs transition-colors ${stateClasses} ${isClickable ? "cursor-pointer" : ""}`}
     >
       <span className="shrink-0 font-mono text-zinc-400">{port.id}</span>
       {assignment && component && (
@@ -78,6 +85,7 @@ export default function DriveBayArea({
   visualStates,
   conflictMessages,
   mode,
+  onBayClick,
 }: DriveBayAreaProps) {
   if (sataPorts.length === 0) {
     return (
@@ -111,7 +119,7 @@ export default function DriveBayArea({
             component={component}
             visualState={vs}
             conflictMessage={msg}
-            mode={mode}
+            onBayClick={onBayClick}
           />
         );
       })}
