@@ -1,32 +1,21 @@
 // Case-scale pure computation module.
 // Computes the pixel scale factor and board position within a fixed-size
-// case canvas, plus PCIe bracket counts per form factor.
+// case canvas.
 //
 // Orientation: case laid flat facing the user.
-//   Left  = rear (I/O panel, PCIe brackets)
+//   Left  = rear (I/O panel)
 //   Right = front (drive bays, front panel connectors)
 //   Top   = top of case
 //   Bottom = bottom of case
 //
 // The motherboard mounts against the rear (left) wall with the I/O shield
-// on the left edge. PCIe slots face left toward the rear bracket openings.
+// on the left edge. PCIe slots face left toward the rear.
 
 /** Reference case interior dimensions in mm (fits E-ATX with overhang margin) */
 export const REFERENCE_CASE_MM = { width: 400, height: 380 } as const;
 
 /** Fixed canvas pixel dimensions */
 export const CANVAS_PX = { width: 900, height: 660 } as const;
-
-/** PCIe bracket counts per form factor family */
-export const BRACKET_COUNTS: Record<string, number> = {
-  "ATX": 7,
-  "Micro-ATX": 4,
-  "Mini-ITX": 1,
-  "E-ATX": 7,
-  "CEB": 7,
-  "SSI-EEB": 7,
-  "SSI-CEB": 7,
-};
 
 export interface CaseScaleResult {
   /** Pixels per millimeter */
@@ -86,12 +75,4 @@ export function computeCaseScale(
     boardOffsetX,
     boardOffsetY,
   };
-}
-
-/**
- * Get the number of PCIe bracket slots for a form factor.
- * Defaults to 7 if form factor is unknown.
- */
-export function getBracketCount(formFactor: string): number {
-  return BRACKET_COUNTS[formFactor] ?? 7;
 }

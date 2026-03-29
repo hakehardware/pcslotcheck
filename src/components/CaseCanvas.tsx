@@ -1,11 +1,10 @@
 "use client";
 
-import type { Motherboard, SlotPosition, Component, GPUComponent } from "@/lib/types";
+import type { Motherboard, SlotPosition, Component } from "@/lib/types";
 import type { VisualState } from "@/lib/physical-conflict-engine";
-import { computeCaseScale, getBracketCount, CANVAS_PX } from "@/lib/case-scale";
+import { computeCaseScale, CANVAS_PX } from "@/lib/case-scale";
 import BoardView from "./BoardView";
 import DriveBayArea from "./DriveBayArea";
-import PCIeBracketSlots from "./PCIeBracketSlots";
 
 interface CaseCanvasProps {
   mode: "display" | "edit";
@@ -30,11 +29,10 @@ const DRIVE_BAY_WIDTH_PX = 110;
 
 /**
  * Fixed-pixel case interior frame that hosts the motherboard at physical
- * scale, PCIe bracket slots along the rear (left) edge, and a drive bay
- * area at the front (right) edge.
+ * scale and a drive bay area at the front (right) edge.
  *
  * Orientation (case laid flat, facing user):
- *   Left  = rear (I/O panel, PCIe bracket openings)
+ *   Left  = rear (I/O panel)
  *   Right = front (drive bays, front panel connectors)
  *   Top   = top of case
  *   Bottom = bottom of case
@@ -58,23 +56,6 @@ export default function CaseCanvas({
 }: CaseCanvasProps) {
   const { pixelsPerMm, boardWidthPx, boardHeightPx, boardOffsetX, boardOffsetY } =
     computeCaseScale(boardWidthMm, boardHeightMm);
-
-  const bracketCount = getBracketCount(motherboard.form_factor);
-
-  // Filter PCIe slot positions for bracket alignment reference
-  const pcieSlotPositions = slotPositions.filter(
-    (sp) => sp.slot_type === "pcie",
-  );
-
-  // Build GPU placements: only GPUs assigned to PCIe slots
-  const gpuPlacements: Array<{ slotPosition: SlotPosition; component: GPUComponent }> = [];
-  for (const sp of pcieSlotPositions) {
-    const componentId = assignments[sp.slot_id];
-    if (!componentId) continue;
-    const component = loadedComponents[componentId];
-    if (!component || component.type !== "gpu") continue;
-    gpuPlacements.push({ slotPosition: sp, component: component as GPUComponent });
-  }
 
   return (
     <div
@@ -125,18 +106,6 @@ export default function CaseCanvas({
           onSlotClick={onSlotClick}
         />
       </div>
-
-      {/* PCIe bracket slots along the rear (left) edge */}
-      <PCIeBracketSlots
-        bracketCount={bracketCount}
-        boardOffsetX={boardOffsetX}
-        boardOffsetY={boardOffsetY}
-        pixelsPerMm={pixelsPerMm}
-        pcieSlotPositions={pcieSlotPositions}
-        boardWidthPx={boardWidthPx}
-        boardHeightPx={boardHeightPx}
-        gpuPlacements={gpuPlacements}
-      />
 
       {/* Drive bay area at the front (right) of the case */}
       <div

@@ -4,10 +4,8 @@ import { describe, it, expect } from "vitest";
 import * as fc from "fast-check";
 import {
   computeCaseScale,
-  getBracketCount,
   REFERENCE_CASE_MM,
   CANVAS_PX,
-  BRACKET_COUNTS,
 } from "../case-scale";
 
 // ===================================================================
@@ -54,33 +52,6 @@ describe("computeCaseScale unit tests", () => {
   });
 });
 
-describe("getBracketCount unit tests", () => {
-  it("returns 7 for ATX", () => {
-    expect(getBracketCount("ATX")).toBe(7);
-  });
-
-  it("returns 4 for Micro-ATX", () => {
-    expect(getBracketCount("Micro-ATX")).toBe(4);
-  });
-
-  it("returns 1 for Mini-ITX", () => {
-    expect(getBracketCount("Mini-ITX")).toBe(1);
-  });
-
-  it("returns 7 for E-ATX", () => {
-    expect(getBracketCount("E-ATX")).toBe(7);
-  });
-
-  it("returns 7 for unknown form factor", () => {
-    expect(getBracketCount("SomeUnknownFactor")).toBe(7);
-  });
-
-  it("returns 7 for CEB, SSI-EEB, SSI-CEB", () => {
-    expect(getBracketCount("CEB")).toBe(7);
-    expect(getBracketCount("SSI-EEB")).toBe(7);
-    expect(getBracketCount("SSI-CEB")).toBe(7);
-  });
-});
 
 
 // ===================================================================
@@ -200,55 +171,4 @@ describe("Property 4: Overhang space accommodates longest GPU", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Feature: case-frame-board-revamp, Property 8: PCIe bracket count and spacing
-// **Validates: Requirements 10.1, 10.2**
-// ---------------------------------------------------------------------------
 
-describe("Property 8: PCIe bracket count and spacing", () => {
-  const knownFormFactors = Object.keys(BRACKET_COUNTS);
-
-  const expectedCounts: Record<string, number> = {
-    "ATX": 7,
-    "Micro-ATX": 4,
-    "Mini-ITX": 1,
-    "E-ATX": 7,
-    "CEB": 7,
-    "SSI-EEB": 7,
-    "SSI-CEB": 7,
-  };
-
-  it("getBracketCount returns the standard count for each known form factor", () => {
-    fc.assert(
-      fc.property(fc.constantFrom(...knownFormFactors), (ff) => {
-        expect(getBracketCount(ff)).toBe(expectedCounts[ff]);
-      }),
-      { numRuns: 100 },
-    );
-  });
-
-  it("consecutive brackets are spaced at exactly 20mm * pixelsPerMm pixels", () => {
-    fc.assert(
-      fc.property(fc.constantFrom(...knownFormFactors), (ff) => {
-        const count = getBracketCount(ff);
-        if (count <= 1) return; // spacing only meaningful with 2+ brackets
-
-        // Use ATX dimensions as a reference board for scale computation
-        const scale = computeCaseScale(305, 244);
-        const PITCH_MM = 20;
-        const FIRST_BRACKET_OFFSET_MM = 45;
-
-        const bracketPositions = Array.from({ length: count }, (_, i) =>
-          scale.boardOffsetY + (FIRST_BRACKET_OFFSET_MM + i * PITCH_MM) * scale.pixelsPerMm,
-        );
-
-        const expectedSpacing = PITCH_MM * scale.pixelsPerMm;
-        for (let i = 1; i < bracketPositions.length; i++) {
-          const spacing = bracketPositions[i] - bracketPositions[i - 1];
-          expect(spacing).toBeCloseTo(expectedSpacing, 5);
-        }
-      }),
-      { numRuns: 100 },
-    );
-  });
-});
