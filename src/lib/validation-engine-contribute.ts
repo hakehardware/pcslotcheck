@@ -2,17 +2,45 @@ import Ajv, { type ErrorObject } from "ajv";
 import addFormats from "ajv-formats";
 import type { ComponentTypeKey } from "./form-helpers";
 import { toKebabCase, SCHEMA_VERSIONS } from "./form-helpers";
-import {
-  VALID_GPU_LANES,
-  VALID_POWER_CONNECTOR_TYPES,
-  NVIDIA_BOARD_PARTNERS,
-} from "../../scripts/sanity-check";
 
-// Reasonable value ranges (mirrored from sanity-check.ts)
+// Constants duplicated from scripts/sanity-check.ts to avoid importing
+// the Node-only script (which uses fs/path) into the client bundle.
+
+/** Reasonable value ranges. */
 const MAX_PCIE_GEN = 5;
 const MAX_LANE_COUNT = 16;
 const MAX_TDP_W = 1000;
 const MAX_CAPACITY_GB = 65536;
+
+/** Valid GPU interface lane values. */
+export const VALID_GPU_LANES = new Set([1, 4, 8, 16]);
+
+/** Valid power connector types. */
+export const VALID_POWER_CONNECTOR_TYPES = new Set([
+  "6-pin",
+  "8-pin",
+  "12-pin",
+  "16-pin/12VHPWR",
+  "16-pin/12V-2x6",
+]);
+
+/** Known NVIDIA board partners (including NVIDIA itself for founders/reference). */
+export const NVIDIA_BOARD_PARTNERS = new Set([
+  "NVIDIA",
+  "ASUS",
+  "MSI",
+  "EVGA",
+  "Gigabyte",
+  "Zotac",
+  "PNY",
+  "Palit",
+  "Gainward",
+  "Inno3D",
+  "Colorful",
+  "Galax",
+  "KFA2",
+  "Manli",
+]);
 
 export interface ValidationError {
   path: string;

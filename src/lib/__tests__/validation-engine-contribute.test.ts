@@ -4,10 +4,10 @@ import {
   runSanityChecks,
   validateFormData,
   validateIdField,
+  NVIDIA_BOARD_PARTNERS,
   type ValidationError,
 } from "../validation-engine-contribute";
 import type { ComponentTypeKey } from "../form-helpers";
-import { NVIDIA_BOARD_PARTNERS } from "../../../scripts/sanity-check";
 import gpuSchema from "../../../data/schema/component-gpu.schema.json";
 
 // ---------------------------------------------------------------------------
