@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { IoCodeSlashOutline } from "react-icons/io5";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/boards", label: "Boards" },
   { href: "/components", label: "Components" },
+  { href: "/contribute", label: "Contribute" },
   { href: "/support", label: "Support" },
 ] as const;
 
@@ -41,10 +43,13 @@ export default function NavBar() {
               <li key={href}>
                 <Link
                   href={href}
-                  className={`transition-colors hover:text-zinc-50 ${
+                  className={`flex items-center gap-1.5 transition-colors hover:text-zinc-50 ${
                     isActive ? "text-zinc-50" : "text-zinc-400"
                   }`}
                 >
+                  {label === "Contribute" && (
+                    <IoCodeSlashOutline aria-hidden="true" className="h-4 w-4" />
+                  )}
                   {label}
                 </Link>
               </li>

@@ -16,6 +16,9 @@ interface BoardViewProps {
   boardWidthMm: number;
   boardHeightMm: number;
   onSlotClick?: (slotId: string, slotType: SlotPosition["slot_type"]) => void;
+  mode?: "display" | "edit";
+  onPositionChange?: (slotId: string, x_pct: number, y_pct: number) => void;
+  onSizeChange?: (slotId: string, width_pct: number, height_pct: number) => void;
 }
 
 export default function BoardView({
@@ -28,6 +31,9 @@ export default function BoardView({
   boardWidthMm,
   boardHeightMm,
   onSlotClick,
+  mode = "display",
+  onPositionChange,
+  onSizeChange,
 }: BoardViewProps) {
   const handleRemove = useCallback((_slotId: string) => {
     // Removal handled by BoardLayout via state lifting.
@@ -60,7 +66,9 @@ export default function BoardView({
           conflictMessage={conflictMessages[sp.slot_id]}
           slotLabel={sp.slot_id}
           onSlotClick={onSlotClick}
-          mode="display"
+          mode={mode}
+          onPositionChange={onPositionChange}
+          onSizeChange={onSizeChange}
         />
       ))}
 

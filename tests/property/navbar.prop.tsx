@@ -33,6 +33,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/boards", label: "Boards" },
   { href: "/components", label: "Components" },
+  { href: "/contribute", label: "Contribute" },
   { href: "/support", label: "Support" },
 ] as const;
 
