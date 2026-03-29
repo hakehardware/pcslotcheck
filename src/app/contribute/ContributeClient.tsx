@@ -6,12 +6,9 @@ import { setNestedValue } from "@/lib/form-helpers";
 import { validateFormData } from "@/lib/validation-engine-contribute";
 import type { ValidationError } from "@/lib/validation-engine-contribute";
 import { serializeToYaml, cleanFormData } from "@/lib/yaml-serializer";
+import { WIZARD_STEPS } from "@/lib/wizard-step-config";
 import ComponentTypeSelector from "@/components/ComponentTypeSelector";
-import FormEngine from "@/components/FormEngine";
-import ValidationPanelContribute from "@/components/ValidationPanelContribute";
-import YamlPreviewPanel from "@/components/YamlPreviewPanel";
-import DownloadButton from "@/components/DownloadButton";
-import BoardCanvasEditor from "@/components/BoardCanvasEditor";
+import WizardShell from "@/components/WizardShell";
 
 interface ContributeClientProps {
   schemas: Record<ComponentTypeKey, object>;
@@ -25,6 +22,7 @@ export default function ContributeClient({ schemas }: ContributeClientProps) {
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [yamlString, setYamlString] = useState("");
   const [isValid, setIsValid] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -58,6 +56,7 @@ export default function ContributeClient({ schemas }: ContributeClientProps) {
     setErrors([]);
     setYamlString("");
     setIsValid(false);
+    setCurrentStep(0);
   }, []);
 
   const handleFieldChange = useCallback((path: string, value: unknown) => {
@@ -102,37 +101,21 @@ export default function ContributeClient({ schemas }: ContributeClientProps) {
       </div>
 
       {selectedType && (
-        <div className="flex gap-8">
-          {/* Left panel: Form (~60%) */}
-          <div className="w-3/5 min-w-0 flex flex-col gap-6">
-            <FormEngine
-              schema={schemas[selectedType]}
-              componentType={selectedType}
-              formData={formData}
-              onChange={handleFieldChange}
-              onBatchChange={handleBatchChange}
-            />
-
-            {/* Board canvas inline for motherboard */}
-            {selectedType === "motherboard" && (
-              <BoardCanvasEditor
-                formData={formData}
-                onChange={handleDirectChange}
-              />
-            )}
-          </div>
-
-          {/* Right panel: YAML preview + validation (~40%) */}
-          <div className="w-2/5 min-w-0 flex flex-col gap-4 sticky top-8 self-start">
-            <ValidationPanelContribute errors={errors} isValid={isValid} />
-            <YamlPreviewPanel yamlString={yamlString} isValid={isValid} />
-            <DownloadButton
-              yamlString={yamlString}
-              filename={filename}
-              disabled={!isValid}
-            />
-          </div>
-        </div>
+        <WizardShell
+          steps={WIZARD_STEPS[selectedType]}
+          currentStep={currentStep}
+          onStepChange={setCurrentStep}
+          schema={schemas[selectedType]}
+          componentType={selectedType}
+          formData={formData}
+          errors={errors}
+          yamlString={yamlString}
+          isValid={isValid}
+          filename={filename}
+          onChange={handleFieldChange}
+          onBatchChange={handleBatchChange}
+          onDirectChange={handleDirectChange}
+        />
       )}
     </div>
   );

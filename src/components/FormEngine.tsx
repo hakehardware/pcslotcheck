@@ -14,6 +14,7 @@ interface FormEngineProps {
   formData: Record<string, unknown>;
   onChange: (path: string, value: unknown) => void;
   onBatchChange: (updates: Array<{ path: string; value: unknown }>) => void;
+  fieldFilter?: Set<string>;
 }
 
 interface SchemaProperty {
@@ -823,6 +824,7 @@ export default function FormEngine({
   formData,
   onChange,
   onBatchChange,
+  fieldFilter,
 }: FormEngineProps) {
   const jsonSchema = schema as JsonSchema;
   const properties = jsonSchema.properties ?? {};
@@ -876,6 +878,7 @@ export default function FormEngine({
   const fieldEntries = Object.entries(properties).filter(([key]) => {
     // Always hide type for non-motherboard
     if (key === "type" && componentType !== "motherboard") return false;
+    if (fieldFilter && !fieldFilter.has(key)) return false;
     return true;
   });
 

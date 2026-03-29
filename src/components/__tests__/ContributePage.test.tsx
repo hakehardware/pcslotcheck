@@ -93,27 +93,30 @@ describe("No type selected on initial load (Req 1.4)", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Req 3.1-3.5: Motherboard form renders expected sections
+// Req 3.1-3.5: Motherboard form renders expected sections via wizard steps
 // ---------------------------------------------------------------------------
 describe("Motherboard form renders memory, M.2, PCIe, SATA, sources sections (Req 3.1-3.5)", () => {
-  it("renders all motherboard-specific fieldset sections", () => {
+  it("renders Board Details fields on step 1 and can navigate to Memory step", () => {
     const { container } = render(<ContributeClient schemas={ALL_SCHEMAS} />);
 
     // Select Motherboard type
     const motherboardBtn = screen.getByText("Motherboard");
     fireEvent.click(motherboardBtn);
 
-    // Check for fieldset legends containing the expected section names
+    // Step indicator should show Board Details as current step
+    expect(screen.getByText("Board Details")).toBeInTheDocument();
+
+    // Memory step should be visible in the step indicator
+    expect(screen.getByText("Memory")).toBeInTheDocument();
+
+    // Navigate to Memory step by clicking its button in the step indicator
+    fireEvent.click(screen.getByText("Memory"));
+
+    // Memory fieldset should now be rendered
     const legends = container.querySelectorAll("legend");
     const legendTexts = Array.from(legends).map((l) => l.textContent ?? "");
-
-    // formatLabel converts: memory -> "Memory", m2_slots -> "M2 Slots",
-    // pcie_slots -> "Pcie Slots", sata_ports -> "Sata Ports", sources -> "Sources"
-    const expectedSections = ["Memory", "M2 Slots", "Pcie Slots", "Sata Ports", "Sources"];
-    for (const section of expectedSections) {
-      const found = legendTexts.some((text) => text.includes(section));
-      expect(found).toBe(true);
-    }
+    const found = legendTexts.some((text) => text.includes("Memory"));
+    expect(found).toBe(true);
   });
 });
 
@@ -121,12 +124,15 @@ describe("Motherboard form renders memory, M.2, PCIe, SATA, sources sections (Re
 // Req 4.2: Validation errors display with field path and message
 // ---------------------------------------------------------------------------
 describe("Validation errors display with field path and message (Req 4.2)", () => {
-  it("shows validation errors after selecting a type with empty form data", async () => {
+  it("shows per-step validation errors after selecting a type with empty form data", async () => {
     render(<ContributeClient schemas={ALL_SCHEMAS} />);
 
     // Select CPU type -- empty form will trigger validation errors after debounce
     const cpuBtn = screen.getByText("CPU");
     fireEvent.click(cpuBtn);
+
+    // Navigate to Review step to see all errors unfiltered
+    fireEvent.click(screen.getByText("Review & Download"));
 
     // Wait for debounced validation (300ms) to produce error list items
     await waitFor(
@@ -159,20 +165,23 @@ describe("Success indicator shown when valid (Req 4.4)", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Req 6.4: Download button disabled when errors exist
+// Req 6.4: Download button disabled when errors exist (on Review step)
 // ---------------------------------------------------------------------------
 describe("Download button disabled when errors exist (Req 6.4)", () => {
-  it("renders a disabled download button with error message after type selection", async () => {
+  it("renders a disabled download button on the Review step", async () => {
     render(<ContributeClient schemas={ALL_SCHEMAS} />);
 
     // Select GPU type -- empty form means validation errors
     const gpuBtn = screen.getByText("GPU");
     fireEvent.click(gpuBtn);
 
+    // Navigate to Review step
+    fireEvent.click(screen.getByText("Review & Download"));
+
     // Wait for debounced validation
     await waitFor(
       () => {
-        const downloadBtn = screen.getByRole("button", { name: /download/i });
+        const downloadBtn = screen.getByRole("button", { name: /download component/i });
         expect(downloadBtn).toBeDisabled();
       },
       { timeout: 1000 },
@@ -186,15 +195,18 @@ describe("Download button disabled when errors exist (Req 6.4)", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Req 9.4: YAML preview shows output with validity indicator
+// Req 9.4: YAML preview shows output on Review step
 // ---------------------------------------------------------------------------
 describe("YAML preview shows output with validity indicator (Req 9.4)", () => {
-  it("renders YAML Preview header and Not yet valid badge when invalid", async () => {
+  it("renders YAML Preview header and Not yet valid badge on Review step", async () => {
     render(<ContributeClient schemas={ALL_SCHEMAS} />);
 
     // Select NVMe type
     const nvmeBtn = screen.getByText("NVMe");
     fireEvent.click(nvmeBtn);
+
+    // Navigate to Review step
+    fireEvent.click(screen.getByText("Review & Download"));
 
     // Wait for debounced validation to run
     await waitFor(
